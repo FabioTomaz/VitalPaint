@@ -1,4 +1,4 @@
-package com.icm.projeto.vitailpaint;
+package com.icm.projeto.vitalpaint;
 
 /**
  * Created by Bruno Silva on 11/10/2017.
@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class UserDBHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 1;
 
     static final String DATABASE_NAME = "vitalPaintUsers.db";
 
@@ -21,14 +21,10 @@ public class UserDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        // Create a table to hold locations.  A location consists of the string supplied in the
-        // location setting, the city name, and the latitude and longitude
-        final String SQL_CREATE_LOCATION_TABLE = "CREATE TABLE " + LocationEntry.TABLE_NAME + " (" +
-                LocationEntry._ID + " INTEGER PRIMARY KEY," +
-                LocationEntry.COLUMN_LOCATION_SETTING + " TEXT UNIQUE NOT NULL, " +
-                LocationEntry.COLUMN_CITY_NAME + " TEXT NOT NULL, " +
-                LocationEntry.COLUMN_COORD_LAT + " REAL NOT NULL, " +
-                LocationEntry.COLUMN_COORD_LONG + " REAL NOT NULL " +
+        //criar tabela
+        final String SQL_CREATE_USER_TABLE = "CREATE TABLE " + UserContract.UserEntry.TABLE_NAME + " (" +
+                UserContract.UserEntry.COLUMN_USER_NAME + " VARCHAR(30) PRIMARY KEY," +
+                UserContract.UserEntry.COLUMN_PASSWORD + " VARCHAR(30) UNIQUE NOT NULL, " +
                 " );";
 
         final String SQL_CREATE_WEATHER_TABLE = "CREATE TABLE " + WeatherEntry.TABLE_NAME + " (" +

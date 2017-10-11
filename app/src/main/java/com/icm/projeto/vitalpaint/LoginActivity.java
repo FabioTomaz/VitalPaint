@@ -1,4 +1,4 @@
-package com.icm.projeto.vitailpaint;
+package com.icm.projeto.vitalpaint;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

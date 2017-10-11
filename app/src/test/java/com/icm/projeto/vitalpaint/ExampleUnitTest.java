@@ -1,4 +1,4 @@
-package com.icm.projeto.vitailpaint;
+package com.icm.projeto.vitalpaint;
 
 import org.junit.Test;
 

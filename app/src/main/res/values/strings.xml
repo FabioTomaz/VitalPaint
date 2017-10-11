@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">VitailPaint</string>
+    <string name="app_name">VitalPaint</string>
 
     <!-- Strings related to login -->
     <string name="prompt_userName">Nome de Utilizador</string>
