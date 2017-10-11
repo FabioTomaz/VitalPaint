@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VitailPaint</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Log In</string>
+    <string name="error_field_required">This field is requeired</string>
+    <string name="error_incorrect_password">Incorrect password</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_invalid_userName">Invalid User Name</string>
+    <string name="prompt_password">Password</string>
+    <string name="prompt_userName">User Name</string>
+</resources>
