@@ -14,6 +14,6 @@
         completions."
     </string>
     <string name="error_invalid_email"></string>
-    <item name="visible" type="id"/>
-    <item name="masked" type="id"/>
+    <item name="visible" type="id" />
+    <item name="masked" type="id" />
 </resources>
