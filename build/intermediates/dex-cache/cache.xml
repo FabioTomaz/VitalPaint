@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\8a3bf2e561b0232610a015f64d0e3e50ca7bd87c\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="8bc45ce1f63d1a391fd38b32a201be5a42f9c95d">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_9b2ec6086cbed7eb59a7a2298eeefc1348774e53.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\b6da2365c194477467c636196bc604e3d9ab2e56\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="7b4dc2d9e39fb8ec5ddca9b3b3cb7c627690f3a6">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_191f34a5df0f16fa4b30070240d00122dfc1ba7f.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\c7381f540601e39508de69fa0f8113c1f666ad87\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="cad6f251cba07624f49b0c5b6287731a3c9957b8">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_111233290497227d5fcdd2ccc5fd7a9f09454f30.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\cbdec9cf4a5bc4bc415b5486c1e06e81661b0f57\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="53a420cd4f49274db6bd43475f8006ba67ef6bbd">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_51bf0482f8bf5d1f868e6ed7167fc24eccb33f32.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\fb0cdb1d9ab8a9f3fa6310adf6d5e1bbdceeb608\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="26384be22ddc74cfe197ebda9edbc7d1fd8bd537">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_e0d0c065cf9130cc9e2ca1a920f47cc49a06d275.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\1adb0d4de1465ebcf31cf608b274d99cb6996b47\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="36a6c288ed760d2d899126fa90761b84af10dd2d">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_31fa0bf736ddf3bf819bf4239d7e8c6ebcaab79d.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\f7c318ed36040e311012f0749b0e3ad8dd2f183b\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="fa0446a14ed5dd3725047d6399ffea771a564b30">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_fc3285ee15a8a5cb659333364a0c6b77886c3f77.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\b1f723f95da4cad71b5d3e71de29afddc520b1d4\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="d29714cc76b38157e3cbd034c66e1ec808eb4c19">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_f69a78f1057ea165e022ccda3c8bc5d32b0a9b64.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\25.2.0\support-annotations-25.2.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="4a5a82a027706397fff621b22fd6fa796e91d7c5">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\support-annotations-25.2.0_7744b5a2e781ac973221fa86ab3adc7e197cbea7.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\ea0a3cd6758b58d46816b19a441f26694ab4d236\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="0c6d948e6cb9ea6f535d175fb61ba2930719c0e9">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_4a322a84339750a6bc0ab8ee3ce590358e75744c.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\4bb3c451e5614558974330c657286d615e5276c0\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="8a372c4191f80489770a231f7be4820b204b886a">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_de85c6b9b9bb31d5102f66b16d5b35d0b4638c49.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\32cb24041583776a7543b9fd237544c33645e104\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="5e497d60f0cb6ce87c458ac5420a46d0fed49bd0">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_63c7eb1506d3af1011f5f76490d2005adf6d423f.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\ec083fab11c497345f7aebe478d53d57ba3ff7d1\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="01a590e11a94cb7f5c8b1243d4a2783eab4d0a34">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_3dc12d3a4bb7ac0a14f7f6f79ea9344351b225d6.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\4ca3b73ea23f63a70e7baf995a272234065a2ed6\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="41872d809cff2114169756aad6dcd593be2ecb59">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_16e78fe45bd6c44634a017296e5861f49fef1433.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\e22df2efd1c484b49a7c974b207b9a40f8cf1af7\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="8fe8a8f77d651982ce5e18f6187dc4daf914ac57">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_30f60be825ca6a67280aecfbb776adb907036647.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\c2f84d26ecfd3be57cf131793c7d8d74f7467495\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_a42a746a2c5f17a2d9030507769ee12650969c0d.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\c2ff219a05d997d3cf9bb640f8a9b854ead540fa\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="67eb33110dbacb46a48175b08ae0c96761d2c17d">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_7e6e55fa61c4f88cfd682272d0190d01b8fa5a91.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\fe11bf7f30e507ee21a2222e812d5418ed25b8af\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="57717bc4b81722a9c3e481fc6f150a950afd550c">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_a742bd9412109331e60b56a2b51714ca3608e6eb.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\db3068fdef6b09924e382a0cbbbc1f5f4314a23d\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="ee394a892dd21c03a528139c1e8d4e0e1264ac84">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_bdadb3de63a4e7f7442fa7e6ffad72a38fd59b1f.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\young\.android\build-cache\12f8d488ab34a826552477f43228dcdd40e873ba\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="e820b7be8c035dd522da4bc822e8a76c8e27921a">
+        <dex dex="C:\Users\young\AndroidStudioProjects\VitalPaint\vitalpaint\app\build\intermediates\pre-dexed\debug\classes_f659b2a015232d1ed186e877de909c6b8943ca84.jar" />
+    </item>
+
+</items>
