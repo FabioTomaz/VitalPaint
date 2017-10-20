@@ -24,4 +24,10 @@
     <string name="text_im_hit">Im Hit!</string>
     <string name="text_log">Show Log</string>
     <string name="text_leave_game">Leave Game</string>
+    <string name="title_activity_play">PlayActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
 </resources>
