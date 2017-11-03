@@ -4,7 +4,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "26.0.2"
     defaultConfig {
-        applicationId "com.icm.projeto.vitailpaint"
+        applicationId "com.icm.projeto.vitalpaint"
         minSdkVersion 17
         targetSdkVersion 25
         versionCode 1
@@ -37,5 +37,8 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:11.2.0'
     compile 'com.google.android.gms:play-services-location:11.2.0'
     compile 'com.google.android.gms:play-services-places:11.2.0'
+    compile 'com.google.firebase:firebase-auth:11.2.0'
     testCompile 'junit:junit:4.12'
 }
+
+apply plugin: 'com.google.gms.google-services'

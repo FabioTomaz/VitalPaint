@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "142167992013",
+    "firebase_url": "https://vitalpaint-6d10b.firebaseio.com",
+    "project_id": "vitalpaint-6d10b",
+    "storage_bucket": "vitalpaint-6d10b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:142167992013:android:a1ea9c331ddb8972",
+        "android_client_info": {
+          "package_name": "com.icm.projeto.vitalpaint"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "142167992013-dttk1abh0iotaplk993ca719vg6gbtq5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.icm.projeto.vitalpaint",
+            "certificate_hash": "f81d6f4a7f58e1136b66d5eda5c39bfca6fdb946"
+          }
+        },
+        {
+          "client_id": "142167992013-s1mhm64962nbgpgnc742iq207dnirv6s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfl7B7ZfevRMilqTrUQ9xDO-jXD9yyO7w"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "142167992013-s1mhm64962nbgpgnc742iq207dnirv6s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
