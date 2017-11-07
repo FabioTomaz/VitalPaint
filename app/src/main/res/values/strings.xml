@@ -58,10 +58,7 @@
     <string name="btn_sign_out">Sign Out</string>
     <string name="lbl_forgot_password">Forgot password?</string>
     <string name="forgot_password_msg">We just need your registered Email Id to sent you password reset instructions.</string>
-    <string name="btn_join">Join Lobby</string>
-    <string name="btn_create">Create Lobby</string>
-    <string name="btn_profile">My Profile</string>
-    <string name="btn_account_settings">Account Settings</string>
+    <string name="vitalpaint_logo">VitalPaint Logo</string>
 
 
 </resources>
