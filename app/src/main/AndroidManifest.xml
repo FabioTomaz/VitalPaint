@@ -36,10 +36,11 @@
 
         <!-- Activities -->
         <activity
-            android:label="@string/app_name"
-            android:name=".LoginActivity">
+            android:name=".LoginActivity"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -48,17 +49,13 @@
             android:label="@string/app_name" />
         <activity
             android:name=".PlayActivity"
-            android:label="@string/app_name"
-            />
+            android:label="@string/app_name" />
         <activity
-            android:label="@string/app_name"
-            android:name=".SignupActivity" />
+            android:name=".SignupActivity"
+            android:label="@string/app_name" />
         <activity
-            android:label="@string/app_name"
-            android:name=".ResetPasswordActivity" />
-        <activity
-            android:label="@string/app_name"
-            android:name=".AccountActivity"/>
+            android:name=".ResetPasswordActivity"
+            android:label="@string/app_name" />
     </application>
 
 </manifest>

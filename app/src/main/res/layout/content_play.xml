@@ -8,4 +8,9 @@
     tools:context="com.icm.projeto.vitalpaint.PlayActivity"
     tools:showIn="@layout/app_bar_play">
 
+    <FrameLayout
+        android:id="@+id/content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </android.support.constraint.ConstraintLayout>

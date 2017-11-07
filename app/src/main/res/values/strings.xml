@@ -1,30 +1,14 @@
 <resources>
     <string name="app_name">VitalPaint</string>
 
-    <!-- Strings related to login -->
-    <string name="prompt_userName">Nome de Utilizador</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Entrar</string>
-    <string name="action_sign_in_short">Registar</string>
-    <string name="error_invalid_userName">O Nome de Utilizador é inválido</string>
-    <string name="error_invalid_password">Esta password è muito pequena</string>
-    <string name="error_incorrect_password">Password incorreta</string>
-    <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
-    <string name="error_invalid_email"></string>
     <item name="visible" type="id" />
     <item name="masked" type="id" />
-    <string name="title_activity_maps">Current Place Details</string>
-    <string name="default_info_title">Default Location</string>
-    <string name="default_info_snippet">No places found, because location permission is disabled.</string>
-    <string name="option_get_place">Get place</string>
+
+
     <string name="pick_place">Choose a place</string>
     <string name="text_im_hit">Im Hit!</string>
     <string name="text_log">Show Log</string>
     <string name="text_leave_game">Leave Game</string>
-    <string name="title_activity_play">PlayActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -59,6 +43,21 @@
     <string name="lbl_forgot_password">Forgot password?</string>
     <string name="forgot_password_msg">We just need your registered Email Id to sent you password reset instructions.</string>
     <string name="vitalpaint_logo">VitalPaint Logo</string>
+    <string name="btn_join">Juntar-me a partida</string>
+    <string name="btn_create">Criar Partida</string>
+    <string name="btn_profile">Perfil</string>
+    <string name="btn_account_settings">Defenições de conta</string>
+    <string name="create_game">Criar Jogo</string>
+    <string name="join_game">Juntar a jogo</string>
+    <string name="play">Jogar</string>
+    <string name="nav_profile">Perfil</string>
+    <string name="nav_help">Ajuda</string>
+    <string name="nav_logout">Terminar Sessão</string>
+    <string name="nav_account_settings">Definições de Conta</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="account_settings">Defenições de Conta</string>
 
 
 </resources>
