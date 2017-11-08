@@ -25,6 +25,10 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.icm.projeto.vitalpaint.Data.GameDataManager;
 
 import java.util.ArrayList;
@@ -33,10 +37,12 @@ import java.util.List;
 public class GameMapActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private GoogleMap mMap;
 
+    private String gameName;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     LocationRequest mLocationRequest;
     private GameDataManager dbManager;
+    private DatabaseReference blueTeam = FirebaseDatabase.getInstance().getReference("Game1").child("Equipa Azul");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,7 +177,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
 
-        dbManager.getMyTeamPlayersLocations();
+        //dbManager.getMyTeamPlayersLocations();
 
     }
 
@@ -247,6 +253,32 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         }
     }
 
+    blueTeam.addValueEventListener(new ValueEventListener() {
+        double lat;
+        double longt;
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            // Get Post object and use the values to update the UI
+            List<Double>  cords = new ArrayList<>();
+            for (String name : blueTeamPlayers){
+                lat = dataSnapshot.child(name).child("lat").getValue(Double.class);
+                longt = dataSnapshot.child(name).child("long").getValue(Double.class);
+                cords.add(lat);
+                cords.add(longt);
+                teamCoords.put(name, cords);
 
+            }
+            //Double post = dataSnapshot.getValue(Double.class);
+            //Log.i("VERBOSE", dataSnapshot.child("Silva").child("lat").getValue(String.class));
+
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+
+    });
 
 }
