@@ -29,7 +29,7 @@
     <string name="hint_password">Password</string>
     <string name="hint_name">Fullname</string>
     <string name="btn_login">LOGIN</string>
-    <string name="btn_link_to_register">Not a member? Get registered in Firebase now!</string>
+    <string name="btn_link_to_register">Not a member? Get registered in VitalPaint now!</string>
     <string name="btn_link_to_login">Already registered. Login Me!</string>
     <string name="title_activity_reset_password">ResetPasswordActivity</string>
     <string name="btn_forgot_password">Forgot your password?</string>
@@ -58,6 +58,10 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="account_settings">Defenições de Conta</string>
+
+    <string name="action_sign_in_short">Sign In</string>
+    <string name="game_name">Nome do Jogo</string>
+    <string name="btn_create_game">Criar Jogo!</string>
 
 
 </resources>

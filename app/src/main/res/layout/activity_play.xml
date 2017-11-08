@@ -22,6 +22,6 @@
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_play"
         app:menu="@menu/activity_play_drawer"
-        app:itemTextColor="@color/colorAccent"/>
+        app:itemTextColor="@color/colorPrimary"/>
 
 </android.support.v4.widget.DrawerLayout>
