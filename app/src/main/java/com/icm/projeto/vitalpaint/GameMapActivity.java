@@ -3,11 +3,10 @@ package com.icm.projeto.vitalpaint;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -26,12 +25,18 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.icm.projeto.vitalpaint.Data.GameDataManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameMapActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private GoogleMap mMap;
+
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     LocationRequest mLocationRequest;
+    private GameDataManager dbManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +50,19 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        List<String> blueTeam = new ArrayList<>();
+        blueTeam.add("Bruno");
+        blueTeam.add("Pires");
+        blueTeam.add("Silva");
+
+        List<String> redTeam = new ArrayList<>();
+        redTeam.add("Fabio");
+        redTeam.add("Miguel");
+        redTeam.add("Santos");
+
+        dbManager = new GameDataManager("Game1", blueTeam, redTeam);
+
     }
 
 
@@ -130,14 +148,15 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         //Place current location marker
         Log.v("TAG_location", "IN ON LOCATION CHANGE, bearing=" + location.getBearing());
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        dbManager.updatePlayerLocation("Equipa Azul", "Bruno", location.getLatitude(), location.getLongitude());
         Marker m =
-        mMap.addMarker(new MarkerOptions()
-                .position(latLng)
-                .snippet(
-                        "Lat:" + latLng.latitude + "Lng:"
-                                + latLng.longitude)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_player_pointer))
-                .title("position"));
+                mMap.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .snippet(
+                                "Lat:" + latLng.latitude + "Lng:"
+                                        + latLng.longitude)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_player_pointer))
+                        .title("position"));
         //move map camera
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(latLng)
@@ -224,4 +243,5 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
             // You can add here other case statements according to your requirement.
         }
     }
+
 }

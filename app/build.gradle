@@ -39,6 +39,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-location:11.2.0'
     compile 'com.google.android.gms:play-services-places:11.2.0'
     compile 'com.google.firebase:firebase-auth:11.2.0'
+    compile 'com.google.firebase:firebase-database:11.2.0'
     testCompile 'junit:junit:4.12'
 }
 
