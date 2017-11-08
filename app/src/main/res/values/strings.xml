@@ -6,7 +6,7 @@
 
 
     <string name="pick_place">Choose a place</string>
-    <string name="text_im_hit">Im Hit!</string>
+    <string name="text_im_hit">Mataram-me!</string>
     <string name="text_log">Show Log</string>
     <string name="text_leave_game">Leave Game</string>
 
@@ -35,33 +35,34 @@
     <string name="btn_forgot_password">Forgot your password?</string>
     <string name="btn_reset_password">Reset Password</string>
     <string name="btn_back"><![CDATA[<< Back]]></string>
-    <string name="hint_new_email">New Email</string>
-    <string name="btn_change">Change</string>
+    <string name="hint_new_email">Novo Email</string>
+    <string name="btn_change">Mudar</string>
     <string name="btn_send">Send</string>
     <string name="btn_remove">Remove</string>
-    <string name="btn_sign_out">Sign Out</string>
-    <string name="lbl_forgot_password">Forgot password?</string>
-    <string name="forgot_password_msg">We just need your registered Email Id to sent you password reset instructions.</string>
+    <string name="btn_sign_out">Terminar Sessão</string>
+    <string name="lbl_forgot_password">Esqueceu-se da Password?</string>
+    <string name="forgot_password_msg">Precisamos do seu email de registo para que possamos enviar-te as intruções de reset de password</string>
     <string name="vitalpaint_logo">VitalPaint Logo</string>
-    <string name="btn_join">Juntar-me a partida</string>
-    <string name="btn_create">Criar Partida</string>
+    <string name="btn_join">Juntar a Lobby</string>
+    <string name="btn_create">Criar Lobby</string>
     <string name="btn_profile">Perfil</string>
-    <string name="btn_account_settings">Defenições de conta</string>
-    <string name="create_game">Criar Jogo</string>
-    <string name="join_game">Juntar a jogo</string>
+    <string name="btn_account_settings">Definições de conta</string>
+    <string name="create_game">Criar Lobby</string>
+    <string name="join_game">Juntar a Lobby</string>
     <string name="play">Jogar</string>
     <string name="nav_profile">Perfil</string>
     <string name="nav_help">Ajuda</string>
     <string name="nav_logout">Terminar Sessão</string>
     <string name="nav_account_settings">Definições de Conta</string>
+    <string name="team_number">Número de jogadores</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="account_settings">Defenições de Conta</string>
+    <string name="account_settings">Definições de Conta</string>
 
     <string name="action_sign_in_short">Sign In</string>
     <string name="game_name">Nome do Jogo</string>
-    <string name="btn_create_game">Criar Jogo!</string>
+    <string name="btn_create_game">Criar Lobby!</string>
 
 
 </resources>

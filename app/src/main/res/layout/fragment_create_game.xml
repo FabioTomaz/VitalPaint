@@ -23,7 +23,7 @@ android:fitsSystemWindows="true">
         android:maxLines="1"/>
 
     <Spinner
-        android:id="@+id/spinner1"
+        android:id="@+id/game_mode_spinner"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="#d11f08"
@@ -40,6 +40,24 @@ android:fitsSystemWindows="true">
         android:text="@string/btn_create_game"
         android:textColor="@android:color/white"
         android:textStyle="bold" />
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/text_view_id"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/team_number" />
+        <Spinner
+            android:id="@+id/nLementsSpinner"
+            android:layout_width="fill_parent"
+            android:layout_height="80dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:entries="@array/number_players"
+            android:padding="5dp" />
+    </LinearLayout>
+
 </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

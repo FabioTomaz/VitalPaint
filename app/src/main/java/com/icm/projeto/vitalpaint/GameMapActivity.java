@@ -9,6 +9,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -29,6 +30,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.icm.projeto.vitalpaint.Data.GameDataManager;
 
 import java.util.ArrayList;
@@ -37,18 +39,23 @@ import java.util.List;
 public class GameMapActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private GoogleMap mMap;
 
+
+    private List<String> blueTeamPlayers;
+    private List<String> redTeamPlayers;
+    private String myName = "Bruno";
     private String gameName;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     LocationRequest mLocationRequest;
     private GameDataManager dbManager;
-    private DatabaseReference blueTeam = FirebaseDatabase.getInstance().getReference("Game1").child("Equipa Azul");
+    private DatabaseReference myTeam = FirebaseDatabase.getInstance().getReference("Game1").child("Equipa Azul");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_map);
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);//nao bloquear o ecra
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
         }
@@ -57,17 +64,17 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        List<String> blueTeam = new ArrayList<>();
-        blueTeam.add("Bruno");
-        blueTeam.add("Pires");
-        blueTeam.add("Silva");
+        this.blueTeamPlayers = new ArrayList<>();
+        blueTeamPlayers.add("Bruno");
+        blueTeamPlayers.add("Pires");
+        blueTeamPlayers.add("Silva");
 
-        List<String> redTeam = new ArrayList<>();
-        redTeam.add("Fabio");
-        redTeam.add("Miguel");
-        redTeam.add("Santos");
+        redTeamPlayers = new ArrayList<>();
+        redTeamPlayers.add("Fabio");
+        redTeamPlayers.add("Miguel");
+        redTeamPlayers.add("Santos");
 
-        dbManager = new GameDataManager("Game1", blueTeam, redTeam);
+        dbManager = new GameDataManager("Game1", blueTeamPlayers, redTeamPlayers);
 
     }
 
@@ -176,6 +183,33 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         if (mMap != null) {
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
+        //Ler valores da minha equipa
+        myTeam.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                double lat;
+                double longt;
+                List<Double>  cords = new ArrayList<>();
+                for (String name : blueTeamPlayers){
+                    if (!name.equals(myName)) {
+                        lat = dataSnapshot.child(name).child("lat").getValue(Double.class);
+                        longt = dataSnapshot.child(name).child("long").getValue(Double.class);
+                        //Log.i("", "lat: " + lat);
+                        //Log.i("", "long: "+ longt);
+                        LatLng coord = new LatLng(lat, longt);
+                        //adicionar marcador com as novas coordenadas
+                        mMap.addMarker(new MarkerOptions()
+                                .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_player_pointer))
+                                .title(name));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         //dbManager.getMyTeamPlayersLocations();
 
@@ -253,32 +287,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         }
     }
 
-    blueTeam.addValueEventListener(new ValueEventListener() {
-        double lat;
-        double longt;
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            // Get Post object and use the values to update the UI
-            List<Double>  cords = new ArrayList<>();
-            for (String name : blueTeamPlayers){
-                lat = dataSnapshot.child(name).child("lat").getValue(Double.class);
-                longt = dataSnapshot.child(name).child("long").getValue(Double.class);
-                cords.add(lat);
-                cords.add(longt);
-                teamCoords.put(name, cords);
+    
 
-            }
-            //Double post = dataSnapshot.getValue(Double.class);
-            //Log.i("VERBOSE", dataSnapshot.child("Silva").child("lat").getValue(String.class));
-
-
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-
-    });
 
 }

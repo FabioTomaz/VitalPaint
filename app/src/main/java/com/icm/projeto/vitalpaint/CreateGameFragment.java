@@ -1,13 +1,16 @@
 package com.icm.projeto.vitalpaint;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
 
 
 /**
@@ -15,12 +18,17 @@ import android.view.ViewGroup;
  * Activities that contain this fragment must implement the
  * {@link CreateGameFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link CreateGameFragment#newInstance} factory method to
+ * Use the {//@link CreateGameFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class CreateGameFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
+    private Button createBtn;
+    private View inflatedView;
+    private EditText gameName;
+    private Spinner nTeamElements;
+    private Spinner gameMode;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,7 +40,27 @@ public class CreateGameFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         getActivity().setTitle("Criar Jogo");
-        return inflater.inflate(R.layout.fragment_create_game, container, false);
+        this.inflatedView = inflater.inflate(R.layout.fragment_create_game, container, false);
+        createBtn = (Button) inflatedView.findViewById(R.id.create_game);
+        gameName = (EditText) inflatedView.findViewById(R.id.game_name);
+        gameMode =(Spinner) inflatedView.findViewById(R.id.game_mode_spinner);
+        nTeamElements =(Spinner) inflatedView.findViewById(R.id.nLementsSpinner);
+
+        //listener para o click do botao de criar lobby. Iniciar atividade de Lobby
+        createBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if ( gameMode.getSelectedItem().toString() == "Teams vs Team") {
+                    Intent intent = new Intent(getActivity(), LobbyTeamActivity.class);
+                    intent.putExtra("gameName", gameName.getText().toString());
+                    intent.putExtra("gameMode", gameMode.getSelectedItem().toString());
+                    intent.putExtra("nElements", Integer.parseInt(nTeamElements.getSelectedItem().toString()));
+                    startActivity(intent);
+                }
+            }
+        });
+        return inflatedView;
+
 
     }
 
