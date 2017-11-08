@@ -1,5 +1,7 @@
 package com.icm.projeto.vitalpaint.Data;
 
+import android.util.Log;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -53,8 +55,8 @@ public class GameDataManager {
         FirebaseDatabase.getInstance().getReference(gameName).child(team).child(player).child("long").setValue(longt);
     }
 
-    public List<List<Double>> getMyTeamPlayersLocations(){
-        List<List<Double>> teamCoords = new ArrayList<>();
+    public Map<String, List<Double>> getMyTeamPlayersLocations(){
+        final Map<String, List<Double>> teamCoords = new HashMap<>();
 
         FirebaseDatabase.getInstance().getReference(gameName).child("Equipa Azul").addValueEventListener(new ValueEventListener() {
             double lat;
@@ -62,19 +64,28 @@ public class GameDataManager {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
+                List<Double>  cords = new ArrayList<>();
                 for (String name : blueTeamPlayers){
                     lat = dataSnapshot.child(name).child("lat").getValue(Double.class);
                     longt = dataSnapshot.child(name).child("long").getValue(Double.class);
+                    cords.add(lat);
+                    cords.add(longt);
+                    teamCoords.put(name, cords);
+
                 }
                 //Double post = dataSnapshot.getValue(Double.class);
                 //Log.i("VERBOSE", dataSnapshot.child("Silva").child("lat").getValue(String.class));
+
+
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
+
         });
+        Log.i("" , teamCoords.get("Bruno").get(0).toString());
         return teamCoords;
     }
 
