@@ -64,7 +64,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        this.blueTeamPlayers = new ArrayList<>();
+        /*this.blueTeamPlayers = new ArrayList<>();
         blueTeamPlayers.add("Bruno");
         blueTeamPlayers.add("Pires");
         blueTeamPlayers.add("Silva");
@@ -75,7 +75,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         redTeamPlayers.add("Santos");
 
         dbManager = new GameDataManager("Game1", blueTeamPlayers, redTeamPlayers);
-
+        */
     }
 
 
