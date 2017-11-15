@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_item1"
+        android:icon="@drawable/ic_profile"
+        android:tint="@color/textColorPrimary"
+        android:title="@string/my_profile"/>
+    <item
+        android:id="@+id/action_item2"
+        android:icon="@drawable/ic_account_multiple"
+        android:title="@string/friends"/>
+    <item
+        android:id="@+id/action_item3"
+        android:icon="@drawable/ic_format_list_bulleted"
+        android:title="@string/games"/>
+</menu>

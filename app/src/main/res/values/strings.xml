@@ -63,6 +63,10 @@
     <string name="action_sign_in_short">Sign In</string>
     <string name="game_name">Nome do Jogo</string>
     <string name="btn_create_game">Criar Lobby!</string>
+    <string name="games">Jogos</string>
+    <string name="friends">Amigos</string>
+    <string name="my_profile">Meu Perfil</string>
+    <string name="nav_spectate">Assistir a Jogo</string>
 
 
 </resources>

@@ -25,9 +25,7 @@ public class UserDBHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_USER_TABLE = "CREATE TABLE " + UserContract.UserEntry.TABLE_NAME + " (" +
                 UserContract.UserEntry.COLUMN_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT" +
                 UserContract.UserEntry.COLUMN_USER_NAME + " VARCHAR(30) UNIQUE NOT NULL," +
-                UserContract.UserEntry.COLUMN_PASSWORD + " VARCHAR(30)  NOT NULL, " +
-                UserContract.UserEntry.COLUMN_EMAIL + " VARCHAR(50)  NOT NULL, " +
-                UserContract.UserEntry.COLUMN_N_HITS + " INTEGER DEFAULT 0, " +
+                UserContract.UserEntry.COLUMN_N_DEATHS + " INTEGER DEFAULT 0, " +
                 UserContract.UserEntry.COLUMN_N_WINS + " INTEGER  DEFAULT 0, " +
                 UserContract.UserEntry.COLUMN_N_MATCHES + " INTEGER  DEFAULT 0, " +
                 UserContract.UserEntry.COLUMN_KILL_DEATH_RATIO + " DECIMAL(10, 2)  DEFAULT 0.0 " +

@@ -15,6 +15,10 @@
             </menu>
         </item>
         <item
+            android:id="@+id/nav_spectate"
+            android:icon="@drawable/ic_eye_outline"
+            android:title="@string/nav_spectate" />
+        <item
             android:id="@+id/nav_profile"
             android:icon="@drawable/ic_menu_profile"
             android:title="@string/nav_profile" />

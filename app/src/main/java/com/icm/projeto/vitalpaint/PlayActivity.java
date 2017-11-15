@@ -96,7 +96,9 @@ public class PlayActivity extends AppCompatActivity
         } else if (id == R.id.nav_join_game) {
             startActivity(new Intent(PlayActivity.this, GameMapActivity.class));
         } else if (id == R.id.nav_profile) {
-
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame,  new ProfileMainFragment());
+            ft.commit();
         } else if (id == R.id.nav_help) {
 
         } else if (id == R.id.nav_account) {
