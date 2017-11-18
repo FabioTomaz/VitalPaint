@@ -55,6 +55,12 @@
     <string name="nav_logout">Terminar Sessão</string>
     <string name="nav_account_settings">Definições de Conta</string>
     <string name="team_number">Número de jogadores</string>
+    <string name="blue_team_join">Juntar á equipa azul</string>
+    <string name="blue_team_name">Equipa Azul</string>
+    <string name="red_team_name">Equipa Vermelha</string>
+    <string name="red_team_join">Juntar á equipa vermelha</string>
+    <string name="nome">Nome</string>
+    <string name="username">Defina um nome de usuário</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,16 +46,18 @@ public class CreateGameFragment extends Fragment {
         gameName = (EditText) inflatedView.findViewById(R.id.game_name);
         gameMode =(Spinner) inflatedView.findViewById(R.id.game_mode_spinner);
         nTeamElements =(Spinner) inflatedView.findViewById(R.id.nLementsSpinner);
-
+        //Log.i("email:", UserData.EMAIL+"");
         //listener para o click do botao de criar lobby. Iniciar atividade de Lobby
         createBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if ( gameMode.getSelectedItem().toString() == "Teams vs Team") {
+                Log.i("",  nTeamElements.getSelectedItem().toString());
+                if ( gameMode.getSelectedItemPosition() == 1) {//selecionado modo Team vs Team
                     Intent intent = new Intent(getActivity(), LobbyTeamActivity.class);
                     intent.putExtra("gameName", gameName.getText().toString());
                     intent.putExtra("gameMode", gameMode.getSelectedItem().toString());
-                    intent.putExtra("nElements", Integer.parseInt(nTeamElements.getSelectedItem().toString()));
+                    intent.putExtra("nElements", nTeamElements.getSelectedItem().toString());
+                    intent.putExtra("isHost", true);//este utilizador criou o lobby
                     startActivity(intent);
                 }
             }

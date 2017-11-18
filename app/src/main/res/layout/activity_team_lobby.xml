@@ -6,32 +6,55 @@
     android:layout_height="match_parent"
     tools:context="com.icm.projeto.vitalpaint.LobbyTeamActivity">
 
+
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="150dp">
-
-    </RelativeLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:orientation="vertical">
 
-        <android.support.v7.widget.CardView
-            android:layout_width="170dp"
-            android:layout_height="match_parent">
+        <LinearLayout
+            android:id="@+id/team_names"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:weightSum="100"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin">
+            <TextView
+                android:layout_height="match_parent"
+                android:layout_width="170dp"
+                android:text="@string/red_team_name" />
+            <TextView
+                android:layout_height="match_parent"
+                android:layout_width="170dp"
+                android:text="@string/blue_team_name" />
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/teams"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:orientation="horizontal"
+            android:weightSum="100"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:layout_below="@id/team_names">
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/red_team"
+                android:layout_width="150dp"
+                android:layout_height="match_parent"
+                android:layout_weight="50"
                 android:layout_gravity="left"
                 android:orientation="horizontal"
                 android:padding="8dp">
+
 
                 <TextView
                     android:id="@+id/red_team_player1"
@@ -54,21 +77,17 @@
                     android:layout_height="wrap_content" />
 
 
-            </RelativeLayout>
-        </android.support.v7.widget.CardView>
+            </android.support.v7.widget.CardView>
 
 
-        <android.support.v7.widget.CardView
-            android:layout_width="170dp"
-            android:layout_height="wrap_content">
-
-            <RelativeLayout
+            <android.support.v7.widget.CardView
+                android:id="@+id/blue_team"
                 android:layout_width="150dp"
-                android:layout_height="300dp"
+                android:layout_height="match_parent"
+                android:layout_weight="50"
                 android:layout_gravity="right"
                 android:orientation="horizontal"
                 android:padding="8dp">
-
 
                 <TextView
                     android:id="@+id/blue_team_player1"
@@ -91,9 +110,36 @@
                     android:layout_height="wrap_content" />
 
 
-            </RelativeLayout>
-        </android.support.v7.widget.CardView>
+            </android.support.v7.widget.CardView>
 
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:orientation="horizontal"
+            android:weightSum="100"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:layout_below="@id/teams">
+            <Button
+                android:id="@+id/enter_red_team"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_alignLeft="@+id/red_team"
+                android:layout_alignRight="@+id/red_team"
+                android:gravity="left"
+                android:text="@string/red_team_join"/>
+            <Button
+                android:id="@+id/enter_blue_team"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/blue_team"
+                android:layout_alignRight="@+id/blue_team"
+                android:gravity="right"
+                android:text="@string/blue_team_join"/>
+        </LinearLayout>
+    </RelativeLayout>
 
-    </LinearLayout>
 </android.support.constraint.ConstraintLayout>
