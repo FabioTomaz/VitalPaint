@@ -62,6 +62,8 @@ public class CreateGameFragment extends Fragment {
                 }
             }
         });
+
+
         return inflatedView;
 
 

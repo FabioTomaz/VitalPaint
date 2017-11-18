@@ -15,7 +15,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.icm.projeto.vitalpaint.Data.UserData;
+import com.icm.projeto.vitalpaint.Data.UserDataManager;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -23,7 +23,7 @@ public class SignupActivity extends AppCompatActivity {
     private Button btnSignIn, btnSignUp, btnResetPassword;
     private ProgressBar progressBar;
     private FirebaseAuth auth;
-    private UserData userData;
+    private UserDataManager userData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +78,7 @@ public class SignupActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Password too short, enter minimum 6 characters!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if(UserData.userNameExists(userName)){
+                if(UserDataManager.userNameExists(userName)){
                     Toast.makeText(getApplicationContext(), "O username que escolheu já existe. Por favor tente outro.", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -102,9 +102,9 @@ public class SignupActivity extends AppCompatActivity {
                                     String email = inputEmail.getText().toString().trim();
                                     String nome = inputNome.getText().toString().trim();
                                     String userName = inputUsername.getText().toString().trim();
-                                    userData = new UserData(nome, userName, email);//nome, user e email serão acessiveis publicamente no projeto
+                                    userData = new UserDataManager(nome, userName, email);//nome, user e email serão acessiveis publicamente no projeto
                                     userData.uploadUserData();
-                                    startActivity(new Intent(SignupActivity.this, PlayActivity.class));
+                                    startActivity(new Intent(SignupActivity.this, LoginActivity.class));
                                     finish();
                                 }
                             }

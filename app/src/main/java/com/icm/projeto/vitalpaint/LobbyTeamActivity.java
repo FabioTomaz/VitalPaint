@@ -45,6 +45,10 @@ public class LobbyTeamActivity extends AppCompatActivity {
 
         blueTeamPlayers = new ArrayList<>();
         redTeamPlayers = new ArrayList<>();
+
+        if (isHost){
+
+        }
         dbManager = new GameDataManager(gameName);//create new game
 
         blueTeam = FirebaseDatabase.getInstance().getReference(gameName).child("Equipa Azul");
