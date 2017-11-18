@@ -4,6 +4,7 @@ package com.icm.projeto.vitalpaint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,14 +18,16 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.icm.projeto.vitalpaint.Data.UserData;
-import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 
@@ -98,7 +101,7 @@ public class ProfileFragment extends Fragment {
             ImageView imageProfile = (ImageView) getView().findViewById(R.id.profile_image);
             imageProfile.setImageBitmap(BitmapFactory.decodeStream(inputStream));
             selectedImage = data.getData();
-            uploadImage("profilepic");
+            uploadImage("profilePic");
         }else if(requestCode == PICK_PHOTO_FOR_HEADER && resultCode == Activity.RESULT_OK && data!= null && data.getData()!=null) {
             InputStream inputStream = null;
             try {
@@ -109,13 +112,13 @@ public class ProfileFragment extends Fragment {
             ImageView imageHeader = (ImageView) getView().findViewById(R.id.header_cover_image);
             imageHeader.setImageBitmap(BitmapFactory.decodeStream(inputStream));
             selectedImage = data.getData();
-            uploadImage("headerpic");
+            uploadImage("headerPic");
         }
     }
 
     public void uploadImage(String imageType) {
         //create reference to images folder and assing a name to the file that will be uploaded
-        imageRef = storageRef.child(UserData.USERNAME+"/"+imageType);
+        imageRef = storageRef.child("User Profile Photos/"+UserData.USERNAME+"/"+imageType+"/");
         //creating and showing progress dialog
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMax(100);
@@ -153,5 +156,30 @@ public class ProfileFragment extends Fragment {
                 //Picasso.with(UploadActivity.this).load(downloadUrl).into(imageView);
             }
         });
+    }
+
+    public static Bitmap downloadProfilePic(String username) throws IOException {
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        final File localFile = File.createTempFile("profile", "jpg");
+        final Bitmap[] image = {null};
+
+        storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                image[0] = ProfileFragment.convertToBitMap(localFile);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                //Drawable drawable = new ProfileFragment().getResources().getDrawable(R.drawable.imagem_perfil);
+                //image[0] = BitmapFactory.decodeResource(drawable);
+            }
+        });
+        UserData.profilePic = image[0];
+        return image[0];
+    }
+
+    public static Bitmap convertToBitMap(File file){
+        return BitmapFactory.decodeFile(file.getAbsolutePath());
     }
 }

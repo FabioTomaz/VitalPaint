@@ -1,5 +1,7 @@
 package com.icm.projeto.vitalpaint.Data;
 
+import android.graphics.Bitmap;
+
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
@@ -8,8 +10,7 @@ import java.util.List;
 /**
  * Created by Bruno Silva on 14/11/2017.
  */
-//excelente tutorial de firebase  database:
-//   https://www.learnhowtoprogram.com/android/data-persistence/firebase-firebase-structure-and-further-setup
+//Contém os dados do utilizador logado para acesso rápido dentro do projeto
 public class UserData {
     public static String NAME;
     public static String USERNAME;
@@ -17,6 +18,17 @@ public class UserData {
     public static int nMatchPlayed;
     public static int nVictories;
     public static List<String> locationsPlayed;
+
+    public static void setProfilePic(Bitmap profilePic) {
+        UserData.profilePic = profilePic;
+    }
+
+    public static void setHeaderPic(Bitmap headerPic) {
+        UserData.headerPic = headerPic;
+    }
+
+    public static Bitmap profilePic;
+    public static Bitmap headerPic;
     private DatabaseReference dbData;
 
     public UserData(String name, String userName, String email){

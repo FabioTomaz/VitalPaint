@@ -1,12 +1,18 @@
 package com.icm.projeto.vitalpaint.Data;
 
 
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.util.Log;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +32,11 @@ public class UserDataManager {
     List<String> locationsPlayed;
     private DatabaseReference dbData;
     private UserDataManager user;
+    private Bitmap profilePic;
+    private Bitmap headerPic;
+    private static final String PHOTOSFOLDER = "User Profile Photos";
+    private static final String PROFILEFOLDER = "profilePic";
+    private static final String HEADERFOLDER = "headerPic";
 
     public UserDataManager(String name, String userName, String email) {
         this.name = name;
@@ -34,6 +45,8 @@ public class UserDataManager {
         this.nMatchPlayed = 0;
         this.nVictories = 0;
         locationsPlayed = new ArrayList<>();
+        profilePic = null;
+        headerPic = null;
     }
 
     public UserDataManager(String name, String userName, String email, int nMatchPlayed, int nVictories) {
@@ -43,6 +56,8 @@ public class UserDataManager {
         this.nMatchPlayed = nMatchPlayed;
         this.nVictories = nVictories;
         locationsPlayed = new ArrayList<>();//pode ser-nos útil manter a ordem de inserção, mas não queremos elementos duplicados
+        profilePic = null;
+        headerPic = null;
     }
 
     public UserDataManager() {
@@ -135,10 +150,10 @@ public class UserDataManager {
         dbData.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                if (snapshot.hasChild(userName)) {
-                    bool[0] = true;
-                } else {
-                    bool[0] = false;
+                for (DataSnapshot data : snapshot.getChildren()) {//percore os users ate encontrar o user com username correto
+                    if (data.getKey().equals(userName)) {
+                        bool[0]=true;
+                    }
                 }
             }
 
@@ -150,6 +165,65 @@ public class UserDataManager {
 
         return bool[0];
     }
+    //atualizar na database o nome de um user. Se for o user logado, a classe UserData tmb será atualizada
+    public void updateName(final String username, final String name){
+        final DatabaseReference dbData = FirebaseDatabase.getInstance().getReference().child("Users");
+        dbData.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                UserDataManager userDatam = new UserDataManager();
+                for (DataSnapshot data : snapshot.getChildren()) {//percore os users ate encontrar o user com username correto
+                    if (data.getKey().equals(username)) {
+                        userDatam = data.getValue(com.icm.projeto.vitalpaint.Data.UserDataManager.class);//obter dados do user
+                        userDatam.setName(name);//atualizar o nome
+                        if(UserData.USERNAME.equals(username))
+                            UserData.setNAME(name); //atualizar os dados do user logado na classe UserData
+                        Map<String, Object> map = new HashMap<String, Object>();
+                        map.put(username, userDatam);
+                        dbData.updateChildren(map); //do nos Users, ele atualiza o no do username ja existente com os novos dados
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        Log.i("outer", user + "");
+    }
+    /*//atualizar na database o username de um user. Se for o user logado, a classe UserData tmb será atualizada
+    public boolean updateUserName(final String oldUsername, final String newUserName){
+        if (!userNameExists(newUserName)) {
+
+            final DatabaseReference dbData = FirebaseDatabase.getInstance().getReference().child("Users");
+            dbData.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    UserDataManager userDatam = new UserDataManager();
+                    for (DataSnapshot data : snapshot.getChildren()) {//percore os users ate encontrar o user com username correto
+                        if (data.getKey().equals(oldUsername)) {
+                            userDatam = data.getValue(com.icm.projeto.vitalpaint.Data.UserDataManager.class);//obter dados do user
+                            Map<String, Object> map = new HashMap<String, Object>();
+                            map.put(newUserName, userDatam);
+                            dbData.updateChildren(map);//cria um novo nó com o novo username novo e todos os dados do user.
+                            //remover o no do username antigo
+                            dbData.child(oldUsername).removeValue(); //dbData.child(oldUsername).setValue(null); //tmb funciona
+                            if(UserData.USERNAME.equals(oldUsername)){
+                                UserData.setUSERNAME(newUserName);
+                            }
+                        }
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {  }
+            });
+            //Log.i("", user + "");
+            return true;
+        }
+        else{
+            return false;
+        }
+    }*/
 
     public String getName() {
         return name;
@@ -190,4 +264,18 @@ public class UserDataManager {
     public void setnVictories(int nVictories) {
         this.nVictories = nVictories;
     }
+
+    public void uploadProfilePic(String username, Uri uri) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference().child("User Profile Photos/"+username+"profilePic/");
+        storageRef.putFile(uri);
+    }
+    public void uploadHeaderPic(String username, Uri uri) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference().child("User Profile Photos/"+username+"headerPic/");
+        storageRef.putFile(uri);
+    }
+
+
 }
+
