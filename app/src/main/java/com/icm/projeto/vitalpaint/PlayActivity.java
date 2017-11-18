@@ -66,11 +66,12 @@ public class PlayActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        Fragment fragment = new CreateGameFragment(); // <-------
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.content_frame, fragment);
-        ft.commit();
+        if (savedInstanceState == null) {
+            Fragment fragment = new CreateGameFragment(); // <-------
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame, fragment);
+            ft.commit();
+        }
     }
 
     @Override
@@ -88,7 +89,8 @@ public class PlayActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setCheckedItem(id);
         if (id == R.id.nav_create_game) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame,  new CreateGameFragment());
@@ -100,7 +102,7 @@ public class PlayActivity extends AppCompatActivity
             ft.replace(R.id.content_frame,  new ProfileMainFragment());
             ft.commit();
         } else if (id == R.id.nav_help) {
-
+            navigationView.getMenu().getItem(id).setChecked(true);
         } else if (id == R.id.nav_account) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame,  new AccountFragment());
