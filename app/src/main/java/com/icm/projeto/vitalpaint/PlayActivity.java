@@ -99,10 +99,16 @@ public class PlayActivity extends AppCompatActivity
             startActivity(new Intent(PlayActivity.this, GameMapActivity.class));
         } else if (id == R.id.nav_profile) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame,  new ProfileMainFragment());
+            ft.replace(R.id.content_frame,  new ProfileFragment());
             ft.commit();
-        } else if (id == R.id.nav_help) {
-            navigationView.getMenu().getItem(id).setChecked(true);
+        } else if (id == R.id.nav_friends) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame,  new FriendsFragment());
+            ft.commit();
+        } else if (id == R.id.nav_game_history) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame,  new GameHistoryFragment());
+            ft.commit();
         } else if (id == R.id.nav_account) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame,  new AccountFragment());

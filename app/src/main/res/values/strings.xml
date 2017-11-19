@@ -38,7 +38,6 @@
     <string name="join_game">Juntar a Lobby</string>
     <string name="play">Jogar</string>
     <string name="nav_profile">Perfil</string>
-    <string name="nav_help">Ajuda</string>
     <string name="nav_logout">Terminar Sessão</string>
     <string name="nav_account_settings">Definições de Conta</string>
     <string name="team_number">Número de jogadores</string>
@@ -50,14 +49,12 @@
     <string name="username">Defina um nome de usuário</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="action_sign_in_short">Sign In</string>
     <string name="game_name">Nome do Jogo</string>
     <string name="btn_create_game">Criar Lobby!</string>
     <string name="games">Jogos</string>
     <string name="friends">Amigos</string>
-    <string name="my_profile">Meu Perfil</string>
     <string name="nav_spectate">Assistir a Jogo</string>
 
 

@@ -8,7 +8,6 @@
     <string name="nav_account_settings">Account Settings</string>
     <string name="game_name">Game Name</string>
     <string name="btn_create_game">Create Lobby!</string>
-    <string name="nav_help">Help</string>
     <string name="nav_profile">Profile</string>
     <string name="play">Play</string>
     <string name="join_game">Join Lobby</string>

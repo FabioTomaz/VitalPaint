@@ -1,4 +1,3 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <item name="ic_menu_profile" type="drawable">@drawable/ic_profile</item>
-    <item name="ic_menu_help" type="drawable">@android:drawable/ic_menu_help</item>
 </resources>

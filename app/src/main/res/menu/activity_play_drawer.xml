@@ -23,13 +23,17 @@
             android:icon="@drawable/ic_menu_profile"
             android:title="@string/nav_profile" />
         <item
+            android:id="@+id/nav_friends"
+            android:icon="@drawable/ic_account_multiple"
+            android:title="@string/friends"/>
+        <item
+            android:id="@+id/nav_game_history"
+            android:icon="@drawable/ic_format_list_bulleted"
+            android:title="@string/games"/>
+        <item
             android:id="@+id/nav_account"
             android:icon="@drawable/ic_account_settings_variant"
             android:title="@string/nav_account_settings" />
-        <item
-            android:id="@+id/nav_help"
-            android:icon="@drawable/ic_menu_help"
-            android:title="@string/nav_help" />
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_leave_game"
