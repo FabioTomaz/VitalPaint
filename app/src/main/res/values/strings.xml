@@ -5,7 +5,6 @@
     <item name="masked" type="id" />
 
 
-    <string name="pick_place">Choose a place</string>
     <string name="text_im_hit">Mataram-me!</string>
     <string name="text_log">Show Log</string>
     <string name="text_leave_game">Leave Game</string>
@@ -13,40 +12,28 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
-
     <string name="email">Email</string>
     <string name="minimum_password">Password too short, enter minimum 6 characters!</string>
     <string name="auth_failed">Authentication failed, check your email and password or sign up</string>
     <string name="change_email">Change Email</string>
     <string name="change_password">Change Password</string>
     <string name="send_password_reset_email">Send Password reset email</string>
-    <string name="remove_user">Remove user</string>
     <string name="new_pass">New Password</string>
-    <string name="title_activity_profile">Firebase</string>
-    <string name="title_activity_login">Sign in</string>
     <string name="hint_email">Email</string>
     <string name="hint_password">Password</string>
-    <string name="hint_name">Fullname</string>
     <string name="btn_login">LOGIN</string>
     <string name="btn_link_to_register">Not a member? Get registered in VitalPaint now!</string>
     <string name="btn_link_to_login">Already registered. Login Me!</string>
-    <string name="title_activity_reset_password">ResetPasswordActivity</string>
     <string name="btn_forgot_password">Forgot your password?</string>
     <string name="btn_reset_password">Reset Password</string>
     <string name="btn_back"><![CDATA[<< Back]]></string>
     <string name="hint_new_email">Novo Email</string>
     <string name="btn_change">Mudar</string>
     <string name="btn_send">Send</string>
-    <string name="btn_remove">Remove</string>
     <string name="btn_sign_out">Terminar Sessão</string>
     <string name="lbl_forgot_password">Esqueceu-se da Password?</string>
     <string name="forgot_password_msg">Precisamos do seu email de registo para que possamos enviar-te as intruções de reset de password</string>
     <string name="vitalpaint_logo">VitalPaint Logo</string>
-    <string name="btn_join">Juntar a Lobby</string>
-    <string name="btn_create">Criar Lobby</string>
-    <string name="btn_profile">Perfil</string>
-    <string name="btn_account_settings">Definições de conta</string>
     <string name="create_game">Criar Lobby</string>
     <string name="join_game">Juntar a Lobby</string>
     <string name="play">Jogar</string>
@@ -64,7 +51,6 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="account_settings">Definições de Conta</string>
 
     <string name="action_sign_in_short">Sign In</string>
     <string name="game_name">Nome do Jogo</string>

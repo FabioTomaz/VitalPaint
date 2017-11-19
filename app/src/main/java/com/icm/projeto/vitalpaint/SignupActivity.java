@@ -15,6 +15,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.icm.projeto.vitalpaint.Data.UserData;
 import com.icm.projeto.vitalpaint.Data.UserDataManager;
 
 public class SignupActivity extends AppCompatActivity {
@@ -23,7 +24,7 @@ public class SignupActivity extends AppCompatActivity {
     private Button btnSignIn, btnSignUp, btnResetPassword;
     private ProgressBar progressBar;
     private FirebaseAuth auth;
-    private UserDataManager userData;
+    private UserDataManager userDataManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,8 +103,12 @@ public class SignupActivity extends AppCompatActivity {
                                     String email = inputEmail.getText().toString().trim();
                                     String nome = inputNome.getText().toString().trim();
                                     String userName = inputUsername.getText().toString().trim();
-                                    userData = new UserDataManager(nome, userName, email);//nome, user e email serão acessiveis publicamente no projeto
-                                    userData.uploadUserData();
+                                    UserData userData = new UserData();
+                                    userData.setNAME(nome);
+                                    userData.setEMAIL(email);
+                                    userData.setUSERNAME(userName);
+                                    userDataManager = new UserDataManager();//nome, user e email serão acessiveis publicamente no projeto
+                                    userDataManager.uploadUserData(email, userData);
                                     startActivity(new Intent(SignupActivity.this, LoginActivity.class));
                                     finish();
                                 }

@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -59,6 +60,11 @@ public class ProfileFragment extends Fragment {
         storage = FirebaseStorage.getInstance();
         //creates a storage reference
         storageRef = storage.getReference();
+        try {
+            downloadProfilePic(UserData.loggedUser.getUSERNAME());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -68,6 +74,8 @@ public class ProfileFragment extends Fragment {
         getActivity().setTitle("Perfil");
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         ImageView imageProfile = (ImageView) view.findViewById(R.id.profile_image);
+        ((TextView) view.findViewById(R.id.user_profile_name)).setText(UserData.loggedUser.getNAME());
+        ((TextView) view.findViewById(R.id.user_profile_short_bio)).setText(UserData.loggedUser.getUSERNAME());
         imageProfile.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -118,7 +126,7 @@ public class ProfileFragment extends Fragment {
 
     public void uploadImage(String imageType) {
         //create reference to images folder and assing a name to the file that will be uploaded
-        imageRef = storageRef.child("User Profile Photos/"+UserData.USERNAME+"/"+imageType+"/");
+        imageRef = storageRef.child("User Profile Photos/"+UserData.loggedUser.getUSERNAME()+"/"+imageType+"/");
         //creating and showing progress dialog
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMax(100);
@@ -158,47 +166,27 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    public static Bitmap downloadProfilePic(String username) throws IOException {
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/"+UserData.USERNAME+"/profilePic/");
+    private void downloadProfilePic(String username) throws IOException {
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         final File localFile = File.createTempFile("profile", "jpg");
         final Bitmap[] image = {null};
 
         storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                image[0] = BitmapFactory.decodeFile(localFile.getAbsolutePath());
+                image[0] = ProfileFragment.convertToBitMap(localFile);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                //em alternativa, colocar como foto de perfil a foto em drawables
-                image[0] = BitmapFactory.decodeResource(new ProfileFragment().getContext().getResources(), R.drawable.imagem_perfil);
+                //Drawable drawable = new ProfileFragment().getResources().getDrawable(R.drawable.imagem_perfil);
+                //image[0] = BitmapFactory.decodeResource(drawable);
             }
         });
-        UserData.profilePic = image[0];
-        return image[0];
+        UserData.loggedUser.profilePic = image[0];
     }
 
-    public static Bitmap downloadHeaderPic(String username) throws IOException {
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/"+UserData.USERNAME+"/headerPic/");
-        final File localFile = File.createTempFile("header", "jpg");
-        final Bitmap[] image = {null};
-
-        storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                image[0] = BitmapFactory.decodeFile(localFile.getAbsolutePath());
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                //em alternativa, colocar como foto de perfil a foto em drawables
-                //image[0] = BitmapFactory.decodeResource(new ProfileFragment().getContext().getResources(), R.drawable.image_capa);
-            }
-        });
-        UserData.profilePic = image[0];
-        return image[0];
+    public static Bitmap convertToBitMap(File file){
+        return BitmapFactory.decodeFile(file.getAbsolutePath());
     }
-
-
 }

@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.icm.projeto.vitalpaint.Data.UserData;
 import com.icm.projeto.vitalpaint.Data.UserDataManager;
 
@@ -35,8 +36,6 @@ public class LoginActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         if (auth.getCurrentUser() != null) {
-            UserData userdata = new UserDataManager().getLoggedUserDataFromEmail(auth.getCurrentUser().getEmail());
-            Log.i("user",UserData.NAME+"");
             startActivity(new Intent(LoginActivity.this, PlayActivity.class));
             finish();
         }
@@ -108,8 +107,8 @@ public class LoginActivity extends AppCompatActivity {
                                 } else {
                                     //obter os dados do user
                                     String email = inputEmail.getText().toString();
-                                    new UserDataManager().getLoggedUserDataFromEmail(email);
-                                    // userdata.getUserDataFromEmail(email);
+                                    (new UserDataManager()).getLoggedUserFromEmail(email);
+                                    Log.v("INFO DE USER LOGADO", UserData.loggedUser.toString());
 
                                     Intent intent = new Intent(LoginActivity.this, PlayActivity.class);
                                     startActivity(intent);

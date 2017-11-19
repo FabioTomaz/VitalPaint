@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">VitailPaint</string>
-    <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Log In</string>
-    <string name="error_field_required">This field is requeired</string>
-    <string name="error_incorrect_password">Incorrect password</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_invalid_userName">Invalid User Name</string>
     <string name="prompt_password">Password</string>
-    <string name="prompt_userName">User Name</string>
     <string name="vitalpaint_logo">VitalPaint Logo</string>
     <string name="nav_logout">Log out</string>
     <string name="nav_account_settings">Account Settings</string>
-    <string name="account_settings">Account Settings</string>
     <string name="game_name">Game Name</string>
     <string name="btn_create_game">Create Lobby!</string>
     <string name="nav_help">Help</string>
@@ -20,14 +13,9 @@
     <string name="play">Play</string>
     <string name="join_game">Join Lobby</string>
     <string name="create_game">Create Lobby</string>
-    <string name="btn_account_settings">Account Settings</string>
-    <string name="btn_profile">Profile</string>
-    <string name="btn_create">Create Lobby</string>
-    <string name="btn_join">Join Lobby</string>
     <string name="forgot_password_msg">We just need your registered Email Id to sent you password reset instructions.</string>
     <string name="lbl_forgot_password">Forgot password?</string>
     <string name="btn_sign_out">Sign Out</string>
-    <string name="btn_remove">Remove</string>
     <string name="btn_send">Send</string>
     <string name="btn_change">Change</string>
     <string name="hint_new_email">New email</string>
