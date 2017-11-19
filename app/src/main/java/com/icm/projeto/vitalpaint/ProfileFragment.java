@@ -159,27 +159,46 @@ public class ProfileFragment extends Fragment {
     }
 
     public static Bitmap downloadProfilePic(String username) throws IOException {
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/"+UserData.USERNAME+"/profilePic/");
         final File localFile = File.createTempFile("profile", "jpg");
         final Bitmap[] image = {null};
 
         storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                image[0] = ProfileFragment.convertToBitMap(localFile);
+                image[0] = BitmapFactory.decodeFile(localFile.getAbsolutePath());
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                //Drawable drawable = new ProfileFragment().getResources().getDrawable(R.drawable.imagem_perfil);
-                //image[0] = BitmapFactory.decodeResource(drawable);
+                //em alternativa, colocar como foto de perfil a foto em drawables
+                image[0] = BitmapFactory.decodeResource(new ProfileFragment().getContext().getResources(), R.drawable.imagem_perfil);
             }
         });
         UserData.profilePic = image[0];
         return image[0];
     }
 
-    public static Bitmap convertToBitMap(File file){
-        return BitmapFactory.decodeFile(file.getAbsolutePath());
+    public static Bitmap downloadHeaderPic(String username) throws IOException {
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/"+UserData.USERNAME+"/headerPic/");
+        final File localFile = File.createTempFile("header", "jpg");
+        final Bitmap[] image = {null};
+
+        storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                image[0] = BitmapFactory.decodeFile(localFile.getAbsolutePath());
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                //em alternativa, colocar como foto de perfil a foto em drawables
+                //image[0] = BitmapFactory.decodeResource(new ProfileFragment().getContext().getResources(), R.drawable.image_capa);
+            }
+        });
+        UserData.profilePic = image[0];
+        return image[0];
     }
+
+
 }

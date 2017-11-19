@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,6 +35,8 @@ public class LoginActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         if (auth.getCurrentUser() != null) {
+            UserData userdata = new UserDataManager().getLoggedUserDataFromEmail(auth.getCurrentUser().getEmail());
+            Log.i("user",UserData.NAME+"");
             startActivity(new Intent(LoginActivity.this, PlayActivity.class));
             finish();
         }
@@ -105,7 +108,7 @@ public class LoginActivity extends AppCompatActivity {
                                 } else {
                                     //obter os dados do user
                                     String email = inputEmail.getText().toString();
-                                    UserData userdata = new UserDataManager().getLoggedUserDataFromEmail(email);
+                                    new UserDataManager().getLoggedUserDataFromEmail(email);
                                     // userdata.getUserDataFromEmail(email);
 
                                     Intent intent = new Intent(LoginActivity.this, PlayActivity.class);

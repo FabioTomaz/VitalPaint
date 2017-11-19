@@ -18,6 +18,9 @@ public class UserData {
     public static int nMatchPlayed;
     public static int nVictories;
     public static List<String> locationsPlayed;
+    public static Bitmap profilePic;
+    public static Bitmap headerPic;
+    private DatabaseReference dbData;
 
     public static void setProfilePic(Bitmap profilePic) {
         UserData.profilePic = profilePic;
@@ -27,9 +30,7 @@ public class UserData {
         UserData.headerPic = headerPic;
     }
 
-    public static Bitmap profilePic;
-    public static Bitmap headerPic;
-    private DatabaseReference dbData;
+
 
     public UserData(String name, String userName, String email){
         this.NAME = name;

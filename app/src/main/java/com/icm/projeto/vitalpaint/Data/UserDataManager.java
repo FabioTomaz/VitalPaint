@@ -2,6 +2,7 @@ package com.icm.projeto.vitalpaint.Data;
 
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
 
@@ -12,7 +13,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.icm.projeto.vitalpaint.ProfileFragment;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +36,31 @@ public class UserDataManager {
     List<String> locationsPlayed;
     private DatabaseReference dbData;
     private UserDataManager user;
+
+    public List<String> getLocationsPlayed() {
+        return locationsPlayed;
+    }
+
+    public void setLocationsPlayed(List<String> locationsPlayed) {
+        this.locationsPlayed = locationsPlayed;
+    }
+
+    public Bitmap getProfilePic() {
+        return profilePic;
+    }
+
+    public void setProfilePic(Bitmap profilePic) {
+        this.profilePic = profilePic;
+    }
+
+    public Bitmap getHeaderPic() {
+        return headerPic;
+    }
+
+    public void setHeaderPic(Bitmap headerPic) {
+        this.headerPic = headerPic;
+    }
+
     private Bitmap profilePic;
     private Bitmap headerPic;
     private static final String PHOTOSFOLDER = "User Profile Photos";
@@ -83,18 +112,30 @@ public class UserDataManager {
     }
     //https://stackoverflow.com/questions/37031222/firebase-add-new-child-with-specified-name
 
-    public com.icm.projeto.vitalpaint.Data.UserData getLoggedUserDataFromEmail(String email) {
+    public UserData getLoggedUserDataFromEmail(String email) {
         final String EMAIL = email;
 
-        dbData = FirebaseDatabase.getInstance().getReference().child("Users");
+        DatabaseReference dbData = FirebaseDatabase.getInstance().getReference().child("Users");
         dbData.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 for (DataSnapshot data : snapshot.getChildren()) {
-                    loggedUser = data.getValue(com.icm.projeto.vitalpaint.Data.UserData.class);
-                    if (loggedUser.EMAIL.equals(EMAIL)) {
-                        loggedUser.setUSERNAME(data.getKey());//encontrados dados do user, adicionar user name q esta na chave e nao nos valores
-                        Log.i("", data.getValue() + "");
+                    user = data.getValue(com.icm.projeto.vitalpaint.Data.UserDataManager.class);
+                    if (user.getEmail().equals(EMAIL)) {
+                        user.setUserName(data.getKey());//encontrados dados do user, adicionar user name q esta na chave e nao nos valores
+                        //colocar as fotos de capa do user
+                        try {
+                            user.setProfilePic(ProfileFragment.downloadProfilePic(user.getUserName()));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        try {
+                            user.setHeaderPic(ProfileFragment.downloadHeaderPic(user.getUserName()));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        //colocar os dados do user na classe UserData para q estejam acessiveis no projeto
+                        //Log.i("", data.getValue() + "");
                     }
                 }
             }
@@ -104,8 +145,8 @@ public class UserDataManager {
 
             }
         });
-        Log.i("outer", user + "");
-        return loggedUser;
+        return this.setLoggedUserData(user);
+
     }
 
     public UserDataManager getUserDataFromEmail(String email) {
@@ -120,6 +161,7 @@ public class UserDataManager {
                     userData = data.getValue(com.icm.projeto.vitalpaint.Data.UserDataManager.class);
                     if (userData.getEmail().equals(EMAIL)) {
                         userData.setUserName(data.getKey());//encontrados dados do user
+
                         Log.i("", data.getValue() + "");
                     }
                 }
@@ -274,6 +316,19 @@ public class UserDataManager {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference().child("User Profile Photos/"+username+"headerPic/");
         storageRef.putFile(uri);
+    }
+
+    public static Bitmap convertToBitMap(File file){
+        return BitmapFactory.decodeFile(file.getAbsolutePath());
+    }
+    public static UserData setLoggedUserData(UserDataManager user){
+        UserData us = new UserData( user.getName(), user.getUserName(), user.getEmail() );
+        us.nVictories = user.getnVictories();
+        us.nMatchPlayed = user.getnMatchPlayed();
+        us.profilePic = user.getProfilePic();
+        us.headerPic = user.getHeaderPic();
+        us.locationsPlayed = user.getLocationsPlayed();
+        return us;
     }
 
 
