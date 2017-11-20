@@ -34,7 +34,6 @@ public class LoginActivity extends AppCompatActivity {
 
         if (auth.getCurrentUser() != null) {
             startActivity(new Intent(LoginActivity.this, PlayActivity.class));
-            new UserDataManager().getLoggedUserFromEmail(auth.getCurrentUser().getEmail());
             finish();
         }
 
@@ -103,9 +102,6 @@ public class LoginActivity extends AppCompatActivity {
                                         Toast.makeText(LoginActivity.this, getString(R.string.auth_failed), Toast.LENGTH_LONG).show();
                                     }
                                 } else {
-                                    //obter os dados do user
-                                    String email = inputEmail.getText().toString();
-                                    (new UserDataManager()).getLoggedUserFromEmail(email);
                                     Intent intent = new Intent(LoginActivity.this, PlayActivity.class);
                                     startActivity(intent);
                                     finish();

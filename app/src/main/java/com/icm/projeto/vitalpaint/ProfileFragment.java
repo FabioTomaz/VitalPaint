@@ -25,6 +25,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.icm.projeto.vitalpaint.Data.UserData;
+import com.icm.projeto.vitalpaint.Data.UserDataManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,7 +36,7 @@ import java.io.InputStream;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements UserDataManager.UserDataListener{
 
     public static final int PICK_PHOTO_FOR_AVATAR = 1;
     public static final int PICK_PHOTO_FOR_HEADER = 2;
@@ -44,48 +45,40 @@ public class ProfileFragment extends Fragment {
     StorageReference storageRef,imageRef;
     ProgressDialog progressDialog;
     UploadTask uploadTask;
-    ImageView profileImageView;
-    ImageView headerImageView;
+    private ImageView profileImageView;
+    private ImageView headerImageView;
+    private TextView name;
+    private TextView shortBio;
 
     public ProfileFragment() {
-        // Required empty public constructor
+
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        profileImageView = (ImageView) getActivity().findViewById(R.id.profile_image);
-        headerImageView = (ImageView) getActivity().findViewById(R.id.header_cover_image);
-        //accessing the firebase storage
         storage = FirebaseStorage.getInstance();
-        //creates a storage reference
         storageRef = storage.getReference();
-        try {
-            downloadProfilePic(UserData.loggedUser.getUSERNAME());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        UserDataManager userDataManager = new UserDataManager();
+        userDataManager.addListener(this);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getActivity().setTitle("Perfil");
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
-        ImageView imageProfile = (ImageView) view.findViewById(R.id.profile_image);
-        ((TextView) view.findViewById(R.id.user_profile_name)).setText(UserData.loggedUser.getNAME());
-        ((TextView) view.findViewById(R.id.user_profile_short_bio)).setText(UserData.loggedUser.getUSERNAME());
-        imageProfile.setOnClickListener(new View.OnClickListener() {
+        profileImageView = (ImageView) getActivity().findViewById(R.id.profile_image);
+        headerImageView = (ImageView) getActivity().findViewById(R.id.header_cover_image);
+        shortBio = (TextView) view.findViewById(R.id.user_profile_name);
+        shortBio = (TextView) view.findViewById(R.id.user_profile_short_bio);
+        profileImageView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
                 startActivityForResult(intent, PICK_PHOTO_FOR_AVATAR);
             }
         });
-
-        ImageView imageHeader = (ImageView) view.findViewById(R.id.header_cover_image);
-        imageHeader.setOnClickListener(new View.OnClickListener() {
+        headerImageView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
@@ -126,7 +119,7 @@ public class ProfileFragment extends Fragment {
 
     public void uploadImage(String imageType) {
         //create reference to images folder and assing a name to the file that will be uploaded
-        imageRef = storageRef.child("User Profile Photos/"+UserData.loggedUser.getUSERNAME()+"/"+imageType+"/");
+        imageRef = storageRef.child("User Profile Photos/"+UserData.loggedUser.getEMAIL()+"/"+imageType+"/");
         //creating and showing progress dialog
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMax(100);
@@ -166,27 +159,14 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private void downloadProfilePic(String username) throws IOException {
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-        final File localFile = File.createTempFile("profile", "jpg");
-        final Bitmap[] image = {null};
-
-        storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                image[0] = ProfileFragment.convertToBitMap(localFile);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                //Drawable drawable = new ProfileFragment().getResources().getDrawable(R.drawable.imagem_perfil);
-                //image[0] = BitmapFactory.decodeResource(drawable);
-            }
-        });
-        UserData.loggedUser.profilePic = image[0];
-    }
-
-    public static Bitmap convertToBitMap(File file){
-        return BitmapFactory.decodeFile(file.getAbsolutePath());
+    @Override
+    public void onReceive(UserData user) {
+        shortBio.setText(user.getNAME());
+        /*shortBio.setText(user.getShortBio());
+        try {
+            downloadProfilePic(UserData.loggedUser.getUSERNAME());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
     }
 }

@@ -20,8 +20,8 @@ import com.icm.projeto.vitalpaint.Data.UserDataManager;
 
 public class SignupActivity extends AppCompatActivity {
 
-    private EditText inputEmail, inputPassword, inputNome, inputUsername;
-    private Button btnSignIn, btnSignUp, btnResetPassword;
+    private EditText inputEmail, inputPassword, inputNome;
+    private Button btnSignIn, btnSignUp;
     private ProgressBar progressBar;
     private FirebaseAuth auth;
     private UserDataManager userDataManager;
@@ -39,16 +39,7 @@ public class SignupActivity extends AppCompatActivity {
         inputEmail = (EditText) findViewById(R.id.email);
         inputPassword = (EditText) findViewById(R.id.password);
         inputNome = (EditText) findViewById(R.id.nome);
-        inputUsername = (EditText) findViewById(R.id.userName);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        btnResetPassword = (Button) findViewById(R.id.btn_reset_password);
-
-        btnResetPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(SignupActivity.this, ResetPasswordActivity.class));
-            }
-        });
 
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,7 +54,6 @@ public class SignupActivity extends AppCompatActivity {
 
                 String email = inputEmail.getText().toString().trim();
                 String password = inputPassword.getText().toString().trim();
-                String userName = inputUsername.getText().toString().trim();
 
                 if (TextUtils.isEmpty(email)) {
                     Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
@@ -77,10 +67,6 @@ public class SignupActivity extends AppCompatActivity {
 
                 if (password.length() < 6) {
                     Toast.makeText(getApplicationContext(), "Password too short, enter minimum 6 characters!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if(UserDataManager.userNameExists(userName)){
-                    Toast.makeText(getApplicationContext(), "O username que escolheu já existe. Por favor tente outro.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -102,11 +88,7 @@ public class SignupActivity extends AppCompatActivity {
                                     //registar na fireBase o novo user
                                     String email = inputEmail.getText().toString().trim();
                                     String nome = inputNome.getText().toString().trim();
-                                    String userName = inputUsername.getText().toString().trim();
-                                    UserData userData = new UserData();
-                                    userData.setNAME(nome);
-                                    userData.setEMAIL(email);
-                                    userData.setUSERNAME(userName);
+                                    UserData userData = new UserData(nome, email);
                                     userDataManager = new UserDataManager();//nome, user e email serão acessiveis publicamente no projeto
                                     userDataManager.uploadUserData(email, userData);
                                     startActivity(new Intent(SignupActivity.this, LoginActivity.class));

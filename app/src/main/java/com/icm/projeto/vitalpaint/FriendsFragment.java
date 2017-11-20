@@ -11,6 +11,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+
+import com.icm.projeto.vitalpaint.Data.UserData;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -23,8 +31,8 @@ public class FriendsFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public void getFriends(){
-
+    public List<UserData> getFriends(){
+        return null;
     }
 
     @Override
@@ -33,6 +41,27 @@ public class FriendsFragment extends Fragment {
         // Inflate the layout for this fragment
         getActivity().setTitle("Amigos");
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        super.onCreate(savedInstanceState);
+
+        List<HashMap<String, String>> aList = new ArrayList<HashMap<String, String>>();
+
+        List<UserData> friends = getFriends();
+
+        /*for (int i = 0; i < friends.size(); i++) {
+            HashMap<String, String> hm = new HashMap<String, String>();
+            hm.put("listview_title", friends.get(i).getNAME());
+            hm.put("listview_discription", friends.get(i).getEMAIL());
+            hm.put("listview_image", friends.get(i).getProfilePic());
+            aList.add(hm);
+        }*/
+
+        String[] from = {"listview_image", "listview_title", "listview_discription"};
+        int[] to = {R.id.listview_image, R.id.listview_item_title, R.id.listview_item_short_description};
+
+        SimpleAdapter simpleAdapter = new SimpleAdapter(getActivity(), aList, R.layout.listview_activity, from, to);
+        ListView androidListView = (ListView) getActivity().findViewById(R.id.list_friends);
+        androidListView.setAdapter(simpleAdapter);
+
         FloatingActionButton imageProfile = (FloatingActionButton) view.findViewById(R.id.profile_image);
         imageProfile.setOnClickListener(new View.OnClickListener() {
             @Override
