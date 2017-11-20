@@ -19,6 +19,6 @@
         android:layout_marginRight="16dp"
         android:clickable="true"
         android:src="@drawable/ic_account_plus"
-        app:elevation="4dp" />
+        android:elevation="4dp" />
 
 </FrameLayout>

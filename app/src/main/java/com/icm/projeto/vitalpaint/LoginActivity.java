@@ -108,8 +108,6 @@ public class LoginActivity extends AppCompatActivity {
                                     //obter os dados do user
                                     String email = inputEmail.getText().toString();
                                     (new UserDataManager()).getLoggedUserFromEmail(email);
-                                    Log.v("INFO DE USER LOGADO", UserData.loggedUser.toString());
-
                                     Intent intent = new Intent(LoginActivity.this, PlayActivity.class);
                                     startActivity(intent);
                                     finish();

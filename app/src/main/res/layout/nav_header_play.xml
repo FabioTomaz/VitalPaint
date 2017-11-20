@@ -20,6 +20,7 @@
         app:srcCompat="@mipmap/vital_paint_logo" />
 
     <TextView
+        android:id="@+id/navBarUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"

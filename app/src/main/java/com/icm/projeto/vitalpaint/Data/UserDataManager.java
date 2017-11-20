@@ -5,6 +5,9 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -17,6 +20,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Semaphore;
 
 /**
  * Created by Bruno Silva on 14/11/2017.
@@ -48,17 +53,27 @@ public class UserDataManager {
     //https://stackoverflow.com/questions/37031222/firebase-add-new-child-with-specified-name
 
     public void getLoggedUserFromEmail(String email) {
+        final TaskCompletionSource<UserData> tcs = new TaskCompletionSource<>();
         dbData.child(encodeUserEmail(email)).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot data : snapshot.getChildren()) {
-                    UserData.loggedUser = data.getValue(UserData.class);
-                    Log.i("USEROBTAINED", UserData.loggedUser.toString());
-                }
+                tcs.setResult(snapshot.getValue(UserData.class));
             }
             @Override
-            public void onCancelled(DatabaseError databaseError) {}
+            public void onCancelled(DatabaseError databaseError) {
+                tcs.setException(databaseError.toException());
+            }
         });
+        Task<UserData> t = tcs.getTask();
+        try {
+            Tasks.await(t);
+        } catch (ExecutionException | InterruptedException e) {
+            t = Tasks.forException(e);
+        }
+
+        if(t.isSuccessful()) {
+            UserData.loggedUser = t.getResult();
+        }
     }
 
     public static boolean userNameExists(final String userName) {//nao esta a funcionar..

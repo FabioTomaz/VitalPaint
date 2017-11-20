@@ -7,6 +7,8 @@
     <color name="colorAccent">#ff9500</color>
     <color name="orange">#FF9800</color>
     <color name="blue">#2962FF</color>
+    <color name="redTeamColor">#F44336</color>
+    <color name="blueTeamColor">#3F51B5</color>
 
     <color name="white">#ffffff</color>
 </resources>

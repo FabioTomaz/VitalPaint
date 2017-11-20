@@ -1,6 +1,7 @@
 package com.icm.projeto.vitalpaint;
 
 import android.app.*;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
 import android.support.v4.*;
 import android.support.v4.app.*;
@@ -20,9 +21,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.icm.projeto.vitalpaint.Data.UserData;
 
 public class PlayActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -33,6 +37,15 @@ public class PlayActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_play);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
+        BitmapDrawable ob = new BitmapDrawable(getResources(), UserData.loggedUser.getHeaderPic());
+        headerView.setBackground(ob);
+        ImageView drawerImage = (ImageView) headerView.findViewById(R.id.imageView);
+        drawerImage.setImageBitmap(UserData.loggedUser.getProfilePic());
+        TextView drawerUsername = (TextView) headerView.findViewById(R.id.navBarUsername);
+        drawerUsername.setText(UserData.loggedUser.getNAME());
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
 
@@ -54,7 +67,6 @@ public class PlayActivity extends AppCompatActivity
 
         auth.addAuthStateListener(authListener);
 
-        setContentView(R.layout.activity_play);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -64,7 +76,6 @@ public class PlayActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         if (savedInstanceState == null) {
             Fragment fragment = new CreateGameFragment(); // <-------

@@ -56,6 +56,8 @@
     <string name="games">Jogos</string>
     <string name="friends">Amigos</string>
     <string name="nav_spectate">Assistir a Jogo</string>
+    <string name="join_team">Juntar-me</string>
+    <string name="invite_friends">Convidar Amigos</string>
 
 
 </resources>
