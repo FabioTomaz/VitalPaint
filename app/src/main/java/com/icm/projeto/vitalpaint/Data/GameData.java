@@ -1,6 +1,7 @@
 package com.icm.projeto.vitalpaint.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -8,8 +9,30 @@ import java.util.List;
  */
 
 public class GameData implements Serializable{
-
+    private List<String> redTeamPlayers;
+    private String gameName;
+    private GameMode gameMode;
+    private String host;
+    private double lobbyLat;
+    private double lobbyLong;
+    private String playerName;
     private List<String> blueTeamPlayers;
+
+    public GameData(String gameName, GameMode gameMode){
+        this.gameName = gameName;
+        this.gameMode = gameMode;
+        this.blueTeamPlayers = new ArrayList<>();
+        this.redTeamPlayers = new ArrayList<>();
+    }
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
+
 
     public List<String> getBlueTeamPlayers() {
         return blueTeamPlayers;
@@ -67,13 +90,4 @@ public class GameData implements Serializable{
         this.lobbyLong = lobbyLong;
     }
 
-    private List<String> redTeamPlayers;
-    private String gameName;
-    private GameMode gameMode;
-    private String host;
-    private double lobbyLat;
-    private double lobbyLong;
-
-
-    public enum GameMode{ TEAMVSTEAM, DEATHMATCH};
 }

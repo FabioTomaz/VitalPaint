@@ -76,8 +76,8 @@ public class LobbyTeamActivity extends AppCompatActivity {
                     users.add(data.getKey());
                 }
 
-                TextView textv1 = (TextView)findViewById(R.id.blue_team_player1);
-                textv1.setText(users.get(0));
+                //TextView textv1 = (TextView)findViewById(R.id.blue_team_player1);
+                //textv1.setText(users.get(0));
 
             }
 

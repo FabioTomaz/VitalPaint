@@ -13,6 +13,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.icm.projeto.vitalpaint.Data.GameMode;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,7 +57,8 @@ public class CreateGameFragment extends Fragment {
                 if ( gameMode.getSelectedItemPosition() == 1) {//selecionado modo Team vs Team
                     Intent intent = new Intent(getActivity(), LobbyTeamActivity.class);
                     intent.putExtra("gameName", gameName.getText().toString());
-                    intent.putExtra("gameMode", gameMode.getSelectedItem().toString());
+                    if (gameMode.getSelectedItem().toString().equals("Team vs Team"))
+                        intent.putExtra("gameMode", GameMode.TEAMVSTEAM);
                     intent.putExtra("nElements", nTeamElements.getSelectedItem().toString());
                     intent.putExtra("isHost", true);//este utilizador criou o lobby
                     startActivity(intent);
