@@ -1,8 +1,7 @@
 package com.icm.projeto.vitalpaint.Data;
 
 import android.graphics.Bitmap;
-
-import com.google.firebase.database.DatabaseReference;
+import android.os.Parcelable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,7 +11,8 @@ import java.util.List;
  * Created by Bruno Silva on 14/11/2017.
  */
 //Contém os dados do utilizador logado para acesso rápido dentro do projeto
-public class UserData implements Serializable{
+public class UserData implements Serializable {
+    private static final long serialVersionUID = 1L;
     public static UserData loggedUser;
     private String NAME;
     private String SHORTBIO;

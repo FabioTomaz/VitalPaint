@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -27,9 +27,7 @@ import com.google.firebase.storage.UploadTask;
 import com.icm.projeto.vitalpaint.Data.UserData;
 import com.icm.projeto.vitalpaint.Data.UserDataManager;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 
 
@@ -50,6 +48,7 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
     private TextView name;
     private TextView shortBio;
     private UserDataManager userDataManager;
+    FirebaseAuth auth = FirebaseAuth.getInstance();
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -106,7 +105,7 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
             ImageView imageProfile = (ImageView) getView().findViewById(R.id.profile_image);
             imageProfile.setImageBitmap(BitmapFactory.decodeStream(inputStream));
             selectedImage = data.getData();
-            uploadUserImage(UserData.loggedUser.getEMAIL(),"profilePic");
+            uploadUserImage(UserDataManager.encodeUserEmail(auth.getCurrentUser().getEmail()),"profilePic");
         }else if(requestCode == PICK_PHOTO_FOR_HEADER && resultCode == Activity.RESULT_OK && data!= null && data.getData()!=null) {
             InputStream inputStream = null;
             try {
@@ -117,7 +116,7 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
             ImageView imageHeader = (ImageView) getView().findViewById(R.id.header_cover_image);
             imageHeader.setImageBitmap(BitmapFactory.decodeStream(inputStream));
             selectedImage = data.getData();
-            uploadUserImage(UserData.loggedUser.getEMAIL(), "headerPic");
+            uploadUserImage(UserDataManager.encodeUserEmail(auth.getCurrentUser().getEmail()), "headerPic");
         }
     }
 

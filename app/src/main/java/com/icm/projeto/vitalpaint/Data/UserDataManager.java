@@ -1,16 +1,14 @@
 package com.icm.projeto.vitalpaint.Data;
 
 
-import android.content.Context;
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.TaskCompletionSource;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -25,10 +23,11 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 //classe para ler/escrever dados de utilizadores da database
-public class UserDataManager  implements Serializable{
+@SuppressLint("ParcelCreator")
+public class UserDataManager  implements Serializable, Parcelable{
+    private static final long serialVersionUID = 1L;
     private final String email;
     private DatabaseReference dbData;
     private List<UserDataListener> list;
@@ -40,15 +39,15 @@ public class UserDataManager  implements Serializable{
         this.email = email;
     }
 
-    public interface UserDataListener{
+    public interface UserDataListener extends Serializable{
         public void onReceiveUserData(UserData user);
     }
 
-    public interface UserHeaderPicListener{
+    public interface UserHeaderPicListener extends Serializable{
         public void onReceiveUserHeaderPic(Bitmap user);
     }
 
-    public interface UserProfilePicListener{
+    public interface UserProfilePicListener extends Serializable{
         public void onReceiveUserProfilePic(Bitmap user);
     }
 
@@ -102,7 +101,7 @@ public class UserDataManager  implements Serializable{
 
 
     public void profilePicListener() throws IOException {
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/"+email+"/profilePic/");
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/"+email+"/profilePic");
         final File localFile = File.createTempFile("profile", "jpg");
         final Bitmap[] image = {null};
         storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
@@ -116,12 +115,13 @@ public class UserDataManager  implements Serializable{
     }
 
     public void headerPicListener() throws IOException {
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/"+email+"/headerPic/");
-        final File localFile = File.createTempFile("profile", "jpg");
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos"+email+"/headerPic");
+        final File localFile = File.createTempFile("headerPic", "jpg");
         final Bitmap[] image = {null};
         storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                Log.i("", "hey");
                 for(int i = 0; i<headerPicListeners.size(); i++) {
                     headerPicListeners.get(i).onReceiveUserHeaderPic(BitmapFactory.decodeFile(localFile.getAbsolutePath()));
                 }
@@ -129,13 +129,19 @@ public class UserDataManager  implements Serializable{
         });
     }
 
-    public String encodeUserEmail(String email) {
+    public static String encodeUserEmail(String email) {
         return email.replace(".", ",");
     }
 
-    public String decodeUserEmail(String email) {
+    public static String decodeUserEmail(String email) {
         return email.replace(".", ",");
     }
+
+    @Override
+    public int describeContents() {return 0;}
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {}
 }
 
     /*public static boolean userNameExists(final String userName) {//nao esta a funcionar..
