@@ -89,6 +89,8 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
             }
         });
         userDataManager.addListener(this);
+        userDataManager.addHeaderPicListener(this);
+        userDataManager.addProfilePicListener(this);
         return view;
     }
 
@@ -105,7 +107,7 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
             ImageView imageProfile = (ImageView) getView().findViewById(R.id.profile_image);
             imageProfile.setImageBitmap(BitmapFactory.decodeStream(inputStream));
             selectedImage = data.getData();
-            uploadUserImage(UserDataManager.encodeUserEmail(auth.getCurrentUser().getEmail()),"profilePic");
+            uploadUserImage(auth.getCurrentUser().getEmail(),"profilePic");
         }else if(requestCode == PICK_PHOTO_FOR_HEADER && resultCode == Activity.RESULT_OK && data!= null && data.getData()!=null) {
             InputStream inputStream = null;
             try {
@@ -116,7 +118,7 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
             ImageView imageHeader = (ImageView) getView().findViewById(R.id.header_cover_image);
             imageHeader.setImageBitmap(BitmapFactory.decodeStream(inputStream));
             selectedImage = data.getData();
-            uploadUserImage(UserDataManager.encodeUserEmail(auth.getCurrentUser().getEmail()), "headerPic");
+            uploadUserImage(auth.getCurrentUser().getEmail(), "headerPic");
         }
     }
 

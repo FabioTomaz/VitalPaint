@@ -36,6 +36,8 @@ public class UserDataManager  implements Serializable, Parcelable{
 
     public UserDataManager(String email) {
         list = new ArrayList<UserDataListener>();
+        profilePicListeners = new ArrayList<>();
+        headerPicListeners = new ArrayList<>();
         this.email = email;
     }
 
