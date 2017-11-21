@@ -89,8 +89,8 @@ public class SignupActivity extends AppCompatActivity {
                                     String email = inputEmail.getText().toString().trim();
                                     String nome = inputNome.getText().toString().trim();
                                     UserData userData = new UserData(nome, email);
-                                    userDataManager = new UserDataManager();//nome, user e email serão acessiveis publicamente no projeto
-                                    userDataManager.uploadUserData(email, userData);
+                                    userDataManager = new UserDataManager(email);//nome, user e email serão acessiveis publicamente no projeto
+                                    userDataManager.uploadUserData(userData);
                                     startActivity(new Intent(SignupActivity.this, LoginActivity.class));
                                     finish();
                                 }

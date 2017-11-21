@@ -36,7 +36,7 @@ import java.io.InputStream;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ProfileFragment extends Fragment implements UserDataManager.UserDataListener{
+public class ProfileFragment extends Fragment implements UserDataManager.UserDataListener, UserDataManager.UserProfilePicListener, UserDataManager.UserHeaderPicListener{
 
     public static final int PICK_PHOTO_FOR_AVATAR = 1;
     public static final int PICK_PHOTO_FOR_HEADER = 2;
@@ -49,27 +49,31 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
     private ImageView headerImageView;
     private TextView name;
     private TextView shortBio;
-
-    public ProfileFragment() {
-
-    }
+    private UserDataManager userDataManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        userDataManager = (UserDataManager) getArguments().getSerializable("dbmanager");
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
-        UserDataManager userDataManager = new UserDataManager();
-        userDataManager.addListener(this);
+    }
+
+    public static ProfileFragment newInstance(UserDataManager manager) {
+        ProfileFragment fragmentDemo = new ProfileFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("dbmanager", manager);
+        fragmentDemo.setArguments(args);
+        return fragmentDemo;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getActivity().setTitle("Perfil");
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
-        profileImageView = (ImageView) getActivity().findViewById(R.id.profile_image);
-        headerImageView = (ImageView) getActivity().findViewById(R.id.header_cover_image);
-        shortBio = (TextView) view.findViewById(R.id.user_profile_name);
+        profileImageView = (ImageView) view.findViewById(R.id.profile_image);
+        headerImageView = (ImageView) view.findViewById(R.id.header_cover_image);
+        name = (TextView) view.findViewById(R.id.user_profile_name);
         shortBio = (TextView) view.findViewById(R.id.user_profile_short_bio);
         profileImageView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -85,7 +89,7 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
                 startActivityForResult(intent, PICK_PHOTO_FOR_HEADER);
             }
         });
-
+        userDataManager.addListener(this);
         return view;
     }
 
@@ -102,7 +106,7 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
             ImageView imageProfile = (ImageView) getView().findViewById(R.id.profile_image);
             imageProfile.setImageBitmap(BitmapFactory.decodeStream(inputStream));
             selectedImage = data.getData();
-            uploadImage("profilePic");
+            uploadUserImage(UserData.loggedUser.getEMAIL(),"profilePic");
         }else if(requestCode == PICK_PHOTO_FOR_HEADER && resultCode == Activity.RESULT_OK && data!= null && data.getData()!=null) {
             InputStream inputStream = null;
             try {
@@ -113,13 +117,13 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
             ImageView imageHeader = (ImageView) getView().findViewById(R.id.header_cover_image);
             imageHeader.setImageBitmap(BitmapFactory.decodeStream(inputStream));
             selectedImage = data.getData();
-            uploadImage("headerPic");
+            uploadUserImage(UserData.loggedUser.getEMAIL(), "headerPic");
         }
     }
 
-    public void uploadImage(String imageType) {
+    public void uploadUserImage(String userEmail, String imageType) {
         //create reference to images folder and assing a name to the file that will be uploaded
-        imageRef = storageRef.child("User Profile Photos/"+UserData.loggedUser.getEMAIL()+"/"+imageType+"/");
+        imageRef = storageRef.child("User Profile Photos/"+ userEmail+"/"+imageType+"/");
         //creating and showing progress dialog
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMax(100);
@@ -160,13 +164,18 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
     }
 
     @Override
-    public void onReceive(UserData user) {
-        shortBio.setText(user.getNAME());
-        /*shortBio.setText(user.getShortBio());
-        try {
-            downloadProfilePic(UserData.loggedUser.getUSERNAME());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+    public void onReceiveUserData(UserData user) {
+        name.setText(user.getNAME());
+        //shortBio.setText(user.getSHORTBIO());
+    }
+
+    @Override
+    public void onReceiveUserHeaderPic(Bitmap user) {
+        headerImageView.setImageBitmap(user);
+    }
+
+    @Override
+    public void onReceiveUserProfilePic(Bitmap user) {
+        profileImageView.setImageBitmap(user);
     }
 }

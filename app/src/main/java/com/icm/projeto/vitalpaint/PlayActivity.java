@@ -45,10 +45,11 @@ import java.io.File;
 import java.io.IOException;
 
 public class PlayActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, UserDataManager.UserDataListener {
-
+        implements NavigationView.OnNavigationItemSelectedListener, UserDataManager.UserDataListener, UserDataManager.UserHeaderPicListener, UserDataManager.UserProfilePicListener {
+    private View headerView;
     private FirebaseAuth auth;
     private FirebaseAuth.AuthStateListener authListener;
+    private UserDataManager userDataManager;
     NavigationView navigationView;
     Toolbar toolbar;
 
@@ -73,10 +74,7 @@ public class PlayActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
-
-        UserDataManager userDataManager = new UserDataManager();
-        userDataManager.addListener(this);
-
+        headerView = navigationView.getHeaderView(0);
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
         //get current user
@@ -94,8 +92,8 @@ public class PlayActivity extends AppCompatActivity
             }
         };
         auth.addAuthStateListener(authListener);
-        Log.i("EMAIL", user.getEmail());
-        userDataManager.userDataFromEmailListener(user.getEmail());
+        userDataManager = new UserDataManager(user.getEmail());
+        userDataManager.addListener(this);
         if (savedInstanceState == null) {
             Fragment fragment = new CreateGameFragment(); // <-------
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -146,7 +144,7 @@ public class PlayActivity extends AppCompatActivity
             startActivity(new Intent(PlayActivity.this, GameMapActivity.class));
         } else if (id == R.id.nav_profile) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame,  new ProfileFragment());
+            ft.replace(R.id.content_frame,  ProfileFragment.newInstance(userDataManager));
             ft.commit();
         } else if (id == R.id.nav_friends) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -184,13 +182,19 @@ public class PlayActivity extends AppCompatActivity
     }
 
     @Override
-    public void onReceive(UserData userData){
-        View headerView = navigationView.getHeaderView(0);
-        /*BitmapDrawable ob = new BitmapDrawable(getResources(), userData.getHeaderPic());
-        headerView.setBackground(ob);
-        ImageView drawerImage = (ImageView) headerView.findViewById(R.id.imageView);
-        drawerImage.setImageBitmap(UserData.loggedUser.getProfilePic());*/
+    public void onReceiveUserData(UserData userData){
         TextView drawerUsername = (TextView) headerView.findViewById(R.id.navBarUsername);
         drawerUsername.setText(userData.getNAME());
+    }
+
+    @Override
+    public void onReceiveUserHeaderPic(Bitmap user) {
+        headerView.setBackground(new BitmapDrawable(getResources(), user));
+    }
+
+    @Override
+    public void onReceiveUserProfilePic(Bitmap user) {
+        ImageView drawerImage = (ImageView) headerView.findViewById(R.id.imageView);
+        drawerImage.setImageBitmap(user);
     }
 }
