@@ -21,23 +21,6 @@ public class UserData implements Serializable {
     private int nVictories;
     private int nLosses;
     private int nDraws;
-
-    public int getnLosses() {
-        return nLosses;
-    }
-
-    public void setnLosses(int nLosses) {
-        this.nLosses = nLosses;
-    }
-
-    public int getnDraws() {
-        return nDraws;
-    }
-
-    public void setnDraws(int nDraws) {
-        this.nDraws = nDraws;
-    }
-
     private List<UserData> friends;
     private List<Location> locationsPlayed;
 

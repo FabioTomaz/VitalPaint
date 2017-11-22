@@ -190,7 +190,9 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
         pieChart.setData(data);
         pieChart.invalidate(); // refresh
 
-        headerImageView.setImageBitmap(headerPic);
-        profileImageView.setImageBitmap(profilePic);
+        if(headerPic!=null)
+            headerImageView.setImageBitmap(headerPic);
+        if (profilePic!=null)
+            profileImageView.setImageBitmap(profilePic);
     }
 }

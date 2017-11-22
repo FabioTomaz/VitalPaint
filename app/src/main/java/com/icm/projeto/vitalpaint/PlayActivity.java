@@ -168,8 +168,11 @@ public class PlayActivity extends AppCompatActivity
     public void onReceiveUserData(int requestType ,UserData user, Bitmap profilePic, Bitmap headerPic) {
         TextView drawerUsername = (TextView) headerView.findViewById(R.id.navBarUsername);
         drawerUsername.setText(user.getNAME());
-        ImageView drawerImage = (ImageView) headerView.findViewById(R.id.imageView);
-        drawerImage.setImageBitmap(profilePic);
-        headerView.setBackground(new BitmapDrawable(getResources(), headerPic));
+        if (profilePic!=null) {
+            ImageView drawerImage = (ImageView) headerView.findViewById(R.id.imageView);
+            drawerImage.setImageBitmap(profilePic);
+        }
+        if(headerPic!=null)
+            headerView.setBackground(new BitmapDrawable(getResources(), headerPic));
     }
 }

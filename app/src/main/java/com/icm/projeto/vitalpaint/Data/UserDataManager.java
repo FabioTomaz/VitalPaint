@@ -7,8 +7,10 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -47,7 +49,7 @@ public class UserDataManager  implements Serializable, Parcelable{
         userDataFromEmailListener(requestType);
     }
 
-    public void uploadUserData(UserData userData) {
+    public void newUserData(UserData userData) {
         dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email));//aceder ao nó Users, que guarda os usuários
         dbData.setValue(userData);
     }
@@ -84,26 +86,53 @@ public class UserDataManager  implements Serializable, Parcelable{
 
                 StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/"+email+"/profilePic");
                 try {
-                    final File  localFile = File.createTempFile("profile", "jpg");
+                    final File  profileFile = File.createTempFile("profile", "jpg");
                     final Bitmap[] image = {null};
-                    storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                    storageRef.getFile(profileFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                            final Bitmap profilePic = BitmapFactory.decodeFile(localFile.getAbsolutePath());
+                            final Bitmap profilePic = BitmapFactory.decodeFile(profileFile.getAbsolutePath());
                             StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/"+email+"/headerPic");
                             try {
-                            final File localFile = File.createTempFile("profile", "jpg");
+                            final File headerFile = File.createTempFile("header", "jpg");
                             final Bitmap[] image = {null};
-                            storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                            storageRef.getFile(headerFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                                 @Override
                                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                                     for (int i = 0; i < list.size(); i++) {
-                                        list.get(i).onReceiveUserData(requestType, finalUserData, profilePic, BitmapFactory.decodeFile(localFile.getAbsolutePath()));
+                                        list.get(i).onReceiveUserData(requestType,finalUserData, profilePic, BitmapFactory.decodeFile(headerFile.getAbsolutePath()));
                                     }
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    notifyObservers(requestType,finalUserData, profilePic, null);
                                 }
                             });
                             } catch (IOException e) {
                                 e.printStackTrace();
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/"+email+"/headerPic");
+                            try {
+                                final File headerFile = File.createTempFile("header", "jpg");
+                                final Bitmap[] image = {null};
+                                storageRef.getFile(headerFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                        notifyObservers(requestType,finalUserData, null, BitmapFactory.decodeFile(headerFile.getAbsolutePath()));
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        notifyObservers(requestType,finalUserData, null, null);
+                                    }
+                                });
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
                             }
                         }
                     });
@@ -114,6 +143,12 @@ public class UserDataManager  implements Serializable, Parcelable{
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         });
+    }
+
+    private void notifyObservers(int requestType, UserData user, Bitmap profilePic, Bitmap headerPic){
+        for (int i = 0; i < list.size(); i++) {
+            list.get(i).onReceiveUserData(requestType,user, profilePic, headerPic);
+        }
     }
 
     public static String encodeUserEmail(String email) {
