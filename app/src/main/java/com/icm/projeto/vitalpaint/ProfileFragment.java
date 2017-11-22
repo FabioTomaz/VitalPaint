@@ -3,6 +3,7 @@ package com.icm.projeto.vitalpaint;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,13 +11,19 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,12 +36,14 @@ import com.icm.projeto.vitalpaint.Data.UserDataManager;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ProfileFragment extends Fragment implements UserDataManager.UserDataListener, UserDataManager.UserProfilePicListener, UserDataManager.UserHeaderPicListener{
+public class ProfileFragment extends Fragment implements UserDataManager.UserDataListener{
 
     public static final int PICK_PHOTO_FOR_AVATAR = 1;
     public static final int PICK_PHOTO_FOR_HEADER = 2;
@@ -48,6 +57,7 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
     private TextView name;
     private TextView shortBio;
     private UserDataManager userDataManager;
+    public static final int PROFILE_DATA = 1;
     FirebaseAuth auth = FirebaseAuth.getInstance();
 
     @Override
@@ -88,9 +98,7 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
                 startActivityForResult(intent, PICK_PHOTO_FOR_HEADER);
             }
         });
-        userDataManager.addListener(this);
-        userDataManager.addHeaderPicListener(this);
-        userDataManager.addProfilePicListener(this);
+        userDataManager.addListener(this, PROFILE_DATA);
         return view;
     }
 
@@ -165,18 +173,24 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
     }
 
     @Override
-    public void onReceiveUserData(UserData user) {
+    public void onReceiveUserData(int requestType, UserData user, Bitmap profilePic, Bitmap headerPic) {
         name.setText(user.getNAME());
-        //shortBio.setText(user.getSHORTBIO());
-    }
+        shortBio.setText(user.getSHORTBIO());
 
-    @Override
-    public void onReceiveUserHeaderPic(Bitmap user) {
-        headerImageView.setImageBitmap(user);
-    }
+        PieChart pieChart = (PieChart) getView().findViewById(R.id.pieChart);
+        List<PieEntry> entries = new ArrayList<>();
 
-    @Override
-    public void onReceiveUserProfilePic(Bitmap user) {
-        profileImageView.setImageBitmap(user);
+        entries.add(new PieEntry(18.5f, "Green"));
+        entries.add(new PieEntry(26.7f, "Yellow"));
+        entries.add(new PieEntry(24.0f, "Red"));
+        entries.add(new PieEntry(30.8f, "Blue"));
+
+        PieDataSet set = new PieDataSet(entries, "Resultados dos Jogos");
+        PieData data = new PieData(set);
+        pieChart.setData(data);
+        pieChart.invalidate(); // refresh
+
+        headerImageView.setImageBitmap(headerPic);
+        profileImageView.setImageBitmap(profilePic);
     }
 }

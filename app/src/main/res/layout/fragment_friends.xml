@@ -18,6 +18,7 @@
         android:layout_marginBottom="16dp"
         android:layout_marginRight="16dp"
         android:clickable="true"
+        app:layout_anchor="@id/list_friends"
         android:src="@drawable/ic_account_plus"
         app:elevation="4dp" />
 

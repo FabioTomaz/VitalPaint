@@ -4,6 +4,7 @@ package com.icm.projeto.vitalpaint.Data;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
@@ -31,103 +32,87 @@ public class UserDataManager  implements Serializable, Parcelable{
     private final String email;
     private DatabaseReference dbData;
     private List<UserDataListener> list;
-    private List<UserProfilePicListener> profilePicListeners;
-    private List<UserHeaderPicListener> headerPicListeners;
 
     public UserDataManager(String email) {
         list = new ArrayList<UserDataListener>();
-        profilePicListeners = new ArrayList<>();
-        headerPicListeners = new ArrayList<>();
         this.email = email;
     }
 
     public interface UserDataListener extends Serializable{
-        public void onReceiveUserData(UserData user);
+        public void onReceiveUserData(int requestType, UserData user, Bitmap profilePic, Bitmap headerPic);
     }
 
-    public interface UserHeaderPicListener extends Serializable{
-        public void onReceiveUserHeaderPic(Bitmap user);
-    }
-
-    public interface UserProfilePicListener extends Serializable{
-        public void onReceiveUserProfilePic(Bitmap user);
-    }
-
-    public void addListener(UserDataListener userListener) {
+    public void addListener(UserDataListener userListener, int requestType) {
         list.add(userListener);
-        userDataFromEmailListener();
-    }
-
-    public void addProfilePicListener(UserProfilePicListener userListener) {
-        profilePicListeners.add(userListener);
-        try {
-            profilePicListener();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void addHeaderPicListener(UserHeaderPicListener userListener) {
-        headerPicListeners.add(userListener);
-        try {
-            headerPicListener();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        userDataFromEmailListener(requestType);
     }
 
     public void uploadUserData(UserData userData) {
         dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email));//aceder ao nó Users, que guarda os usuários
         dbData.setValue(userData);
     }
+    public void addFriend(String friendEmail){
+        dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child("friends").child(encodeUserEmail(friendEmail));
+        dbData.setValue(friendEmail);
+    }
+    public void addLocation(Location locationsPlayed){
+        dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child("locationsPlayed").push();
+        dbData.setValue(locationsPlayed);
+    }
 
-    private void userDataFromEmailListener() {
-        DatabaseReference dbData = FirebaseDatabase.getInstance().getReference().child("Users");
+
+    private void userDataFromEmailListener(final int requestType) {
+        DatabaseReference dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email));
         dbData.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot data : snapshot.getChildren()) {
-                    if (data.getKey().equals(encodeUserEmail(email))){
-                        for(int i = 0; i<list.size(); i++) {
-                            UserData user = data.getValue(UserData.class);
-                            list.get(i).onReceiveUserData(user);
+                UserData userData = new UserData();
+                List<UserData> listOfFriends = new ArrayList<>();
+                for (DataSnapshot emp : snapshot.child("friends").getChildren()) {
+                    UserData friendData = new UserData();
+                    userData.setEMAIL(emp.child("email").getValue(String.class));
+                    userData.setNAME(emp.child("name").getValue(String.class));
+                    listOfFriends.add(friendData);
+                }
+                userData.setFriends(listOfFriends);
+                userData.setEMAIL(snapshot.child("email").getValue(String.class));
+                userData.setNAME(snapshot.child("name").getValue(String.class));
+                userData.setSHORTBIO(snapshot.child("shotbio").getValue(String.class));
+                userData.setnMatchPlayed(snapshot.child("nMatchPlayed").getValue(Integer.class));
+                userData.setnVictories(snapshot.child("nVictories").getValue(Integer.class));
+                final UserData finalUserData = userData;
+
+                StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/"+email+"/profilePic");
+                try {
+                    final File  localFile = File.createTempFile("profile", "jpg");
+                    final Bitmap[] image = {null};
+                    storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            final Bitmap profilePic = BitmapFactory.decodeFile(localFile.getAbsolutePath());
+                            StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/"+email+"/headerPic");
+                            try {
+                            final File localFile = File.createTempFile("profile", "jpg");
+                            final Bitmap[] image = {null};
+                            storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                    for (int i = 0; i < list.size(); i++) {
+                                        list.get(i).onReceiveUserData(requestType, finalUserData, profilePic, BitmapFactory.decodeFile(localFile.getAbsolutePath()));
+                                    }
+                                }
+                            });
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
-                        break;
-                    }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
-        });
-    }
-
-
-    public void profilePicListener() throws IOException {
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/"+email+"/profilePic");
-        final File localFile = File.createTempFile("profile", "jpg");
-        final Bitmap[] image = {null};
-        storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                for(int i = 0; i<profilePicListeners.size(); i++) {
-                    profilePicListeners.get(i).onReceiveUserProfilePic(BitmapFactory.decodeFile(localFile.getAbsolutePath()));
-                }
-            }
-        });
-    }
-
-    public void headerPicListener() throws IOException {
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos"+email+"/headerPic");
-        final File localFile = File.createTempFile("headerPic", "jpg");
-        final Bitmap[] image = {null};
-        storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                Log.i("", "hey");
-                for(int i = 0; i<headerPicListeners.size(); i++) {
-                    headerPicListeners.get(i).onReceiveUserHeaderPic(BitmapFactory.decodeFile(localFile.getAbsolutePath()));
-                }
-            }
         });
     }
 

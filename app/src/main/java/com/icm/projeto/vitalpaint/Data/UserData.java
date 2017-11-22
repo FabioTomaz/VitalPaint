@@ -1,6 +1,7 @@
 package com.icm.projeto.vitalpaint.Data;
 
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.os.Parcelable;
 
 import java.io.Serializable;
@@ -13,22 +14,49 @@ import java.util.List;
 //Contém os dados do utilizador logado para acesso rápido dentro do projeto
 public class UserData implements Serializable {
     private static final long serialVersionUID = 1L;
-    public static UserData loggedUser;
     private String NAME;
     private String SHORTBIO;
     private String EMAIL;
     private int nMatchPlayed;
     private int nVictories;
-    private List<String> locationsPlayed;
-    public Bitmap profilePic;
-    public Bitmap headerPic;
+    private int nLosses;
+    private int nDraws;
+
+    public int getnLosses() {
+        return nLosses;
+    }
+
+    public void setnLosses(int nLosses) {
+        this.nLosses = nLosses;
+    }
+
+    public int getnDraws() {
+        return nDraws;
+    }
+
+    public void setnDraws(int nDraws) {
+        this.nDraws = nDraws;
+    }
+
+    private List<UserData> friends;
+    private List<Location> locationsPlayed;
+
+    public List<UserData> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(List<UserData> friends) {
+        this.friends = friends;
+    }
 
     public UserData(String name, String email){
         this.NAME = name;
         this.EMAIL = email;
+        this.SHORTBIO = "Enter a Short Bio";
         this.nMatchPlayed = 0;
         this.nVictories = 0;
         locationsPlayed = new ArrayList<>();
+        friends = new ArrayList<>();
     }
 
     public UserData(String name, String SHORTBIO, String email, int nMatchPlayed, int nVictories){
@@ -88,28 +116,12 @@ public class UserData implements Serializable {
         this.nVictories = nVictories;
     }
 
-    public List<String> getLocationsPlayed() {
+    public List<Location> getLocationsPlayed() {
         return locationsPlayed;
     }
 
-    public void setLocationsPlayed(List<String> locationsPlayed) {
+    public void setLocationsPlayed(List<Location> locationsPlayed) {
         this.locationsPlayed = locationsPlayed;
-    }
-
-    public Bitmap getProfilePic() {
-        return profilePic;
-    }
-
-    public void setProfilePic(Bitmap profilePic) {
-        this.profilePic = profilePic;
-    }
-
-    public Bitmap getHeaderPic() {
-        return headerPic;
-    }
-
-    public void setHeaderPic(Bitmap headerPic) {
-        this.headerPic = headerPic;
     }
 
     public UserData(){

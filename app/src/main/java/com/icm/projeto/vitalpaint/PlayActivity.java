@@ -27,11 +27,12 @@ import com.icm.projeto.vitalpaint.Data.UserDataManager;
 import java.io.File;
 
 public class PlayActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, UserDataManager.UserDataListener, UserDataManager.UserHeaderPicListener, UserDataManager.UserProfilePicListener {
+        implements NavigationView.OnNavigationItemSelectedListener, UserDataManager.UserDataListener{
     private View headerView;
     private FirebaseAuth auth;
     private FirebaseAuth.AuthStateListener authListener;
     private UserDataManager userDataManager;
+    public static final int PROFILE_DATA = 1;
     NavigationView navigationView;
     Toolbar toolbar;
 
@@ -75,7 +76,7 @@ public class PlayActivity extends AppCompatActivity
         };
         auth.addAuthStateListener(authListener);
         userDataManager = new UserDataManager(user.getEmail());
-        userDataManager.addListener(this);
+        userDataManager.addListener(this, PROFILE_DATA);
         if (savedInstanceState == null) {
             Fragment fragment = new CreateGameFragment(); // <-------
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -130,7 +131,7 @@ public class PlayActivity extends AppCompatActivity
             ft.commit();
         } else if (id == R.id.nav_friends) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame,  new FriendsFragment());
+            ft.replace(R.id.content_frame,  FriendsFragment.newInstance(userDataManager));
             ft.commit();
         } else if (id == R.id.nav_game_history) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -164,19 +165,11 @@ public class PlayActivity extends AppCompatActivity
     }
 
     @Override
-    public void onReceiveUserData(UserData userData){
+    public void onReceiveUserData(int requestType ,UserData user, Bitmap profilePic, Bitmap headerPic) {
         TextView drawerUsername = (TextView) headerView.findViewById(R.id.navBarUsername);
-        drawerUsername.setText(userData.getNAME());
-    }
-
-    @Override
-    public void onReceiveUserHeaderPic(Bitmap user) {
-        headerView.setBackground(new BitmapDrawable(getResources(), user));
-    }
-
-    @Override
-    public void onReceiveUserProfilePic(Bitmap user) {
+        drawerUsername.setText(user.getNAME());
         ImageView drawerImage = (ImageView) headerView.findViewById(R.id.imageView);
-        drawerImage.setImageBitmap(user);
+        drawerImage.setImageBitmap(profilePic);
+        headerView.setBackground(new BitmapDrawable(getResources(), headerPic));
     }
 }
