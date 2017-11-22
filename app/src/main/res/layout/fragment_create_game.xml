@@ -30,23 +30,63 @@
             android:entries="@array/game_modes"
             android:padding="5dp" />
 
-
+        <TextView
+            android:id="@+id/start_time_txt"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textAlignment="center"
+            android:text="@string/startDateText" />
         <LinearLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <TextView
-                android:id="@+id/text_view_id"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:text="@string/team_number" />
-            <Spinner
-                android:id="@+id/nLementsSpinner"
-                android:layout_width="fill_parent"
-                android:layout_height="80dp"
-                android:backgroundTint="@color/colorPrimary"
-                android:entries="@array/number_players"
-                android:padding="5dp" />
+
+            <DatePicker
+                android:id="@+id/start_date"
+                android:layout_width="165dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="left"
+                android:calendarViewShown="false"
+                android:datePickerMode="spinner"
+                android:scaleX="1" />
+
+            <TimePicker
+                android:id="@+id/start_time"
+                android:layout_width="201dp"
+                android:layout_height="186dp"
+                android:layout_gravity="right"
+                android:scaleX="1"
+                android:timePickerMode="spinner" />
+
+        </LinearLayout>
+        <TextView
+            android:id="@+id/end_time_txt"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textAlignment="center"
+            android:text="@string/endDateText" />
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <DatePicker
+                android:id="@+id/end_date"
+                android:layout_width="163dp"
+                android:layout_height="188dp"
+                android:layout_gravity="left"
+                android:calendarViewShown="false"
+                android:datePickerMode="spinner"
+                android:scaleX="0.7" />
+
+            <TimePicker
+                android:id="@+id/end_time"
+                android:layout_width="187dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
+                android:scaleX="0.7"
+                android:timePickerMode="spinner" />
+
         </LinearLayout>
 
         <Button
@@ -59,6 +99,7 @@
             android:text="@string/btn_create_game"
             android:textColor="@android:color/white"
             android:textStyle="bold" />
+
 
     </LinearLayout>
 

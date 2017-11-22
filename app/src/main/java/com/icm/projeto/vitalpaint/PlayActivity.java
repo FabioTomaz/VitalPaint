@@ -124,7 +124,9 @@ public class PlayActivity extends AppCompatActivity
             ft.replace(R.id.content_frame,  new CreateGameFragment());
             ft.commit();
         } else if (id == R.id.nav_join_game) {
-            startActivity(new Intent(PlayActivity.this, GameMapActivity.class));
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame,  new LobbyListFragment());
+            ft.commit();
         } else if (id == R.id.nav_profile) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame,  ProfileFragment.newInstance(userDataManager));

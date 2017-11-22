@@ -1,17 +1,30 @@
 package com.icm.projeto.vitalpaint;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.icm.projeto.vitalpaint.Data.Lobby;
+import com.icm.projeto.vitalpaint.Data.LobbyDataListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A fragment representing a list of Items.
@@ -19,7 +32,7 @@ import java.util.ArrayList;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class LobbyListFragment extends Fragment {
+public class LobbyListFragment extends Fragment implements LobbyDataListener {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -28,7 +41,14 @@ public class LobbyListFragment extends Fragment {
     private OnListFragmentInteractionListener mListener;
     private ListView lobbiesListView;
     private ArrayAdapter<Lobby> adapterItems;
-
+    private DatabaseReference dbRef;
+    private List<Lobby> lobbies;
+    private List<String> lobbyName;
+    private List<String> gameMode;
+    private List<String> lobbyHost;
+    private Map<String, String> hm;
+    private List<Map<String, String>> listViewContents;
+    private List<LobbyDataListener> listener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -51,9 +71,17 @@ public class LobbyListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ArrayList<Lobby> lobbies = Lobby.getItems();
+        lobbies = new ArrayList<>();
+        lobbyName = new ArrayList<>();
+        gameMode = new ArrayList<>();
+        lobbyHost = new ArrayList<>();
+        hm = new HashMap<>();
+        listViewContents = new ArrayList();
+        listener = new ArrayList<>();
         // Create adapter based on items
-        adapterItems = new ArrayAdapter<Lobby>(getActivity(), android.R.layout.simple_list_item_activated_1, lobbies);
+        adapterItems = new ArrayAdapter<Lobby>(getActivity(), R.layout.lobby_list_view, lobbies);
+        dbRef = FirebaseDatabase.getInstance().getReference().child("Games");
+        this.addListener(this);//adicionar ao listener
     }
 
     @Override
@@ -67,9 +95,60 @@ public class LobbyListFragment extends Fragment {
         lobbiesListView = (ListView) view.findViewById(R.id.lvLobbies);
         lobbiesListView.setAdapter(adapterItems);
 
+        lobbiesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                HashMap<String, String> lobby = (HashMap<String, String>) lobbiesListView.getItemAtPosition(i);
+                Intent intent = null;
+                Log.i("", lobby+"");
+                if(lobby.get("gameMode").equals("TEAMVSTEAM"))
+                    intent = new Intent(getActivity(), LobbyTeamActivity.class);
+                intent.putExtra("gameName", lobby.get("lobby_name")+"");
+                intent.putExtra("gameMode", lobby.get("gameMode").toString());
+                intent.putExtra("isHost", false);//o utlizador q se junta a um lobby nunca sera o host
+                startActivity(intent);
+                //adapter.dismiss(); // If you want to close the adapter
+            }
+        });
+
         return view;
     }
 
+    @Override
+    public void onLobbyListChange(List<Map<String, String>> lobbyList){//recebe os dados da firebase
+        String[] from = {"lobby_name", "gameMode", "lobbyHost"};
+        int[] to = {R.id.lobby_name, R.id.gameMode, R.id.lobbyHost};
+        SimpleAdapter simpleAdapter = new SimpleAdapter(this.getContext(), lobbyList, R.layout.lobby_list_view, from, to);
+        lobbiesListView.setAdapter(simpleAdapter);
+    }
+
+    public void addListener(LobbyListFragment lobbyListFragment) {
+        listener.add(lobbyListFragment);
+        lobbyList();//funçao q vai buscar os dados
+    }
+
+    private void lobbyList(){
+        dbRef.addListenerForSingleValueEvent(new ValueEventListener() { //listener para ler no inicio do fragmento da DB
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Lobby lobby = new Lobby();
+                //obter dados dos lobbys e colocá-los nas estruturas de dados para o listView
+                for (DataSnapshot data : snapshot.getChildren()) {
+                    lobby = data.getValue(Lobby.class);
+                    Log.i("lobby", lobby+"");
+                    hm.put("lobby_name", lobby.getGameName());
+                    hm.put("gameMode", lobby.getGameMode()+"");
+                    hm.put("lobbyHost", lobby.getHost());
+                    listViewContents.add(hm);//atualizar a lista de lobbies
+                }
+                listener.get(0).onLobbyListChange(listViewContents);
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+    }
 
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -93,6 +172,5 @@ public class LobbyListFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-
     }
 }

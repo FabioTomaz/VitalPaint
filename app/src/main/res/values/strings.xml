@@ -47,7 +47,8 @@
     <string name="red_team_join">Juntar á equipa vermelha</string>
     <string name="nome">Nome</string>
     <string name="username">Defina um nome de usuário</string>
-
+    <string name="startDateText">Indique a data de início do jogo</string>
+    <string name="endDateText">Indique a data de fim do jogo</string>
     <!-- TODO: Remove or change this placeholder text -->
 
     <string name="action_sign_in_short">Sign In</string>

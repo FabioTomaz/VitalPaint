@@ -5,14 +5,16 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TimePicker;
 
+import com.icm.projeto.vitalpaint.Data.GameDate;
 import com.icm.projeto.vitalpaint.Data.GameMode;
 
 
@@ -30,8 +32,13 @@ public class CreateGameFragment extends Fragment {
     private Button createBtn;
     private View inflatedView;
     private EditText gameName;
-    private Spinner nTeamElements;
     private Spinner gameMode;
+    private DatePicker startDate;
+    private TimePicker startTime;
+    private DatePicker endDate;
+    private TimePicker endTime;
+    GameDate gameStart;
+    GameDate gameEnd;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,19 +54,24 @@ public class CreateGameFragment extends Fragment {
         createBtn = (Button) inflatedView.findViewById(R.id.create_game);
         gameName = (EditText) inflatedView.findViewById(R.id.game_name);
         gameMode =(Spinner) inflatedView.findViewById(R.id.game_mode_spinner);
-        nTeamElements =(Spinner) inflatedView.findViewById(R.id.nLementsSpinner);
+        startDate = (DatePicker) inflatedView.findViewById(R.id.start_date);
+        startTime = (TimePicker) inflatedView.findViewById(R.id.start_time);
+        endDate = (DatePicker) inflatedView.findViewById(R.id.end_date);
+        endTime = (TimePicker) inflatedView.findViewById(R.id.end_time);
+
         //Log.i("email:", UserData.EMAIL+"");
         //listener para o click do botao de criar lobby. Iniciar atividade de Lobby
         createBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("",  nTeamElements.getSelectedItem().toString());
+                gameStart = new GameDate(startDate.getDayOfMonth(), startDate.getMonth(), startTime.getCurrentHour(), startTime.getCurrentMinute());
+                gameEnd = new GameDate(endDate.getDayOfMonth(), endDate.getMonth(), endTime.getCurrentHour(), endTime.getCurrentMinute());
                 if ( gameMode.getSelectedItemPosition() == 1) {//selecionado modo Team vs Team
                     Intent intent = new Intent(getActivity(), LobbyTeamActivity.class);
                     intent.putExtra("gameName", gameName.getText().toString());
-                    if (gameMode.getSelectedItem().toString().equals("Team vs Team"))
-                        intent.putExtra("gameMode", GameMode.TEAMVSTEAM);
-                    intent.putExtra("nElements", nTeamElements.getSelectedItem().toString());
+                    intent.putExtra("startDate", gameStart);
+                    intent.putExtra("endDate", gameEnd);
+                    intent.putExtra("gameMode", GameMode.TEAMVSTEAM.toString());//passar enum como string
                     intent.putExtra("isHost", true);//este utilizador criou o lobby
                     startActivity(intent);
                 }

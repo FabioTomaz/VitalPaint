@@ -1,7 +1,5 @@
 package com.icm.projeto.vitalpaint.Data;
 
-import com.icm.projeto.vitalpaint.Data.GameMode;
-
 import java.util.ArrayList;
 
 /**
@@ -21,6 +19,7 @@ public class Lobby {
                 ", gameMode=" + gameMode +
                 '}';
     }
+    public Lobby(){ }
 
     public void setGameName(String gameName) {
         this.gameName = gameName;

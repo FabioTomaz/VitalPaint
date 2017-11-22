@@ -16,7 +16,25 @@ public class GameData implements Serializable{
     private double lobbyLat;
     private double lobbyLong;
     private String playerName;
+    private GameDate startDate;
+    private GameDate endDate;
     private List<String> blueTeamPlayers;
+
+    public GameDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(GameDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public GameDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(GameDate endDate) {
+        this.endDate = endDate;
+    }
 
     public GameData(String gameName, GameMode gameMode){
         this.gameName = gameName;
