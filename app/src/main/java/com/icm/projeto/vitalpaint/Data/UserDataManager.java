@@ -53,9 +53,9 @@ public class UserDataManager  implements Serializable, Parcelable{
         dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email));//aceder ao nó Users, que guarda os usuários
         dbData.setValue(userData);
     }
-    public void addFriend(String friendEmail){
-        dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child("friends").child(encodeUserEmail(friendEmail));
-        dbData.setValue(friendEmail);
+    public void addFriend(UserData friend){
+        dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child("friends").child(encodeUserEmail(friend.getEMAIL()));
+        dbData.setValue(friend);
     }
     public void addLocation(Location locationsPlayed){
         dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child("locationsPlayed").push();
@@ -68,76 +68,80 @@ public class UserDataManager  implements Serializable, Parcelable{
         dbData.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                UserData userData = new UserData();
-                List<UserData> listOfFriends = new ArrayList<>();
-                for (DataSnapshot emp : snapshot.child("friends").getChildren()) {
-                    UserData friendData = new UserData();
-                    userData.setEMAIL(emp.child("email").getValue(String.class));
-                    userData.setNAME(emp.child("name").getValue(String.class));
-                    listOfFriends.add(friendData);
-                }
-                userData.setFriends(listOfFriends);
-                userData.setEMAIL(snapshot.child("email").getValue(String.class));
-                userData.setNAME(snapshot.child("name").getValue(String.class));
-                userData.setSHORTBIO(snapshot.child("shotbio").getValue(String.class));
-                userData.setnMatchPlayed(snapshot.child("nMatchPlayed").getValue(Integer.class));
-                userData.setnVictories(snapshot.child("nVictories").getValue(Integer.class));
-                final UserData finalUserData = userData;
+                if(snapshot.getValue()==null) {
+                    notifyObservers(requestType, null, null, null);
+                }else {
+                    UserData userData = new UserData();
+                    List<UserData> listOfFriends = new ArrayList<>();
+                    for (DataSnapshot emp : snapshot.child("friends").getChildren()) {
+                        UserData friendData = new UserData();
+                        friendData.setEMAIL(emp.child("email").getValue(String.class));
+                        friendData.setNAME(emp.child("name").getValue(String.class));
+                        listOfFriends.add(friendData);
+                    }
+                    userData.setFriends(listOfFriends);
+                    userData.setEMAIL(snapshot.child("email").getValue(String.class));
+                    userData.setNAME(snapshot.child("name").getValue(String.class));
+                    userData.setSHORTBIO(snapshot.child("shotbio").getValue(String.class));
+                    userData.setnMatchPlayed(snapshot.child("nMatchPlayed").getValue(Integer.class));
+                    userData.setnVictories(snapshot.child("nVictories").getValue(Integer.class));
+                    final UserData finalUserData = userData;
 
-                StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/"+email+"/profilePic");
-                try {
-                    final File  profileFile = File.createTempFile("profile", "jpg");
-                    final Bitmap[] image = {null};
-                    storageRef.getFile(profileFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                            final Bitmap profilePic = BitmapFactory.decodeFile(profileFile.getAbsolutePath());
-                            StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/"+email+"/headerPic");
-                            try {
-                            final File headerFile = File.createTempFile("header", "jpg");
-                            final Bitmap[] image = {null};
-                            storageRef.getFile(headerFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                    for (int i = 0; i < list.size(); i++) {
-                                        list.get(i).onReceiveUserData(requestType,finalUserData, profilePic, BitmapFactory.decodeFile(headerFile.getAbsolutePath()));
-                                    }
+                    StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/" + email + "/profilePic");
+                    try {
+                        final File profileFile = File.createTempFile("profile", "jpg");
+                        final Bitmap[] image = {null};
+                        storageRef.getFile(profileFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                final Bitmap profilePic = BitmapFactory.decodeFile(profileFile.getAbsolutePath());
+                                StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/" + email + "/headerPic");
+                                try {
+                                    final File headerFile = File.createTempFile("header", "jpg");
+                                    final Bitmap[] image = {null};
+                                    storageRef.getFile(headerFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                            for (int i = 0; i < list.size(); i++) {
+                                                list.get(i).onReceiveUserData(requestType, finalUserData, profilePic, BitmapFactory.decodeFile(headerFile.getAbsolutePath()));
+                                            }
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            notifyObservers(requestType, finalUserData, profilePic, null);
+                                        }
+                                    });
+                                } catch (IOException e) {
+                                    e.printStackTrace();
                                 }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    notifyObservers(requestType,finalUserData, profilePic, null);
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/" + email + "/headerPic");
+                                try {
+                                    final File headerFile = File.createTempFile("header", "jpg");
+                                    final Bitmap[] image = {null};
+                                    storageRef.getFile(headerFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                            notifyObservers(requestType, finalUserData, null, BitmapFactory.decodeFile(headerFile.getAbsolutePath()));
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            notifyObservers(requestType, finalUserData, null, null);
+                                        }
+                                    });
+                                } catch (IOException ex) {
+                                    ex.printStackTrace();
                                 }
-                            });
-                            } catch (IOException e) {
-                                e.printStackTrace();
                             }
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/"+email+"/headerPic");
-                            try {
-                                final File headerFile = File.createTempFile("header", "jpg");
-                                final Bitmap[] image = {null};
-                                storageRef.getFile(headerFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                        notifyObservers(requestType,finalUserData, null, BitmapFactory.decodeFile(headerFile.getAbsolutePath()));
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        notifyObservers(requestType,finalUserData, null, null);
-                                    }
-                                });
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-                    });
-                } catch (IOException e) {
-                    e.printStackTrace();
+                        });
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             @Override
@@ -165,29 +169,6 @@ public class UserDataManager  implements Serializable, Parcelable{
     @Override
     public void writeToParcel(Parcel dest, int flags) {}
 }
-
-    /*public static boolean userNameExists(final String userName) {//nao esta a funcionar..
-        final boolean[] bool = {false};
-
-        final DatabaseReference dbData = FirebaseDatabase.getInstance().getReference().child("Users");
-        dbData.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot data : snapshot.getChildren()) {//percore os users ate encontrar o user com username correto
-                    if (data.getKey().equals(userName)) {
-                        bool[0]=true;
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        return bool[0];
-    }*/
 
 
 //atualizar na database o nome de um user. Se for o user logado, a classe UserData tmb será atualizada

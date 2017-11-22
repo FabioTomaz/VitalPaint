@@ -1,6 +1,7 @@
 package com.icm.projeto.vitalpaint;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ public class FriendsListAdapter extends ArrayAdapter<UserData>{
 
     @Override
     public View getView(int position, View view, ViewGroup parent) {
+        Log.i("OLAAAA", userDatas.get(position).toString());
         LayoutInflater inflater = context.getLayoutInflater();
         View rowView= inflater.inflate(R.layout.listview_activity, null, true);
         TextView txtTitle = (TextView) rowView.findViewById(R.id.listview_item_title);

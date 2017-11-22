@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
@@ -20,10 +21,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -174,25 +177,35 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
 
     @Override
     public void onReceiveUserData(int requestType, UserData user, Bitmap profilePic, Bitmap headerPic) {
-        name.setText(user.getNAME());
-        shortBio.setText(user.getSHORTBIO());
+        if (getView()!=null) {
+            name.setText(user.getNAME());
+            shortBio.setText(user.getSHORTBIO());
 
-        PieChart pieChart = (PieChart) getView().findViewById(R.id.pieChart);
-        List<PieEntry> entries = new ArrayList<>();
+            PieChart pieChart = (PieChart) getView().findViewById(R.id.pieChart);
+            List<PieEntry> entries = new ArrayList<>();
 
-        entries.add(new PieEntry(18.5f, "Green"));
-        entries.add(new PieEntry(26.7f, "Yellow"));
-        entries.add(new PieEntry(24.0f, "Red"));
-        entries.add(new PieEntry(30.8f, "Blue"));
+            entries.add(new PieEntry(5, "Vitorias"));
+            entries.add(new PieEntry(5, "Empates"));
+            entries.add(new PieEntry(5, "Derrotas"));
 
-        PieDataSet set = new PieDataSet(entries, "Resultados dos Jogos");
-        PieData data = new PieData(set);
-        pieChart.setData(data);
-        pieChart.invalidate(); // refresh
+            PieDataSet set = new PieDataSet(entries, "Resultados dos Jogos");
+            set.setValueTextSize(20);
+            set.setColors(ColorTemplate.COLORFUL_COLORS);
+            PieData data = new PieData(set);
+            pieChart.getDescription().setEnabled(false);
+            pieChart.setHoleRadius(35f);
+            pieChart.setData(data);
+            pieChart.invalidate(); // refresh
+            pieChart.animateY(600, Easing.EasingOption.EaseInOutQuad);
 
-        if(headerPic!=null)
-            headerImageView.setImageBitmap(headerPic);
-        if (profilePic!=null)
-            profileImageView.setImageBitmap(profilePic);
+            if (headerPic != null)
+                headerImageView.setImageBitmap(headerPic);
+            if (profilePic != null)
+                profileImageView.setImageBitmap(profilePic);
+            Snackbar snackbar = Snackbar
+                    .make(getView(), "Podes alterar o teu nome, biografia, foto de perfil e de capa clicando neles.", Snackbar.LENGTH_LONG);
+
+            snackbar.show();
+        }
     }
 }

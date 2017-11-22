@@ -44,26 +44,32 @@ public class FriendsFragment extends Fragment implements UserDataManager.UserDat
         adapter = new FriendsListAdapter(getActivity(), new ArrayList<UserData>());
         friendsListView.setAdapter(adapter);
         userDataManager.addListener(this, PROFILE_DATA);
-
+        final FriendsFragment friendsFragment = this;
         addFriendButton = (FloatingActionButton) view.findViewById(R.id.add_friend);
         addFriendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), android.R.style.Theme_Material_Light_Dialog_Alert);
-                builder.setTitle("ADICIONAR AMIGO");
+                LayoutInflater li = LayoutInflater.from(getContext());
+                View promptsView = li.inflate(R.layout.dialog_input_text, null);
 
-                // Set up the input
-                final EditText input = new EditText(getActivity());
-                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                builder.setMessage("Introduza o Email do Amigo").setView(input);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), android.R.style.Theme_Material_Light_Dialog_Alert);
+
+                // set prompts.xml to alertdialog builder
+                builder.setView(promptsView);
+
+                final EditText userInput = (EditText) promptsView
+                        .findViewById(R.id.editTextDialogUserInput);
+                builder.setTitle("Adicionar Amigo");
+
+                builder.setView(promptsView);
 
                 // Set up the buttons
                 builder.setPositiveButton("Adicionar!", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //insert friend in db
-                        userDataManager.addFriend(input.getText().toString());
+                        UserDataManager userDataManager = new UserDataManager(userInput.getText().toString());
+                        userDataManager.addListener(friendsFragment, CHECK_USER_EXISTS);
                     }
                 });
                 builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -72,6 +78,7 @@ public class FriendsFragment extends Fragment implements UserDataManager.UserDat
                         dialog.cancel();
                     }
                 });
+                builder.create();
                 builder.show();
             }
         });
@@ -95,10 +102,31 @@ public class FriendsFragment extends Fragment implements UserDataManager.UserDat
     @Override
     public void onReceiveUserData(int request, UserData user, Bitmap profilePic, Bitmap headerPic) {
         if(request == PROFILE_DATA) {
-            if (user.getFriends() != null)
+            if (user.getFriends() != null) {
+                Log.i("pilas", user.getFriends().toString());
                 adapter.addAll(user.getFriends());
+                adapter.notifyDataSetChanged();
+            }
         }else if(request == CHECK_USER_EXISTS){
+            if(user==null) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), android.R.style.Theme_Material_Light_Dialog_Alert);
+                builder.setTitle("Não foi possivel adicionar amigo");
 
+                builder.setMessage("O email do utilizador não existe ou a conexão ao servidor caiu");
+
+                // Set up the buttons
+                builder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+            }else {
+                UserData filteredUserData = new UserData();
+                filteredUserData.setNAME(user.getNAME());
+                filteredUserData.setEMAIL(user.getEMAIL());
+                userDataManager.addFriend(filteredUserData);
+            }
         }
     }
 }
