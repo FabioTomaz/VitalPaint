@@ -76,7 +76,7 @@ public class PlayActivity extends AppCompatActivity
         };
         auth.addAuthStateListener(authListener);
         userDataManager = new UserDataManager(user.getEmail());
-        userDataManager.addListener(this, PROFILE_DATA);
+        userDataManager.userDataFromEmailListener(PROFILE_DATA);
         if (savedInstanceState == null) {
             Fragment fragment = new CreateGameFragment(); // <-------
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();

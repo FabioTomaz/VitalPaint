@@ -44,18 +44,16 @@ public class UserDataManager  implements Serializable, Parcelable{
         public void onReceiveUserData(int requestType, UserData user, Bitmap profilePic, Bitmap headerPic);
     }
 
-    public void addListener(UserDataListener userListener, int requestType) {
+    public void addListener(UserDataListener userListener) {
         list.add(userListener);
-        userDataFromEmailListener(requestType);
     }
 
     public void newUserData(UserData userData) {
         dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email));//aceder ao nó Users, que guarda os usuários
         dbData.setValue(userData);
     }
-    public void addFriend(UserData friend){
-        dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child("friends").child(encodeUserEmail(friend.getEMAIL()));
-        dbData.setValue(friend);
+    public void addFriend(String friendEmail){
+        FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child("friends").push().setValue(friendEmail);
     }
     public void addLocation(Location locationsPlayed){
         dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child("locationsPlayed").push();
@@ -63,7 +61,7 @@ public class UserDataManager  implements Serializable, Parcelable{
     }
 
 
-    private void userDataFromEmailListener(final int requestType) {
+    public void userDataFromEmailListener(final int requestType) {
         DatabaseReference dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email));
         dbData.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -148,6 +146,7 @@ public class UserDataManager  implements Serializable, Parcelable{
             public void onCancelled(DatabaseError databaseError) {}
         });
     }
+
 
     private void notifyObservers(int requestType, UserData user, Bitmap profilePic, Bitmap headerPic){
         for (int i = 0; i < list.size(); i++) {

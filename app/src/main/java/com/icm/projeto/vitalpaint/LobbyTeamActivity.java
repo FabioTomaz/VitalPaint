@@ -64,7 +64,7 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
         auth = FirebaseAuth.getInstance();
         //criar listener para obter dados do user loggado
         userDataManager = new UserDataManager(auth.getCurrentUser().getEmail());
-        userDataManager.addListener(this, PROFILE_DATA);
+        //userDataManager.addListener(this, PROFILE_DATA);
         gameName = getIntent().getStringExtra("gameName");
         isHost = getIntent().getBooleanExtra ("isHost", false);
         gameMode = GameMode.valueOf(getIntent().getStringExtra("gameMode")); //obter  a string do enum e converter para enum

@@ -3,19 +3,26 @@ package com.icm.projeto.vitalpaint;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
+import com.firebase.ui.database.FirebaseListAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.icm.projeto.vitalpaint.Data.UserData;
 import com.icm.projeto.vitalpaint.Data.UserDataManager;
@@ -31,7 +38,7 @@ import java.util.List;
 public class FriendsFragment extends Fragment implements UserDataManager.UserDataListener{
     private FloatingActionButton addFriendButton;
     private ListView friendsListView;
-    private FriendsListAdapter adapter;
+    private FirebaseListAdapter<String> adapter;
     private UserDataManager userDataManager;
     public static final int PROFILE_DATA = 1;
     public static final int CHECK_USER_EXISTS = 2;
@@ -40,10 +47,9 @@ public class FriendsFragment extends Fragment implements UserDataManager.UserDat
                              Bundle savedInstanceState) {
         getActivity().setTitle("Amigos");
         View view = inflater.inflate(R.layout.fragment_friends, container, false);
+        adapter = new FriendsListAdapter(getActivity(), getContext(),FirebaseAuth.getInstance().getCurrentUser().getEmail());
         friendsListView = (ListView)view.findViewById(R.id.list_friends);
-        adapter = new FriendsListAdapter(getActivity(), new ArrayList<UserData>());
         friendsListView.setAdapter(adapter);
-        userDataManager.addListener(this, PROFILE_DATA);
         final FriendsFragment friendsFragment = this;
         addFriendButton = (FloatingActionButton) view.findViewById(R.id.add_friend);
         addFriendButton.setOnClickListener(new View.OnClickListener() {
@@ -69,7 +75,8 @@ public class FriendsFragment extends Fragment implements UserDataManager.UserDat
                     public void onClick(DialogInterface dialog, int which) {
                         //insert friend in db
                         UserDataManager userDataManager = new UserDataManager(userInput.getText().toString());
-                        userDataManager.addListener(friendsFragment, CHECK_USER_EXISTS);
+                        userDataManager.addListener(friendsFragment);
+                        userDataManager.userDataFromEmailListener(CHECK_USER_EXISTS);
                     }
                 });
                 builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -101,13 +108,7 @@ public class FriendsFragment extends Fragment implements UserDataManager.UserDat
 
     @Override
     public void onReceiveUserData(int request, UserData user, Bitmap profilePic, Bitmap headerPic) {
-        if(request == PROFILE_DATA) {
-            if (user.getFriends() != null) {
-                Log.i("pilas", user.getFriends().toString());
-                adapter.addAll(user.getFriends());
-                adapter.notifyDataSetChanged();
-            }
-        }else if(request == CHECK_USER_EXISTS){
+       if(request == CHECK_USER_EXISTS){
             if(user==null) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), android.R.style.Theme_Material_Light_Dialog_Alert);
                 builder.setTitle("Não foi possivel adicionar amigo");
@@ -122,10 +123,7 @@ public class FriendsFragment extends Fragment implements UserDataManager.UserDat
                     }
                 });
             }else {
-                UserData filteredUserData = new UserData();
-                filteredUserData.setNAME(user.getNAME());
-                filteredUserData.setEMAIL(user.getEMAIL());
-                userDataManager.addFriend(filteredUserData);
+                userDataManager.addFriend(user.getEMAIL());
             }
         }
     }

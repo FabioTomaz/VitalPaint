@@ -9,6 +9,7 @@ android {
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         resValue "string", "google_maps_key", (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
     }
@@ -42,7 +43,15 @@ dependencies {
     compile 'com.google.firebase:firebase-database:11.2.0'
     compile 'com.google.firebase:firebase-storage:11.2.0'
     compile 'de.hdodenhof:circleimageview:2.2.0'
+    // FirebaseUI for Firebase Realtime Database
+    compile 'com.firebaseui:firebase-ui-database:1.0.0'
+
+    // FirebaseUI for Cloud Storage
+    compile 'com.firebaseui:firebase-ui-storage:1.0.0'
     compile 'com.github.PhilJay:MPAndroidChart:v3.0.2'
+
+    compile 'com.github.bumptech.glide:glide:4.3.1'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.3.1'
     //picasso
     compile 'com.squareup.picasso:picasso:2.5.2'
     testCompile 'junit:junit:4.12'

@@ -101,7 +101,8 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
                 startActivityForResult(intent, PICK_PHOTO_FOR_HEADER);
             }
         });
-        userDataManager.addListener(this, PROFILE_DATA);
+        userDataManager.addListener(this);
+        userDataManager.userDataFromEmailListener(PROFILE_DATA);
         return view;
     }
 
