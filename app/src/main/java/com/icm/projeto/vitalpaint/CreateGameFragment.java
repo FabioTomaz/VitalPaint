@@ -1,5 +1,6 @@
 package com.icm.projeto.vitalpaint;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -8,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -59,6 +61,14 @@ public class CreateGameFragment extends Fragment {
         endDate = (DatePicker) inflatedView.findViewById(R.id.end_date);
         endTime = (TimePicker) inflatedView.findViewById(R.id.end_time);
 
+        gameName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    hideKeyboard(v);
+                }
+            }
+        });
         //Log.i("email:", UserData.EMAIL+"");
         //listener para o click do botao de criar lobby. Iniciar atividade de Lobby
         createBtn.setOnClickListener(new View.OnClickListener() {
@@ -82,6 +92,11 @@ public class CreateGameFragment extends Fragment {
         return inflatedView;
 
 
+    }
+
+    public void hideKeyboard(View view) {
+        InputMethodManager inputMethodManager =(InputMethodManager)getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     @Override

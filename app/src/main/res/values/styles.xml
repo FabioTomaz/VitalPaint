@@ -26,4 +26,11 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="Theme.App.Login" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:textColorHint">@color/white</item>
+        <item name="colorAccent">@color/white</item>
+        <item name="colorControlNormal">@color/white</item>
+        <item name="colorControlActivated">@color/white</item>
+    </style>
+
 </resources>

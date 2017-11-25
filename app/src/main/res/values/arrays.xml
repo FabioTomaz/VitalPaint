@@ -2,7 +2,7 @@
 
 <resources>
     <string-array name="game_modes">
-        <item>DeathMatch</item>
+        <item>Domination</item>
         <item>Team vs Team</item>
     </string-array>
     <string-array name="number_players">
