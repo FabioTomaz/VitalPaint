@@ -3,12 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/android_list_view_tutorial_with_example"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:padding="7dp">
+        android:padding="4dp">
         <!--
             <ImageView
                 android:id="@+id/listview_image"
@@ -17,32 +17,52 @@
                 android:contentDescription="@string/app_name"
                 android:padding="10dp" />
             -->
-        <TextView
-            android:id="@+id/lobby_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:textStyle="bold" />
         <LinearLayout
+            android:id="@+id/tittle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="7dp">
+            android:layout_alignParentLeft="true"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/lobby_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginLeft="10dp"
+                android:textSize="17sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/gameMode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
+                android:layout_gravity="left"
+                android:layout_marginLeft="10dp"
+                android:paddingTop="5dp"
+                android:textSize="13sp"
                 android:textStyle="bold" />
-
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/subtittle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:orientation="vertical"
+            android:padding="7dp">
             <TextView
-                android:id="@+id/lobbyHost"
+                android:id="@+id/gameStart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:textSize="12sp" />
+            <TextView
+                android:id="@+id/gameDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="5dp"
+                android:layout_gravity="right"
                 android:textSize="12sp" />
         </LinearLayout>
-    </LinearLayout>
+    </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>

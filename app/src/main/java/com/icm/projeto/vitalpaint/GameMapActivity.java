@@ -46,13 +46,17 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
 
     private List<String> blueTeamPlayers;
     private List<String> redTeamPlayers;
-    private String myName = "Bruno";
+    private String myName;
     private String gameName;
+    private String myTeam = "";
+    private String enemyTeam = "";
+    private int duration;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     LocationRequest mLocationRequest;
     private GameDataManager dbManager;
-    private DatabaseReference myTeam = FirebaseDatabase.getInstance().getReference("Game1").child("Equipa Azul");
+    private DatabaseReference dbRef;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,18 +72,16 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        /*this.blueTeamPlayers = new ArrayList<>();
-        blueTeamPlayers.add("Bruno");
-        blueTeamPlayers.add("Pires");
-        blueTeamPlayers.add("Silva");
-
-        redTeamPlayers = new ArrayList<>();
-        redTeamPlayers.add("Fabio");
-        redTeamPlayers.add("Miguel");
-        redTeamPlayers.add("Santos");
-
-        dbManager = new GameDataManager("Game1", blueTeamPlayers, redTeamPlayers);
-        */
+        gameName = getIntent().getStringExtra("gameName");
+        duration = getIntent().getIntExtra("duration", 0);
+        myTeam = getIntent().getStringExtra("myTeam");
+        Log.i("gamemap", myTeam + ", " + "duration:" + duration + ", gm " + gameName);
+        myName = getIntent().getStringExtra("userName");
+        if (myTeam.equals("Equipa Azul"))
+            enemyTeam = "Equipa Vermelha";
+        else
+            enemyTeam = "Equipa Azul";
+        dbRef = FirebaseDatabase.getInstance().getReference("Games").child(gameName);
     }
 
 
@@ -110,8 +112,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 buildGoogleApiClient();
                 //mMap.setMyLocationEnabled(true);
             }
-        }
-        else {
+        } else {
             buildGoogleApiClient();
             //mMap.setMyLocationEnabled(true);
         }
@@ -148,7 +149,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     }
 
     private void updateCameraBearing(GoogleMap googleMap, float bearing) {
-        if ( googleMap == null) return;
+        if (googleMap == null) return;
         CameraPosition camPos = CameraPosition
                 .builder(
                         googleMap.getCameraPosition() // current Camera
@@ -158,7 +159,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camPos));
     }
 
-    public Address setCurrentPlaceDetails(double latitude, double longitude){
+    public Address setCurrentPlaceDetails(double latitude, double longitude) {
         Geocoder geocoder;
         List<Address> addresses = null;
         geocoder = new Geocoder(this, Locale.getDefault());
@@ -180,12 +181,14 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.i("location change", "m here");
         mMap.clear();
         mLastLocation = location;
         //Place current location marker
         Log.v("TAG_location", "IN ON LOCATION CHANGE, bearing=" + location.getBearing());
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        dbManager.updatePlayerLocation("Equipa Azul", "Bruno", location.getLatitude(), location.getLongitude());
+        dbRef.child(myTeam).child(myName).child("lat").setValue(location.getLatitude());
+        dbRef.child(myTeam).child(myName).child("longt").setValue(location.getLongitude());
         Marker m =
                 mMap.addMarker(new MarkerOptions()
                         .position(latLng)
@@ -208,23 +211,23 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
         //Ler valores da minha equipa
-        myTeam.addValueEventListener(new ValueEventListener() {
+        dbRef.child(myTeam).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 double lat;
                 double longt;
-                List<Double>  cords = new ArrayList<>();
-                for (String name : blueTeamPlayers){
-                    if (!name.equals(myName)) {
-                        lat = dataSnapshot.child(name).child("lat").getValue(Double.class);
-                        longt = dataSnapshot.child(name).child("long").getValue(Double.class);
+                List<Double> cords = new ArrayList<>();
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    if (!data.getKey().equals(myName) && !data.getKey().equals("score")) {
+                        lat = dataSnapshot.child(data.getKey()).child("lat").getValue(Double.class);
+                        longt = dataSnapshot.child(data.getKey()).child("long").getValue(Double.class);
                         //Log.i("", "lat: " + lat);
                         //Log.i("", "long: "+ longt);
                         LatLng coord = new LatLng(lat, longt);
                         //adicionar marcador com as novas coordenadas
                         mMap.addMarker(new MarkerOptions()
                                 .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_player_pointer))
-                                .title(name));
+                                .title(data.getKey()));
                     }
                 }
             }
@@ -235,7 +238,33 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
             }
         });
 
-        //dbManager.getMyTeamPlayersLocations();
+        //Ler valores da equipa inimiga
+        dbRef.child(enemyTeam).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                double lat;
+                double longt;
+                List<Double> cords = new ArrayList<>();
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    if (!data.getKey().equals("score")) {
+                        lat = dataSnapshot.child(data.getKey()).child("lat").getValue(Double.class);
+                        longt = dataSnapshot.child(data.getKey()).child("long").getValue(Double.class);
+                        //Log.i("", "lat: " + lat);
+                        //Log.i("", "long: "+ longt);
+                        LatLng coord = new LatLng(lat, longt);
+                        //adicionar marcador com as novas coordenadas
+                        mMap.addMarker(new MarkerOptions()
+                                .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_player_pointer))
+                                .title(data.getKey()));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
@@ -245,7 +274,8 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
-    public boolean checkLocationPermission(){
+
+    public boolean checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -310,8 +340,4 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
 
         }
     }
-
-    
-
-
 }
