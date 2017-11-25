@@ -70,17 +70,14 @@ public class FriendsListAdapter extends FirebaseListAdapter<String> {
                 Drawable drawable = ContextCompat.getDrawable(activity,R.drawable.imagem_perfil);
                 RequestOptions options = new RequestOptions()
                         .error(drawable);
-                try {
                     Glide.with(activity)
                             .load(FirebaseStorage.getInstance().getReference("User Profile Photos/" + model + "/profilePic"))
                             .apply(options)
                             .into(imageView);
-                }catch (NullPointerException e){
-                    imageView.setImageDrawable(drawable);
-                }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         });
+
     }
 }

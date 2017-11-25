@@ -19,9 +19,11 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.icm.projeto.vitalpaint.Data.UserData;
@@ -30,6 +32,8 @@ import com.icm.projeto.vitalpaint.Data.UserDataManager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static android.widget.Toast.LENGTH_SHORT;
 
 
 /**
@@ -50,6 +54,16 @@ public class FriendsFragment extends Fragment implements UserDataManager.UserDat
         adapter = new FriendsListAdapter(getActivity(), getContext(),FirebaseAuth.getInstance().getCurrentUser().getEmail());
         friendsListView = (ListView)view.findViewById(R.id.list_friends);
         friendsListView.setAdapter(adapter);
+        friendsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                String user = (String)adapter.getItem(position);
+                final FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, ProfileFragment.newInstance(user), user+"Profile");
+                ft.commit();
+                ft.addToBackStack(null);
+            }
+        });
         final FriendsFragment friendsFragment = this;
         addFriendButton = (FloatingActionButton) view.findViewById(R.id.add_friend);
         addFriendButton.setOnClickListener(new View.OnClickListener() {
@@ -95,13 +109,13 @@ public class FriendsFragment extends Fragment implements UserDataManager.UserDat
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        userDataManager = (UserDataManager) getArguments().getSerializable("dbmanager");
+        userDataManager = new UserDataManager((String) getArguments().getSerializable("userEmail"));
     }
 
-    public static FriendsFragment newInstance(UserDataManager manager) {
+    public static FriendsFragment newInstance(String userEmail) {
         FriendsFragment fragmentDemo = new FriendsFragment();
         Bundle args = new Bundle();
-        args.putSerializable("dbmanager", manager);
+        args.putSerializable("userEmail", userEmail);
         fragmentDemo.setArguments(args);
         return fragmentDemo;
     }
@@ -110,19 +124,11 @@ public class FriendsFragment extends Fragment implements UserDataManager.UserDat
     public void onReceiveUserData(int request, UserData user, Bitmap profilePic, Bitmap headerPic) {
        if(request == CHECK_USER_EXISTS){
             if(user==null) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), android.R.style.Theme_Material_Light_Dialog_Alert);
-                builder.setTitle("Não foi possivel adicionar amigo");
-
-                builder.setMessage("O email do utilizador não existe ou a conexão ao servidor caiu");
-
-                // Set up the buttons
-                builder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
+                Toast toast = Toast.makeText(getActivity().getApplicationContext(), "O email do utilizador não existe ou a conexão ao servidor caiu", Toast.LENGTH_SHORT);
+                toast.show();
             }else {
+                Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Amigo adicionado com sucesso!", Toast.LENGTH_SHORT);
+                toast.show();
                 userDataManager.addFriend(user.getEMAIL());
             }
         }

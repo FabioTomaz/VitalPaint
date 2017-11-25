@@ -62,19 +62,21 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
     private UserDataManager userDataManager;
     public static final int PROFILE_DATA = 1;
     FirebaseAuth auth = FirebaseAuth.getInstance();
+    private String userEmail;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        userDataManager = (UserDataManager) getArguments().getSerializable("dbmanager");
+        userEmail = (String) (String) getArguments().getSerializable("userEmail");
+        userDataManager = new UserDataManager(userEmail);
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
     }
 
-    public static ProfileFragment newInstance(UserDataManager manager) {
+    public static ProfileFragment newInstance(String userEmail) {
         ProfileFragment fragmentDemo = new ProfileFragment();
         Bundle args = new Bundle();
-        args.putSerializable("dbmanager", manager);
+        args.putSerializable("userEmail", userEmail);
         fragmentDemo.setArguments(args);
         return fragmentDemo;
     }
@@ -87,20 +89,22 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
         headerImageView = (ImageView) view.findViewById(R.id.header_cover_image);
         name = (TextView) view.findViewById(R.id.user_profile_name);
         shortBio = (TextView) view.findViewById(R.id.user_profile_short_bio);
-        profileImageView.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
-                startActivityForResult(intent, PICK_PHOTO_FOR_AVATAR);
-            }
-        });
-        headerImageView.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
-                startActivityForResult(intent, PICK_PHOTO_FOR_HEADER);
-            }
-        });
+        if(FirebaseAuth.getInstance().getCurrentUser().getEmail() == userEmail) {
+            profileImageView.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.setType("image/*");
+                    startActivityForResult(intent, PICK_PHOTO_FOR_AVATAR);
+                }
+            });
+            headerImageView.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.setType("image/*");
+                    startActivityForResult(intent, PICK_PHOTO_FOR_HEADER);
+                }
+            });
+        }
         userDataManager.addListener(this);
         userDataManager.userDataFromEmailListener(PROFILE_DATA);
         return view;
@@ -203,10 +207,11 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
                 headerImageView.setImageBitmap(headerPic);
             if (profilePic != null)
                 profileImageView.setImageBitmap(profilePic);
-            Snackbar snackbar = Snackbar
-                    .make(getView(), "Podes alterar o teu nome, biografia, foto de perfil e de capa clicando neles.", Snackbar.LENGTH_LONG);
-
-            snackbar.show();
+            if(FirebaseAuth.getInstance().getCurrentUser().getEmail()==userEmail) {
+                Snackbar snackbar = Snackbar
+                        .make(getView(), "Podes alterar o teu nome, biografia, foto de perfil e de capa clicando neles.", Snackbar.LENGTH_LONG);
+                snackbar.show();
+            }
         }
     }
 }

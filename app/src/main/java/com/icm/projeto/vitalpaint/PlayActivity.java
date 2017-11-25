@@ -86,19 +86,6 @@ public class PlayActivity extends AppCompatActivity
 
     }
 
-    /*private void downloadProfilePic(String email) throws IOException {
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-        final File localFile = File.createTempFile("profile", "jpg");
-        final Bitmap image = null;
-        storageRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                loadImage(ProfileFragment.convertToBitMap(localFile));
-            }
-        });
-        UserData.loggedUser.profilePic = image;
-    }*/
-
     public static Bitmap convertToBitMap(File file){
         return BitmapFactory.decodeFile(file.getAbsolutePath());
     }
@@ -129,11 +116,11 @@ public class PlayActivity extends AppCompatActivity
             ft.commit();
         } else if (id == R.id.nav_profile) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame,  ProfileFragment.newInstance(userDataManager));
+            ft.replace(R.id.content_frame,  ProfileFragment.newInstance(FirebaseAuth.getInstance().getCurrentUser().getEmail()));
             ft.commit();
         } else if (id == R.id.nav_friends) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame,  FriendsFragment.newInstance(userDataManager));
+            ft.replace(R.id.content_frame,  FriendsFragment.newInstance(FirebaseAuth.getInstance().getCurrentUser().getEmail()));
             ft.commit();
         } else if (id == R.id.nav_game_history) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();

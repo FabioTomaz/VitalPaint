@@ -19,6 +19,19 @@ public class GameData implements Serializable{
     private GameDate startDate;
     private GameDate endDate;
     private List<String> blueTeamPlayers;
+    private GAMERESULT result;
+
+    public GAMERESULT getResult() {
+        return result;
+    }
+
+    public void setResult(GAMERESULT result) {
+        this.result = result;
+    }
+
+    public static enum GAMERESULT{
+        REDTEAMWON, BLUETEAMWON, DRAW
+    }
 
     public GameDate getStartDate() {
         return startDate;
