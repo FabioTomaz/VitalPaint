@@ -21,6 +21,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.icm.projeto.vitalpaint.Data.Lobby;
 import com.icm.projeto.vitalpaint.Data.LobbyDataListener;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +36,7 @@ import java.util.Map;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class LobbyListFragment extends Fragment implements LobbyDataListener {
+public class LobbyListFragment extends Fragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -49,6 +53,9 @@ public class LobbyListFragment extends Fragment implements LobbyDataListener {
     private Map<String, String> hm;
     private List<Map<String, String>> listViewContents;
     private List<LobbyDataListener> listener;
+    private String[] from = {"lobby_name", "gameMode", "gameStart", "gameDuration"};
+    private int[] to = {R.id.lobby_name, R.id.gameMode, R.id.gameStart, R.id.gameDuration};
+
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -81,7 +88,7 @@ public class LobbyListFragment extends Fragment implements LobbyDataListener {
         // Create adapter based on items
         adapterItems = new ArrayAdapter<Lobby>(getActivity(), R.layout.lobby_list_view, lobbies);
         dbRef = FirebaseDatabase.getInstance().getReference().child("Games");
-        this.addListener(this);//adicionar ao listener
+
     }
 
     @Override
@@ -101,53 +108,99 @@ public class LobbyListFragment extends Fragment implements LobbyDataListener {
 
                 HashMap<String, String> lobby = (HashMap<String, String>) lobbiesListView.getItemAtPosition(i);
                 Intent intent = null;
-                Log.i("", lobby+"");
+                Log.i("lobby", lobby+"");
+                Log.i("duration", lobby.get("gameStart").replaceAll("Início: ", "")+"");
                 if(lobby.get("gameMode").equals("TEAMVSTEAM"))
                     intent = new Intent(getActivity(), LobbyTeamActivity.class);
                 intent.putExtra("gameName", lobby.get("lobby_name")+"");
                 intent.putExtra("gameMode", lobby.get("gameMode").toString());
-                intent.putExtra("isHost", false);//o utlizador q se junta a um lobby nunca sera o host
+                intent.putExtra("startDate", lobby.get("gameStart").replaceAll("Início: ", ""));
+                intent.putExtra("duration", lobby.get("gameDuration").replaceAll("[Duração: m]", ""));
+                intent.putExtra("isHost", false);
                 startActivity(intent);
                 //adapter.dismiss(); // If you want to close the adapter
             }
         });
-
-        return view;
-    }
-
-    @Override
-    public void onLobbyListChange(List<Map<String, String>> lobbyList){//recebe os dados da firebase
-        String[] from = {"lobby_name", "gameMode", "lobbyHost"};
-        int[] to = {R.id.lobby_name, R.id.gameMode, R.id.lobbyHost};
-        SimpleAdapter simpleAdapter = new SimpleAdapter(this.getContext(), lobbyList, R.layout.lobby_list_view, from, to);
-        lobbiesListView.setAdapter(simpleAdapter);
-    }
-
-    public void addListener(LobbyListFragment lobbyListFragment) {
-        listener.add(lobbyListFragment);
-        lobbyList();//funçao q vai buscar os dados
-    }
-
-    private void lobbyList(){
+        final Context context = getActivity().getApplicationContext();
         dbRef.addListenerForSingleValueEvent(new ValueEventListener() { //listener para ler no inicio do fragmento da DB
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 Lobby lobby = new Lobby();
+                hm = new HashMap<>();
+                listViewContents = new ArrayList<>();
                 //obter dados dos lobbys e colocá-los nas estruturas de dados para o listView
+                DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm");
+                DateTime gameStart;
                 for (DataSnapshot data : snapshot.getChildren()) {
                     lobby = data.getValue(Lobby.class);
-                    Log.i("lobby", lobby+"");
-                    hm.put("lobby_name", lobby.getGameName());
-                    hm.put("gameMode", lobby.getGameMode()+"");
-                    hm.put("lobbyHost", lobby.getHost());
-                    listViewContents.add(hm);//atualizar a lista de lobbies
+                    hm = new HashMap<>();
+                    gameStart = formatter.parseDateTime(lobby.getStartDate());
+                    Log.i("gamestart", gameStart.plusMinutes(lobby.getDuration()+5)+"");
+                    if(!gameStart.plusMinutes(lobby.getDuration()+5).isAfter(null)){//verificar se existem lobbys que ja iniciaram e nao apresentar esses resultados
+                        dbRef.child(data.getKey()).setValue(null);//apagar lobby invalido
+                    }
+                    else{
+                        if(gameStart.isAfter(null)){//o jogo ainda nao começou
+                            hm.put("lobby_name", lobby.getGameName());
+                            hm.put("gameMode", lobby.getGameMode() + "");
+                            hm.put("gameStart", "Início: " + lobby.getStartDate());
+                            hm.put("gameDuration", "Duração: " + lobby.getDuration() + "m");
+                            Log.i("lobby", hm + "");
+                            listViewContents.add(hm);//atualizar a lista de lobbies
+                            hm = new HashMap<>();
+                        }
+                    }
+
+                    //Log.i("lobby", "Início: "+lobby.getStartDate());
+                    //listener.get(i).onLobbyListChange(listViewContents);
+                    //i++;
                 }
-                listener.get(0).onLobbyListChange(listViewContents);
+                SimpleAdapter simpleAdapter = new SimpleAdapter(context, listViewContents, R.layout.lobby_list_view, from, to);
+                lobbiesListView.setAdapter(simpleAdapter);
 
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         });
+
+        dbRef.addValueEventListener(new ValueEventListener() { //listener para ler no inicio do fragmento da DB
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Lobby lobby = new Lobby();
+                hm = new HashMap<>();
+                listViewContents = new ArrayList<>();
+                //obter dados dos lobbys e colocá-los nas estruturas de dados para o listView
+                DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm");
+                DateTime gameStart;
+                for (DataSnapshot data : snapshot.getChildren()) {
+                    lobby = data.getValue(Lobby.class);
+                    hm = new HashMap<>();
+                    gameStart = formatter.parseDateTime(lobby.getStartDate());
+                    Log.i("gamestart", gameStart.plusMinutes(lobby.getDuration()+5)+"");
+                    if(!gameStart.plusMinutes(lobby.getDuration()+5).isAfter(null)){//verificar se existem lobbys que ja iniciaram e nao apresentar esses resultados
+                        dbRef.child(data.getKey()).setValue(null);//apagar lobby invalido
+                    }
+                    else{
+                        if(gameStart.isAfter(null)){//o jogo ainda nao começou
+                            hm.put("lobby_name", lobby.getGameName());
+                            hm.put("gameMode", lobby.getGameMode() + "");
+                            hm.put("gameStart", "Início: " + lobby.getStartDate());
+                            hm.put("gameDuration", "Duração: " + lobby.getDuration() + "m");
+                            Log.i("lobby", hm + "");
+                            listViewContents.add(hm);//atualizar a lista de lobbies
+                            hm = new HashMap<>();
+                        }
+                    }
+                }
+                SimpleAdapter simpleAdapter = new SimpleAdapter(context, listViewContents, R.layout.lobby_list_view, from, to);
+                lobbiesListView.setAdapter(simpleAdapter);
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+
+        return view;
     }
 
     public void onAttach(Context context) {

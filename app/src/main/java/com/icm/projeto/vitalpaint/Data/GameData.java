@@ -1,7 +1,6 @@
 package com.icm.projeto.vitalpaint.Data;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,17 +8,14 @@ import java.util.List;
  */
 
 public class GameData implements Serializable{
-    private List<String> redTeamPlayers;
     private String gameName;
     private GameMode gameMode;
     private String host;
     private double lobbyLat;
     private double lobbyLong;
     private String playerName;
-    private GameDate startDate;
-    private GameDate endDate;
-    private List<String> blueTeamPlayers;
-    private GAMERESULT result;
+    private String startDate;
+    private int duration;
 
     public GAMERESULT getResult() {
         return result;
@@ -29,31 +25,32 @@ public class GameData implements Serializable{
         this.result = result;
     }
 
-    public static enum GAMERESULT{
-        REDTEAMWON, BLUETEAMWON, DRAW
-    }
+    private GAMERESULT result;
 
-    public GameDate getStartDate() {
+    public String getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(GameDate startDate) {
+    public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
 
-    public GameDate getEndDate() {
-        return endDate;
+    private List<String> blueTeamPlayers;
+
+    public int getDuration() {
+        return duration;
     }
 
-    public void setEndDate(GameDate endDate) {
-        this.endDate = endDate;
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 
-    public GameData(String gameName, GameMode gameMode){
+
+    public GameData(String gameName, GameMode gameMode, String startDate, int duration){
         this.gameName = gameName;
         this.gameMode = gameMode;
-        this.blueTeamPlayers = new ArrayList<>();
-        this.redTeamPlayers = new ArrayList<>();
+        this.startDate = startDate;
+        this.duration = duration;
     }
 
     public String getPlayerName() {
@@ -65,21 +62,6 @@ public class GameData implements Serializable{
     }
 
 
-    public List<String> getBlueTeamPlayers() {
-        return blueTeamPlayers;
-    }
-
-    public void setBlueTeamPlayers(List<String> blueTeamPlayers) {
-        this.blueTeamPlayers = blueTeamPlayers;
-    }
-
-    public List<String> getRedTeamPlayers() {
-        return redTeamPlayers;
-    }
-
-    public void setRedTeamPlayers(List<String> redTeamPlayers) {
-        this.redTeamPlayers = redTeamPlayers;
-    }
 
     public String getGameName() {
         return gameName;
@@ -119,6 +101,10 @@ public class GameData implements Serializable{
 
     public void setLobbyLong(double lobbyLong) {
         this.lobbyLong = lobbyLong;
+    }
+
+    public static enum GAMERESULT{
+        REDTEAMWON, BLUETEAMWON, DRAW
     }
 
 }

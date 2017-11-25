@@ -49,6 +49,14 @@
     <string name="username">Defina um nome de usuário</string>
     <string name="startDateText">Indique a data de início do jogo</string>
     <string name="endDateText">Indique a data de fim do jogo</string>
+
+    <string name="durationText">Duração do Jogo (em minutos)</string>
+
+    <string name="invalidDateWarningDetail">As datas introduzidas não sao válidas. Não pode criar jogos em datas passadas, e a data de inicio tem que ser antes da data de fim.</string>
+
+    <string name="invalidDateWarning">Datas inválidas</string>
+
+    <string name="select_game_mode">Selecione o modo de jogo</string>
     <!-- TODO: Remove or change this placeholder text -->
 
     <string name="action_sign_in_short">Sign In</string>
@@ -59,6 +67,11 @@
     <string name="nav_spectate">Assistir a Jogo</string>
     <string name="join_team">Juntar-me</string>
     <string name="invite_friends">Convidar Amigos</string>
+    <string name="begin">Início</string>
+
+    <string name="duration">Duração</string>
+
+    <string name="exit_team_btn">Sair da equipa</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

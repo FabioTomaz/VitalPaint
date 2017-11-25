@@ -1,15 +1,18 @@
 package com.icm.projeto.vitalpaint;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -19,15 +22,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.icm.projeto.vitalpaint.Data.GameData;
 import com.icm.projeto.vitalpaint.Data.GameDataManager;
-import com.icm.projeto.vitalpaint.Data.GameDate;
 import com.icm.projeto.vitalpaint.Data.GameMode;
 import com.icm.projeto.vitalpaint.Data.UserData;
 import com.icm.projeto.vitalpaint.Data.UserDataManager;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class LobbyTeamActivity extends AppCompatActivity implements UserDataManager.UserDataListener {
     private String gameName;
@@ -35,14 +43,18 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
     private boolean isHost;
     private GameDataManager dbManager;
     private GameData gameData;
+    private String myTeam;
     private Map<String, Double> coordinates;
-    private GameDate startDate;
-    private GameDate endDate;
+    private String startDate;
+    private int duration;
     private UserDataManager userDataManager;
-    private UserData userData;
+    private String loggedUserName;
     private FirebaseAuth auth;
     private ListView blueTeamListView;
     private ListView redTeamListView;
+    private Handler handler;
+    private Runnable myRunnable;
+    private Timer timer;
 
     List<String> blueTeamPlayers;
     List<String> redTeamPlayers;
@@ -50,6 +62,7 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
     private ArrayAdapter redAdapter;
     private Button joinRed;
     private Button joinBlue;
+    private FloatingActionButton exitTeam;
     private DatabaseReference blueTeam;
     private DatabaseReference redTeam;
     private DatabaseReference game;
@@ -61,15 +74,20 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_team_lobby);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);//nao bloquear o ecra
+        loggedUserName = "";
         auth = FirebaseAuth.getInstance();
-        //criar listener para obter dados do user loggado
         userDataManager = new UserDataManager(auth.getCurrentUser().getEmail());
+        userDataManager.userDataFromEmailListener(PROFILE_DATA);
         //userDataManager.addListener(this, PROFILE_DATA);
+        //criar listener para obter dados do user loggado
         gameName = getIntent().getStringExtra("gameName");
         isHost = getIntent().getBooleanExtra ("isHost", false);
         gameMode = GameMode.valueOf(getIntent().getStringExtra("gameMode")); //obter  a string do enum e converter para enum
-        startDate = (GameDate) getIntent().getSerializableExtra("startDate");
-        endDate = (GameDate) getIntent().getSerializableExtra("endDate");
+        startDate = getIntent().getStringExtra("startDate");
+        duration = getIntent().getIntExtra("duration", 0);
+        //duration = new Period(startDate, endDate);
         this.setTitle(gameName);
         coordinates = new HashMap<>();
         coordinates.put("lat", 0.0);
@@ -77,10 +95,11 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
 
         joinBlue = (Button) findViewById(R.id.enter_blue_team);
         joinRed = (Button) findViewById(R.id.enter_red_team);
+        exitTeam = (FloatingActionButton) findViewById(R.id.exit_team);
 
         blueTeamPlayers = new ArrayList<>();
         redTeamPlayers = new ArrayList<>();
-        gameData = new GameData(gameName, gameMode);
+        gameData = new GameData(gameName, gameMode, startDate, duration);
 
         blueTeamListView = (ListView) findViewById(R.id.list_blue_team);
         redTeamListView = (ListView) findViewById(R.id.list_red_team);
@@ -94,74 +113,130 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
         blueTeam = FirebaseDatabase.getInstance().getReference(ROOTNODE).child(gameName).child("Equipa Azul");
         redTeam = FirebaseDatabase.getInstance().getReference(ROOTNODE).child(gameName).child("Equipa Vermelha");
         Log.i("startdate", startDate+"");
-        Log.i("enddate", endDate+"");
+
+        //Log.i("im host", "he");
         if (isHost) {
-            //Log.i("im host", "he");
             Map<String, Object> map = new HashMap<>();
             map.put(gameName, gameData);
             game.updateChildren(map);
-            blueTeam.child("score").setValue(0);
-            redTeam.child("score").setValue(0);
+            FirebaseDatabase.getInstance().getReference(ROOTNODE).child(gameName).child("Equipa Azul").child("score").setValue(0);
+            FirebaseDatabase.getInstance().getReference(ROOTNODE).child(gameName).child("Equipa Vermelha").child("score").setValue(0);
         }
-
+        //juntar a equipa azul
         joinBlue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Map<String, Object> player = new HashMap<>();
-                Log.i("ola", userData.getNAME()+"");
-                player.put(userData.getNAME(), coordinates);
+                Log.i("ola", loggedUserName+"");
+                player.put(loggedUserName, coordinates);
+                myTeam = "Equipa Azul";
                 blueTeam.updateChildren(player);
                 joinBlue.setEnabled(false);
                 joinRed.setEnabled(false);
-                //botao para sair da equipa
+                // mostrar botao para sair da equipa
+                exitTeam.setVisibility(View.VISIBLE);
             }
         });
-
+        // juntar a equipa vermelha
         joinRed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Map<String, Object> player = new HashMap<>();
-                player.put(userData.getNAME(), coordinates);
+                player.put(loggedUserName, coordinates);
+                myTeam = "Equipa Vermelha";
                 redTeam.updateChildren(player);
                 joinBlue.setEnabled(false);
                 joinRed.setEnabled(false);
+                // mostrar botao para sair da equipa
+                exitTeam.setVisibility(View.VISIBLE);
             }
         });
 
-        blueTeam.addValueEventListener(new ValueEventListener() {
+        exitTeam.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Map<String, Object> player = new HashMap<>();
+                player.put(loggedUserName, coordinates);
+                redTeam.child(loggedUserName).setValue(null);
+                //mostrar de novo botoes para juntar as equipas
+                myTeam = "";
+                blueTeam.child(loggedUserName).setValue(null);
+                joinBlue.setEnabled(true);
+                joinRed.setEnabled(true);
+                // ocultar botao para sair da equipa
+                exitTeam.setVisibility(View.GONE);
+
+            }
+        });
+        //ler inicialmente os jogadores na equipa azul
+        blueTeam.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String textOnLobbyBoard = "blue_team_player";
-                TextView textv = null;
                 List<String> users = new ArrayList<>();
-                UserData playerData;
+                blueAdapter.clear();
                 for (DataSnapshot data : dataSnapshot.getChildren()){
                     if(!data.getKey().equals("score")) {
-                        Log.i("", data.getValue(Object.class) + "");//nome de cada jogador na equipa atualmente
-                        playerData = data.getValue(UserData.class);
-                        blueAdapter.add(playerData.getNAME());
+                        Log.i("player", data.getKey()+"");
+                        blueAdapter.add(data.getKey());
                     }
                 }
                 //adicionar os users na listview
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         });
 
+        redTeam.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String textOnLobbyBoard = "blue_team_player";
+                List<String> users = new ArrayList<>();
+                redAdapter.clear();
+                for (DataSnapshot data : dataSnapshot.getChildren()){
+                    if(!data.getKey().equals("score")) {
+                        Log.i("player", data.getKey()+"");
+                        redAdapter.add(data.getKey());
+                    }
+                }
+                //adicionar os users na listview
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+        //quando alguem sai/entra na equipa azul
+        blueTeam.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String textOnLobbyBoard = "blue_team_player";
+                List<String> users = new ArrayList<>();
+                blueAdapter.clear();
+                for (DataSnapshot data : dataSnapshot.getChildren()){
+                    if(!data.getKey().equals("score")) {
+                        Log.i("player", data.getKey()+"");
+                        blueAdapter.add(data.getKey());
+                    }
+                }
+                //adicionar os users na listview
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+        //quando alguem sai/entra na equipa vermelha
         redTeam.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 /*String textOnLobbyBoard = "blue_team_player";
                 TextView textv = null;
                 List<String> users = new ArrayList<>();*/
-                UserData playerData;
+                redAdapter.clear();
                 for (DataSnapshot data : dataSnapshot.getChildren()){
                     if(!data.getKey().equals("score")) {
-                        Log.i("", data.getValue(UserData.class) + "");//nome de cada jogador na equipa atualmente
-                        playerData = data.getValue(UserData.class);
-                        redAdapter.add(playerData.getNAME());
+                        Log.i("", data.getKey()+"");
+                        redAdapter.add(data.getKey());
                     }
                 }
                 //adicionar os users na listview
@@ -172,17 +247,69 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
             }
         });
     }
+    //sempre q a atividade entra no estado OnResume, iniciar um timer ate ao inicio da partida.
+    //a partida n deve iniciar se a atividade estiver em background, ou for destruida, etc
 
     @Override
-    public void onReceiveUserData(int requestType , UserData user, Bitmap profilePic, Bitmap headerPic) {
-        this.userData = userData;
+    protected void onPause() {
+        super.onPause();
+        timer.cancel();
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {//eliminar o jogo da BD caso o host saia do lobby
-        if (keyCode == KeyEvent.KEYCODE_BACK && isHost) {
-            // do something
-            FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).setValue(null);
+    protected void onStop() {
+        super.onStop();
+        timer.cancel();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        timer.cancel();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        scheduleGame();
+    }
+
+    @Override
+    public void onReceiveUserData(int requestType , UserData user, Bitmap profilePic, Bitmap headerPic) {
+        loggedUserName = user.getNAME();
+    }
+
+    private void scheduleGame(){
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm");
+        DateTime dtStart = formatter.parseDateTime(startDate);
+        DateTime dtCurrent = DateTime.now();
+        long diff = dtStart.getMillis() - dtCurrent.getMillis() ;
+        Log.i("diff", diff+"");
+        timer = new Timer();
+        timer.schedule(new TimerTask(){
+            public void run() {
+                finish();
+                LobbyTeamActivity.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Intent intent = new Intent(LobbyTeamActivity.this, GameMapActivity.class);
+                        Log.i("myteam", myTeam+"");
+                        intent.putExtra("myTeam", myTeam);
+                        intent.putExtra("gameName", gameName);
+                        intent.putExtra("userName", loggedUserName);
+                        intent.putExtra("duration", duration);
+                        startActivity(intent);
+                    }
+                });
+            }
+        }, diff);
+    }
+
+    //se o user sair do lobby, entao retirá-lo da equipa, caso se tenha juntado a alguma
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            if ( myTeam != null || myTeam.isEmpty())
+                game.child(gameName).child(myTeam).child(loggedUserName).setValue(null);
         }
         return super.onKeyDown(keyCode, event);
     }
