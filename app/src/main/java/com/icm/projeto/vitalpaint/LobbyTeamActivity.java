@@ -3,6 +3,7 @@ package com.icm.projeto.vitalpaint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,8 @@ import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -68,7 +71,9 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
     private DatabaseReference game;
     private final String ROOTNODE = "Games";
     public static final int PROFILE_DATA = 1;
-
+    private ProgressBar progressBarCircle;
+    private TextView textViewTime;
+    private long diff;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +87,9 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
         userDataManager.addListener(this);
         userDataManager.userDataFromEmailListener(PROFILE_DATA);
         //criar listener para obter dados do user loggado
+
+        progressBarCircle = (ProgressBar) findViewById(R.id.progressBarCircle);
+        textViewTime = (TextView) findViewById(R.id.textViewTime);
         gameName = getIntent().getStringExtra("gameName");
         isHost = getIntent().getBooleanExtra ("isHost", false);
         gameMode = GameMode.valueOf(getIntent().getStringExtra("gameMode")); //obter  a string do enum e converter para enum
@@ -231,6 +239,21 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
     protected void onResume() {
         super.onResume();
         scheduleGame();
+        CountDownTimer countDownTimer = new CountDownTimer(diff, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                progressBarCircle.setMax((int) millisUntilFinished / 1000);
+                progressBarCircle.setProgress((int) millisUntilFinished / 1000);
+                textViewTime.setText("A partida começa em: " + millisUntilFinished / 1000);
+            }
+
+            public void onFinish() {
+
+                textViewTime.setText("Começar!");
+
+            }
+        };
+        countDownTimer.start();
     }
 
     @Override
@@ -242,7 +265,7 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
         DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm");
         DateTime dtStart = formatter.parseDateTime(startDate);
         DateTime dtCurrent = DateTime.now();
-        long diff = dtStart.getMillis() - dtCurrent.getMillis() ;
+        diff = dtStart.getMillis() - dtCurrent.getMillis() ;
         Log.i("diff", diff+"");
         timer = new Timer();
         timer.schedule(new TimerTask(){
