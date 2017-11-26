@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -39,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 public class LobbyTeamActivity extends AppCompatActivity implements UserDataManager.UserDataListener {
     private String gameName;
@@ -220,12 +220,13 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
     protected void onResume() {
         super.onResume();
         scheduleGame();
+        progressBarCircle.setMax((int) diff / 1000);
+        progressBarCircle.setProgress((int) diff / 1000);
         CountDownTimer countDownTimer = new CountDownTimer(diff, 1000) {
 
             public void onTick(long millisUntilFinished) {
-                progressBarCircle.setMax((int) millisUntilFinished / 1000);
-                progressBarCircle.setProgress((int) millisUntilFinished / 1000);
-                textViewTime.setText("A partida começa em: " + millisUntilFinished / 1000);
+                textViewTime.setText(hmsTimeFormatter(millisUntilFinished));
+                progressBarCircle.setProgress((int) (millisUntilFinished / 1000));
             }
 
             public void onFinish() {
@@ -235,6 +236,16 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
             }
         };
         countDownTimer.start();
+    }
+
+    private String hmsTimeFormatter(long milliSeconds) {
+
+        String hms = String.format("%02d:%02d:%02d",
+                TimeUnit.MILLISECONDS.toHours(milliSeconds),
+                TimeUnit.MILLISECONDS.toMinutes(milliSeconds) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(milliSeconds)),
+                TimeUnit.MILLISECONDS.toSeconds(milliSeconds) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliSeconds)));
+
+        return hms;
     }
 
     @Override
