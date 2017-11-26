@@ -61,6 +61,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     LocationRequest mLocationRequest;
     private GameDataManager dbManager;
     private DatabaseReference dbRef;
+    private String userEmail;
 
 
     @Override
@@ -83,6 +84,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         myTeam = getIntent().getStringExtra("myTeam");
         Log.i("gamemap", myTeam + ", " + "duration:" + duration + ", gm " + gameName);
         myName = getIntent().getStringExtra("userName");
+        userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
         if (myTeam.equals("Equipa Azul"))
             enemyTeam = "Equipa Vermelha";
         else
@@ -131,14 +133,21 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 double lat;
                 double longt;
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    if (!data.getKey().equals("score") && !data.getKey().equals(UserDataManager.encodeUserEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail())) && data.hasChild("lat") && data.hasChild("long")) {
+                    if (!data.getKey().equals("score") && !data.getKey().equals(UserDataManager.encodeUserEmail(userEmail)) && data.hasChild("lat") && data.hasChild("long")) {
                         lat = data.child("lat").getValue(Double.class);
                         longt = data.child("long").getValue(Double.class);
                         LatLng coord = new LatLng(lat, longt);
                         if(!lastestPlayerMarkers.containsKey(data.getKey())){
-                            Marker playerMarker = mMap.addMarker(new MarkerOptions()
-                                    .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_player_pointer))
-                                    .title(data.getKey()));
+                            Marker playerMarker;
+                            if(myTeam=="Equipa Vermelha"){
+                                playerMarker = mMap.addMarker(new MarkerOptions()
+                                        .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_red_pointer))
+                                        .title(data.getKey()));
+                            }else{
+                                playerMarker = mMap.addMarker(new MarkerOptions()
+                                        .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_blue_pointer))
+                                        .title(data.getKey()));
+                            }
                             lastestPlayerMarkers.put(data.getKey(), playerMarker);
                         }else{
                             lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
@@ -157,14 +166,21 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 double lat;
                 double longt;
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    if (!data.getKey().equals("score") && !data.getKey().equals(UserDataManager.encodeUserEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail())) && data.hasChild("lat") && data.hasChild("long")) {
+                    if (!data.getKey().equals("score") && !data.getKey().equals(UserDataManager.encodeUserEmail(userEmail)) && data.hasChild("lat") && data.hasChild("long")) {
                         lat = data.child("lat").getValue(Double.class);
                         longt = data.child("long").getValue(Double.class);
                         LatLng coord = new LatLng(lat, longt);
                         if(!lastestPlayerMarkers.containsKey(data.getKey())){
-                            Marker playerMarker = mMap.addMarker(new MarkerOptions()
-                                    .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_player_pointer))
-                                    .title(data.getKey()));
+                            Marker playerMarker;
+                            if(enemyTeam=="Equipa Vermelha"){
+                                playerMarker = mMap.addMarker(new MarkerOptions()
+                                        .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_red_pointer))
+                                        .title(data.getKey()));
+                            }else{
+                                playerMarker = mMap.addMarker(new MarkerOptions()
+                                        .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_blue_pointer))
+                                        .title(data.getKey()));
+                            }
                             lastestPlayerMarkers.put(data.getKey(), playerMarker);
                         }else{
                             lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
@@ -243,8 +259,25 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         mLastLocation = location;
         //Place current location marker
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        dbRef.child(myTeam).child(UserDataManager.encodeUserEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail())).child("lat").setValue(location.getLatitude());
-        dbRef.child(myTeam).child(UserDataManager.encodeUserEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail())).child("long").setValue(location.getLongitude());
+
+        dbRef.child(myTeam).child(UserDataManager.encodeUserEmail(userEmail)).child("lat").setValue(location.getLatitude());
+        dbRef.child(myTeam).child(UserDataManager.encodeUserEmail(userEmail)).child("long").setValue(location.getLongitude());
+        if(!lastestPlayerMarkers.containsKey(userEmail)){
+            Marker playerMarker;
+            if(myTeam=="Equipa Vermelha"){
+                playerMarker = mMap.addMarker(new MarkerOptions()
+                        .position(latLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_red_pointer))
+                        .title(userEmail));
+            }else{
+                playerMarker = mMap.addMarker(new MarkerOptions()
+                        .position(latLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_blue_pointer))
+                        .title(userEmail));
+            }
+            lastestPlayerMarkers.put(userEmail, playerMarker);
+        }else{
+            lastestPlayerMarkers.get(userEmail).setPosition(latLng);
+        }
+
         Marker m =
                 mMap.addMarker(new MarkerOptions()
                         .position(latLng)
@@ -256,7 +289,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         //move map camera
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(latLng)
-                .zoom(22)
+                //.zoom(22)
                 .tilt(50)
                 .bearing(location.getBearing())
                 .build();
