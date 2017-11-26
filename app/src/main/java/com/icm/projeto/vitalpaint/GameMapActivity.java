@@ -39,8 +39,10 @@ import com.icm.projeto.vitalpaint.Data.UserDataManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class GameMapActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private GoogleMap mMap;
@@ -48,6 +50,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
 
     private List<String> blueTeamPlayers;
     private List<String> redTeamPlayers;
+    private Map<String, Marker> lastestPlayerMarkers  = new HashMap<>();
     private String myName;
     private String gameName;
     private String myTeam = "";
@@ -132,10 +135,14 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                         lat = data.child("lat").getValue(Double.class);
                         longt = data.child("long").getValue(Double.class);
                         LatLng coord = new LatLng(lat, longt);
-                        //adicionar marcador com as novas coordenadas
-                        mMap.addMarker(new MarkerOptions()
-                                .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_player_pointer))
-                                .title(data.getKey()));
+                        if(!lastestPlayerMarkers.containsKey(data.getKey())){
+                            Marker playerMarker = mMap.addMarker(new MarkerOptions()
+                                    .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_player_pointer))
+                                    .title(data.getKey()));
+                            lastestPlayerMarkers.put(data.getKey(), playerMarker);
+                        }else{
+                            lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
+                        }
                     }
                 }
             }
@@ -154,10 +161,14 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                         lat = data.child("lat").getValue(Double.class);
                         longt = data.child("long").getValue(Double.class);
                         LatLng coord = new LatLng(lat, longt);
-                        //adicionar marcador com as novas coordenadas
-                        mMap.addMarker(new MarkerOptions()
-                                .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_player_pointer))
-                                .title(data.getKey()));
+                        if(!lastestPlayerMarkers.containsKey(data.getKey())){
+                            Marker playerMarker = mMap.addMarker(new MarkerOptions()
+                                    .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_player_pointer))
+                                    .title(data.getKey()));
+                            lastestPlayerMarkers.put(data.getKey(), playerMarker);
+                        }else{
+                            lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
+                        }
                     }
                 }
             }
