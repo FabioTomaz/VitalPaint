@@ -2,15 +2,22 @@ package com.icm.projeto.vitalpaint;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.hardware.GeomagneticField;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.Surface;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -45,24 +52,20 @@ import java.util.Locale;
 import java.util.Map;
 
 public class GameMapActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+    public static final double SMOOTHING_FACTOR_COMPASS = 0.9;
     private GoogleMap mMap;
-
-
-    private List<String> blueTeamPlayers;
-    private List<String> redTeamPlayers;
     private Map<String, Marker> lastestPlayerMarkers  = new HashMap<>();
     private String myName;
     private String gameName;
     private String myTeam = "";
     private String enemyTeam = "";
     private int duration;
+    private DatabaseReference dbRef;
+    private String userEmail;
+    public static final float METERSTOSEEENEMIES = 500;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     LocationRequest mLocationRequest;
-    private GameDataManager dbManager;
-    private DatabaseReference dbRef;
-    private String userEmail;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +92,6 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
             enemyTeam = "Equipa Vermelha";
         else
             enemyTeam = "Equipa Azul";
-        Log.i("equipa", myTeam);
         dbRef = FirebaseDatabase.getInstance().getReference("Games").child(gameName);
     }
 
@@ -170,20 +172,25 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                         lat = data.child("lat").getValue(Double.class);
                         longt = data.child("long").getValue(Double.class);
                         LatLng coord = new LatLng(lat, longt);
-                        if(!lastestPlayerMarkers.containsKey(data.getKey())){
-                            Marker playerMarker;
-                            if(enemyTeam=="Equipa Vermelha"){
-                                playerMarker = mMap.addMarker(new MarkerOptions()
-                                        .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_red_pointer))
-                                        .title(data.getKey()));
-                            }else{
-                                playerMarker = mMap.addMarker(new MarkerOptions()
-                                        .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_blue_pointer))
-                                        .title(data.getKey()));
+                        Location enemyLocation = new Location("");
+                        enemyLocation.setLatitude(lat);
+                        enemyLocation.setLongitude(longt);
+                        if(enemyLocation.distanceTo(mLastLocation)<METERSTOSEEENEMIES) {
+                            if (!lastestPlayerMarkers.containsKey(data.getKey())) {
+                                Marker playerMarker;
+                                if (enemyTeam == "Equipa Vermelha") {
+                                    playerMarker = mMap.addMarker(new MarkerOptions()
+                                            .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_red_pointer))
+                                            .title(data.getKey()));
+                                } else {
+                                    playerMarker = mMap.addMarker(new MarkerOptions()
+                                            .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_blue_pointer))
+                                            .title(data.getKey()));
+                                }
+                                lastestPlayerMarkers.put(data.getKey(), playerMarker);
+                            } else {
+                                lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
                             }
-                            lastestPlayerMarkers.put(data.getKey(), playerMarker);
-                        }else{
-                            lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
                         }
                     }
                 }
@@ -200,6 +207,74 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 .addApi(LocationServices.API)
                 .build();
         mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initSensors();
+    }
+
+    private SensorEventListener mSensorEventListener = new SensorEventListener() {
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            float[] mGravity = null;
+            float[] mGeomagnetic=null;
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+                mGravity = event.values;
+            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+                mGeomagnetic = event.values;
+            if (mGravity != null && mGeomagnetic != null) {
+                float R[] = new float[9];
+                float I[] = new float[9];
+                boolean success = SensorManager.getRotationMatrix(R, I, mGravity,
+                        mGeomagnetic);
+                if (success) {
+                    float orientation[] = new float[3];
+                    SensorManager.getOrientation(R, orientation);
+                    int azimut = (int) Math.round(Math.toDegrees(orientation[0]));
+                    float azimuthInRadians = orientation[0];
+                    float azimuthInDegress = (float)((Math.toDegrees(azimuthInRadians)+360)%360);
+                    Log.i("AZIMUTHH", String.valueOf(azimuthInDegress));
+                    updateCameraBearing(mMap, azimuthInDegress);
+                }
+            }
+        }
+    };
+
+    /**
+     * Initialize the Sensors (Gravity and magnetic field, required as a compass
+     * sensor)
+     */
+    private void initSensors() {
+        String TAG= "SENSORS";
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        Sensor mSensorGravity = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        Sensor mSensorMagneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+    /* Initialize the gravity sensor */
+        if (mSensorGravity != null) {
+            Log.i(TAG, "Gravity sensor available. (TYPE_GRAVITY)");
+            sensorManager.registerListener(mSensorEventListener,
+                    mSensorGravity, SensorManager.SENSOR_DELAY_GAME);
+        } else {
+            Log.i(TAG, "Gravity sensor unavailable. (TYPE_GRAVITY)");
+        }
+
+    /* Initialize the magnetic field sensor */
+        if (mSensorMagneticField != null) {
+            Log.i(TAG, "Magnetic field sensor available. (TYPE_MAGNETIC_FIELD)");
+            sensorManager.registerListener(mSensorEventListener,
+                    mSensorMagneticField, SensorManager.SENSOR_DELAY_GAME);
+        } else {
+            Log.i(TAG,
+                    "Magnetic field sensor unavailable. (TYPE_MAGNETIC_FIELD)");
+        }
     }
 
     @Override
@@ -294,9 +369,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-    }
+    public void onConnectionFailed(ConnectionResult connectionResult) {}
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
