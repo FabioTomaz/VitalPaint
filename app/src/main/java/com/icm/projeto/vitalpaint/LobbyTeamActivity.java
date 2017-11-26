@@ -79,8 +79,8 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
         loggedUserName = "";
         auth = FirebaseAuth.getInstance();
         userDataManager = new UserDataManager(auth.getCurrentUser().getEmail());
+        userDataManager.addListener(this);
         userDataManager.userDataFromEmailListener(PROFILE_DATA);
-        //userDataManager.addListener(this, PROFILE_DATA);
         //criar listener para obter dados do user loggado
         gameName = getIntent().getStringExtra("gameName");
         isHost = getIntent().getBooleanExtra ("isHost", false);
@@ -173,16 +173,14 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
                 blueAdapter.clear();
                 for (DataSnapshot data : dataSnapshot.getChildren()){
                     if(!data.getKey().equals("score")) {
-                        Log.i("player", data.getKey()+"");
-                        blueAdapter.add(data.getKey());
+                        blueAdapter.add(data.child("name").getValue());
                     }
                 }
                 blueAdapter.notifyDataSetChanged();
                 //adicionar os users na listview
             }
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
+            public void onCancelled(DatabaseError databaseError) {}
         });
         //quando alguem sai/entra na equipa vermelha
         redTeam.addValueEventListener(new ValueEventListener() {
@@ -194,22 +192,19 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
                 redAdapter.clear();
                 for (DataSnapshot data : dataSnapshot.getChildren()){
                     if(!data.getKey().equals("score")) {
-                        Log.i("", data.getKey()+"");
-                        redAdapter.add(data.getKey());
+                        redAdapter.add(data.child("name").getValue());
                     }
                 }
                 blueAdapter.notifyDataSetChanged();
                 //adicionar os users na listview
             }
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
+            public void onCancelled(DatabaseError databaseError) { }
         });
     }
 
     public void addUserToTeam(String team){
-        FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(team).push().setValue(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+        FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(team).child(UserDataManager.encodeUserEmail(auth.getCurrentUser().getEmail())).child("name").setValue(loggedUserName);
     }
     //sempre q a atividade entra no estado OnResume, iniciar um timer ate ao inicio da partida.
     //a partida n deve iniciar se a atividade estiver em background, ou for destruida, etc
@@ -272,7 +267,7 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-            if ( myTeam != null || myTeam.isEmpty())
+            if ( myTeam != null && myTeam.equals(""))
                 game.child(gameName).child(myTeam).child(loggedUserName).setValue(null);
         }
         return super.onKeyDown(keyCode, event);

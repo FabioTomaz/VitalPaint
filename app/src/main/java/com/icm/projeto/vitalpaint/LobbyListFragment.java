@@ -150,10 +150,6 @@ public class LobbyListFragment extends Fragment {
                             hm = new HashMap<>();
                         }
                     }
-
-                    //Log.i("lobby", "Início: "+lobby.getStartDate());
-                    //listener.get(i).onLobbyListChange(listViewContents);
-                    //i++;
                 }
                 SimpleAdapter simpleAdapter = new SimpleAdapter(context, listViewContents, R.layout.lobby_list_view, from, to);
                 lobbiesListView.setAdapter(simpleAdapter);

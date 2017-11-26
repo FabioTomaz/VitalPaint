@@ -28,12 +28,14 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.icm.projeto.vitalpaint.Data.GameDataManager;
+import com.icm.projeto.vitalpaint.Data.UserDataManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -99,9 +101,9 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setCompassEnabled(true);
-        mMap.getUiSettings().setRotateGesturesEnabled(false);
-        mMap.getUiSettings().setScrollGesturesEnabled(false);
-        mMap.getUiSettings().setTiltGesturesEnabled(false);
+        //mMap.getUiSettings().setRotateGesturesEnabled(false);
+        //mMap.getUiSettings().setScrollGesturesEnabled(false);
+        //mMap.getUiSettings().setTiltGesturesEnabled(false);
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
 
@@ -117,6 +119,50 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
             buildGoogleApiClient();
             //mMap.setMyLocationEnabled(true);
         }
+
+        //Ler valores da minha equipa
+        dbRef.child(myTeam).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                double lat;
+                double longt;
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    if (!data.getKey().equals("score") && !data.getKey().equals(UserDataManager.encodeUserEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail())) && data.child("lat") != null) {
+                        lat = data.child("lat").getValue(Double.class);
+                        longt = data.child("long").getValue(Double.class);
+                        LatLng coord = new LatLng(lat, longt);
+                        //adicionar marcador com as novas coordenadas
+                        mMap.addMarker(new MarkerOptions()
+                                .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_player_pointer))
+                                .title(data.getKey()));
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+
+        //Ler valores da equipa inimiga
+        dbRef.child(enemyTeam).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                double lat;
+                double longt;
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    if (!data.getKey().equals("score") && !data.getKey().equals(UserDataManager.encodeUserEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail())) && data.child("lat") != null) {
+                        lat = data.child("lat").getValue(Double.class);
+                        longt = data.child("long").getValue(Double.class);
+                        LatLng coord = new LatLng(lat, longt);
+                        //adicionar marcador com as novas coordenadas
+                        mMap.addMarker(new MarkerOptions()
+                                .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_player_pointer))
+                                .title(data.getKey()));
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -188,8 +234,8 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         //Place current location marker
         Log.v("TAG_location", "IN ON LOCATION CHANGE, bearing=" + location.getBearing());
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        dbRef.child(myTeam).child(myName).child("lat").setValue(location.getLatitude());
-        dbRef.child(myTeam).child(myName).child("longt").setValue(location.getLongitude());
+        dbRef.child(myTeam).child(UserDataManager.encodeUserEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail())).child("lat").setValue(location.getLatitude());
+        dbRef.child(myTeam).child(UserDataManager.encodeUserEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail())).child("longt").setValue(location.getLongitude());
         Marker m =
                 mMap.addMarker(new MarkerOptions()
                         .position(latLng)
@@ -211,62 +257,6 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         if (mMap != null) {
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
-        //Ler valores da minha equipa
-        dbRef.child(myTeam).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                double lat;
-                double longt;
-                List<Double> cords = new ArrayList<>();
-                for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    if (!data.getKey().equals(myName) && !data.getKey().equals("score")) {
-                        lat = dataSnapshot.child(data.getKey()).child("lat").getValue(Double.class);
-                        longt = dataSnapshot.child(data.getKey()).child("long").getValue(Double.class);
-                        //Log.i("", "lat: " + lat);
-                        //Log.i("", "long: "+ longt);
-                        LatLng coord = new LatLng(lat, longt);
-                        //adicionar marcador com as novas coordenadas
-                        mMap.addMarker(new MarkerOptions()
-                                .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_player_pointer))
-                                .title(data.getKey()));
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        //Ler valores da equipa inimiga
-        dbRef.child(enemyTeam).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                double lat;
-                double longt;
-                List<Double> cords = new ArrayList<>();
-                for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    if (!data.getKey().equals("score")) {
-                        lat = dataSnapshot.child(data.getKey()).child("lat").getValue(Double.class);
-                        longt = dataSnapshot.child(data.getKey()).child("long").getValue(Double.class);
-                        //Log.i("", "lat: " + lat);
-                        //Log.i("", "long: "+ longt);
-                        LatLng coord = new LatLng(lat, longt);
-                        //adicionar marcador com as novas coordenadas
-                        mMap.addMarker(new MarkerOptions()
-                                .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_player_pointer))
-                                .title(data.getKey()));
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
     }
 
     @Override
