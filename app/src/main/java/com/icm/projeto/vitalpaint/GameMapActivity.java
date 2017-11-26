@@ -278,14 +278,6 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
             lastestPlayerMarkers.get(userEmail).setPosition(latLng);
         }
 
-        Marker m =
-                mMap.addMarker(new MarkerOptions()
-                        .position(latLng)
-                        .snippet(
-                                "Lat:" + latLng.latitude + "Lng:"
-                                        + latLng.longitude)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_player_pointer))
-                        .title("position"));
         //move map camera
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(latLng)
