@@ -1,22 +1,27 @@
 package com.icm.projeto.vitalpaint;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 
@@ -26,8 +31,10 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.io.IOException;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -45,22 +52,32 @@ public class CreateGameFragment extends Fragment {
     private View inflatedView;
     private EditText gameName;
     private Spinner gameMode;
-    private DatePicker startDate;
     private TimePicker startTime;
     private DateTime gameStart;
-    private NumberPicker durationPicker;
+    private com.shawnlin.numberpicker.NumberPicker durationPicker;
+    private com.shawnlin.numberpicker.NumberPicker  radiusPicker;
+    private double lobbyLongt;
+    private double lobbyLat;
+    private String city;
+    private int radius;
+    private LocationManager locationManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         getActivity().setTitle("Criar Jogo");
         this.inflatedView = inflater.inflate(R.layout.fragment_create_game, container, false);
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        LocationListener locationListener = new MyLocationListener();
+        //receber atualizaçoes a cada 5 segundos,
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, (LocationListener) locationListener);
         createBtn = (Button) inflatedView.findViewById(R.id.create_game);
         gameName = (EditText) inflatedView.findViewById(R.id.game_name);
         gameMode =(Spinner) inflatedView.findViewById(R.id.game_mode_spinner);
@@ -68,9 +85,9 @@ public class CreateGameFragment extends Fragment {
         //colocar timepicker com formato 24h e inicializar para a hora atual
         startTime.setIs24HourView(true);
         startTime.setCurrentHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
-        durationPicker = (NumberPicker)  inflatedView.findViewById(R.id.duration_picker);
-        durationPicker.setMinValue(5); //tempo min de jogo 5 minutos
-        durationPicker.setMaxValue(260); //tempo min de jogo 260 minutos
+        durationPicker = (com.shawnlin.numberpicker.NumberPicker )  inflatedView.findViewById(R.id.duration_picker);
+        radiusPicker = (com.shawnlin.numberpicker.NumberPicker )  inflatedView.findViewById(R.id.radio_picker);
+
         gameName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -100,6 +117,9 @@ public class CreateGameFragment extends Fragment {
                         intent.putExtra("duration", durationPicker.getValue());
                         intent.putExtra("gameMode", GameMode.TEAMVSTEAM.toString());//passar enum como string
                         intent.putExtra("isHost", true);//este utilizador criou o lobby
+                        intent.putExtra("lobbyLat", lobbyLat);
+                        intent.putExtra("lobbyLongt", lobbyLongt);
+                        intent.putExtra("city", city);
                         startActivity(intent);
                     } else if (gameMode.getSelectedItemPosition() == 1) {
 
@@ -127,6 +147,55 @@ public class CreateGameFragment extends Fragment {
                 time.getHourOfDay()+":"+time.getMinuteOfHour();
     }
 
+    private class MyLocationListener implements LocationListener {
+
+        @Override
+        public void onLocationChanged(Location loc) {
+
+
+            /*String longitude = "Longitude: " + loc.getLongitude();
+            Log.v("longitude", longitude);
+            String latitude = "Latitude: " + loc.getLatitude();
+            Log.v("latitude", latitude);*/
+            lobbyLat = loc.getLatitude();
+            lobbyLongt = loc.getLongitude();
+
+        /*------- To get city name from coordinates -------- */
+            String cityName = null;
+            Geocoder gcd = new Geocoder(getActivity().getBaseContext(), Locale.getDefault());
+            List<Address> addresses;
+            try {
+                addresses = gcd.getFromLocation(loc.getLatitude(),
+                        loc.getLongitude(), 1);
+                if (addresses.size() > 0) {
+                    System.out.println(addresses.get(0).getLocality());
+                    city = addresses.get(0).getLocality();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Log.v("city", city);
+            //editLocation.setText(s);
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    }
+
+
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -138,6 +207,22 @@ public class CreateGameFragment extends Fragment {
         mListener = null;
     }
 
+    //para ver se o user tem o gps ligado
+    private Boolean displayGpsStatus() {
+        ContentResolver contentResolver = getActivity().getBaseContext()
+                .getContentResolver();
+        boolean gpsStatus = Settings.Secure
+                .isLocationProviderEnabled(contentResolver,
+                        LocationManager.GPS_PROVIDER);
+        if (gpsStatus) {
+            return true;
+
+        } else {
+            return false;
+        }
+    }
+
+    
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

@@ -73,6 +73,10 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
     private ProgressBar progressBarCircle;
     private TextView textViewTime;
     private long diff;
+    private String city;
+    private double lobbyLongt;
+    private double lobbyLat;
+    private int radius;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +97,11 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
         isHost = getIntent().getBooleanExtra ("isHost", false);
         gameMode = GameMode.valueOf(getIntent().getStringExtra("gameMode")); //obter  a string do enum e converter para enum
         startDate = getIntent().getStringExtra("startDate");
+        city = getIntent().getStringExtra("city");
         duration = getIntent().getIntExtra("duration", 0);
+        radius = getIntent().getIntExtra("radius", 0);
+        lobbyLat = getIntent().getDoubleExtra("lobbyLat", 0.0);
+        lobbyLongt = getIntent().getDoubleExtra("lobbyLongt", 0.0);
         //duration = new Period(startDate, endDate);
         this.setTitle(gameName);
         coordinates = new HashMap<>();
@@ -105,7 +113,7 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
 
         blueTeamPlayers = new ArrayList<>();
         redTeamPlayers = new ArrayList<>();
-        gameData = new GameData(gameName, gameMode, startDate, duration);
+        gameData = new GameData(gameName, gameMode, startDate, duration, lobbyLat, lobbyLongt, city);
 
         blueTeamListView = (ListView) findViewById(R.id.list_blue_team);
         redTeamListView = (ListView) findViewById(R.id.list_red_team);

@@ -34,6 +34,15 @@ public class Lobby {
     private GameMode gameMode;
     private String startDate;
     private int duration;
+    private String city;
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
 
     public String getStartDate() {
         return startDate;
@@ -51,11 +60,12 @@ public class Lobby {
         this.duration = duration;
     }
 
-    public Lobby(String gameName, String host, GameMode gameMode, String startDate, int duration) {
+    public Lobby(String gameName, String host, GameMode gameMode, String startDate, int duration, String city) {
         this.gameName = gameName;
         this.gameMode = gameMode;
         this.startDate = startDate;
         this.duration = duration;
+        this.city = city;
     }
 
 }

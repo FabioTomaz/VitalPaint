@@ -9,6 +9,6 @@
     <color name="blue">#2962FF</color>
     <color name="redTeamColor">#F44336</color>
     <color name="blueTeamColor">#3F51B5</color>
-
+    <color name="darkorange">#EE7600</color>
     <color name="white">#ffffff</color>
 </resources>

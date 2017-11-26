@@ -20,12 +20,14 @@
             android:id="@+id/game_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:hint="@string/game_name"
             android:maxLines="1"/>
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="9dp"
+            android:layout_gravity="center"
             android:orientation="horizontal">
             <TextView
                 android:layout_height="match_parent"
@@ -41,42 +43,89 @@
                 android:entries="@array/game_modes"
                 />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/start_time_txt"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:textAlignment="center"
-            android:padding="9dp"
-            android:layout_gravity="center"
-            android:text="@string/startDateText" />
-
-        <TimePicker
-            android:id="@+id/start_time"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:scaleY="0.8"
-            android:scaleX="0.8"/>
+            android:orientation="vertical"
+            android:layout_gravity="center">
+            <TextView
+                android:id="@+id/start_time_txt"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textAlignment="center"
+                android:padding="9dp"
+                android:layout_gravity="center"
+                android:text="@string/startDateText" />
 
+            <TimePicker
+                android:id="@+id/start_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:timePickerMode="spinner"
+                android:scaleY="0.8"
+                android:scaleX="0.8"/>
+        </LinearLayout>
 
         <LinearLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/end_time_txt"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
+                android:layout_gravity="center"
                 android:textAlignment="center"
                 android:text="@string/durationText" />
-            <NumberPicker
+
+            <com.shawnlin.numberpicker.NumberPicker
                 android:id="@+id/duration_picker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_gravity="center|center"/>
+                android:layout_gravity="center"
+                app:np_width="200dp"
+                app:np_height="60dp"
+                app:np_dividerColor="@color/darkorange"
+                app:np_max="260"
+                app:np_min="5"
+                np_dividerThickness="8sp"
+                app:np_orientation="horizontal"
+                app:np_selectedTextColor="@color/colorPrimary"
+                app:np_selectedTextSize="17sp"
+                app:np_textColor="@color/colorPrimary"
+                app:np_textSize="14sp"
+                app:np_value="5" />
+
+            <TextView
+                android:id="@+id/game_radio"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:textAlignment="center"
+                android:text="@string/game_radio_txt" />
+
+            <com.shawnlin.numberpicker.NumberPicker
+                android:id="@+id/radio_picker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:np_width="200dp"
+                app:np_height="60dp"
+                app:np_dividerColor="@color/darkorange"
+                app:np_max="1"
+                app:np_min="10"
+                np_dividerThickness="8sp"
+                app:np_orientation="horizontal"
+                app:np_selectedTextColor="@color/colorPrimary"
+                app:np_selectedTextSize="17sp"
+                app:np_textColor="@color/colorPrimary"
+                app:np_textSize="14sp"
+                app:np_value="1" />
+
+
         </LinearLayout>
 
 

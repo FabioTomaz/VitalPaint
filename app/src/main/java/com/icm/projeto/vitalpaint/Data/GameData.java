@@ -16,6 +16,24 @@ public class GameData implements Serializable{
     private String playerName;
     private String startDate;
     private int duration;
+    private String city;
+    private int radius;
+
+    public int getRadius() {
+        return radius;
+    }
+
+    public void setRadius(int radius) {
+        this.radius = radius;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
 
     public GAMERESULT getResult() {
         return result;
@@ -46,11 +64,18 @@ public class GameData implements Serializable{
     }
 
 
-    public GameData(String gameName, GameMode gameMode, String startDate, int duration){
+    public GameData(String gameName, GameMode gameMode, String startDate, int duration, double lobbyLat, double lobbyLong, String city){
         this.gameName = gameName;
         this.gameMode = gameMode;
         this.startDate = startDate;
         this.duration = duration;
+        this.lobbyLat = lobbyLat;
+        this.lobbyLong = lobbyLong;
+        this.city = city;
+    }
+
+    public GameData(){
+
     }
 
     public String getPlayerName() {
@@ -106,5 +131,6 @@ public class GameData implements Serializable{
     public static enum GAMERESULT{
         REDTEAMWON, BLUETEAMWON, DRAW
     }
+
 
 }

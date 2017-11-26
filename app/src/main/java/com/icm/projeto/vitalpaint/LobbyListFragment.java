@@ -53,8 +53,11 @@ public class LobbyListFragment extends Fragment {
     private Map<String, String> hm;
     private List<Map<String, String>> listViewContents;
     private List<LobbyDataListener> listener;
-    private String[] from = {"lobby_name", "gameMode", "gameStart", "gameDuration"};
-    private int[] to = {R.id.lobby_name, R.id.gameMode, R.id.gameStart, R.id.gameDuration};
+    private String[] from = {"lobby_name", "gameMode", "gameStart", "gameDuration", "zone"};
+    private int[] to = {R.id.lobby_name, R.id.gameMode, R.id.gameStart, R.id.gameDuration, R.id.zone};
+    private double lobbyLat;
+    private double lobbyLongt;
+    private String city;
 
 
     /**
@@ -117,6 +120,10 @@ public class LobbyListFragment extends Fragment {
                 intent.putExtra("startDate", lobby.get("gameStart").replaceAll("Início: ", ""));
                 intent.putExtra("duration", lobby.get("gameDuration").replaceAll("[Duração: m]", ""));
                 intent.putExtra("isHost", false);
+                intent.putExtra("lobbyLat", 0.0); //nao precisamos de passar as coordenadas do lobby, estas apenas sao escritas na
+                intent.putExtra("lobbyLongt", 0.0); //firebase na altura da criaçao do lobby, nao as vamos usar mais quando nos juntamos a lobby
+                intent.putExtra("city", lobby.get("zone").replaceAll("Zona: ", ""));
+                startActivity(intent);
                 startActivity(intent);
                 //adapter.dismiss(); // If you want to close the adapter
             }
@@ -146,6 +153,7 @@ public class LobbyListFragment extends Fragment {
                             hm.put("gameStart", "Início: " + lobby.getStartDate());
                             hm.put("gameDuration", "Duração: " + lobby.getDuration() + "m");
                             Log.i("lobby", hm + "");
+                            hm.put("zone", "Zona: " + lobby.getCity());
                             listViewContents.add(hm);//atualizar a lista de lobbies
                             hm = new HashMap<>();
                         }
@@ -182,6 +190,7 @@ public class LobbyListFragment extends Fragment {
                             hm.put("gameMode", lobby.getGameMode() + "");
                             hm.put("gameStart", "Início: " + lobby.getStartDate());
                             hm.put("gameDuration", "Duração: " + lobby.getDuration() + "m");
+                            hm.put("zone", "Zona: " + lobby.getCity());
                             Log.i("lobby", hm + "");
                             listViewContents.add(hm);//atualizar a lista de lobbies
                             hm = new HashMap<>();
