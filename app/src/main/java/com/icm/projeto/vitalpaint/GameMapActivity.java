@@ -66,6 +66,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         setContentView(R.layout.activity_game_map);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);//nao bloquear o ecra
+
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
         }
@@ -127,7 +128,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 double lat;
                 double longt;
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    if (!data.getKey().equals("score") && !data.getKey().equals(UserDataManager.encodeUserEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail())) && data.child("lat") != null) {
+                    if (!data.getKey().equals("score") && !data.getKey().equals(UserDataManager.encodeUserEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail())) && data.hasChild("lat") && data.hasChild("long")) {
                         lat = data.child("lat").getValue(Double.class);
                         longt = data.child("long").getValue(Double.class);
                         LatLng coord = new LatLng(lat, longt);
@@ -149,7 +150,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 double lat;
                 double longt;
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    if (!data.getKey().equals("score") && !data.getKey().equals(UserDataManager.encodeUserEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail())) && data.child("lat") != null) {
+                    if (!data.getKey().equals("score") && !data.getKey().equals(UserDataManager.encodeUserEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail())) && data.hasChild("lat") && data.hasChild("long")) {
                         lat = data.child("lat").getValue(Double.class);
                         longt = data.child("long").getValue(Double.class);
                         LatLng coord = new LatLng(lat, longt);
@@ -235,7 +236,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         Log.v("TAG_location", "IN ON LOCATION CHANGE, bearing=" + location.getBearing());
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         dbRef.child(myTeam).child(UserDataManager.encodeUserEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail())).child("lat").setValue(location.getLatitude());
-        dbRef.child(myTeam).child(UserDataManager.encodeUserEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail())).child("longt").setValue(location.getLongitude());
+        dbRef.child(myTeam).child(UserDataManager.encodeUserEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail())).child("long").setValue(location.getLongitude());
         Marker m =
                 mMap.addMarker(new MarkerOptions()
                         .position(latLng)

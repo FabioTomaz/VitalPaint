@@ -65,7 +65,6 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
     private ArrayAdapter redAdapter;
     private Button joinRed;
     private Button joinBlue;
-    private FloatingActionButton exitTeam;
     private DatabaseReference blueTeam;
     private DatabaseReference redTeam;
     private DatabaseReference game;
@@ -103,7 +102,6 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
 
         joinBlue = (Button) findViewById(R.id.enter_blue_team);
         joinRed = (Button) findViewById(R.id.enter_red_team);
-        exitTeam = (FloatingActionButton) findViewById(R.id.exit_team);
 
         blueTeamPlayers = new ArrayList<>();
         redTeamPlayers = new ArrayList<>();
@@ -137,9 +135,7 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
                 myTeam = "Equipa Azul";
                 addUserToTeam(myTeam);
                 joinBlue.setEnabled(false);
-                joinRed.setEnabled(false);
-                // mostrar botao para sair da equipa
-                exitTeam.setVisibility(View.VISIBLE);
+                joinRed.setEnabled(true);
             }
         });
         // juntar a equipa vermelha
@@ -148,27 +144,8 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
             public void onClick(View v) {;
                 myTeam = "Equipa Vermelha";
                 addUserToTeam(myTeam);
-                joinBlue.setEnabled(false);
-                joinRed.setEnabled(false);
-                // mostrar botao para sair da equipa
-                exitTeam.setVisibility(View.VISIBLE);
-            }
-        });
-
-        exitTeam.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Map<String, Object> player = new HashMap<>();
-                player.put(loggedUserName, coordinates);
-                redTeam.child(loggedUserName).setValue(null);
-                //mostrar de novo botoes para juntar as equipas
-                myTeam = "";
-                blueTeam.child(loggedUserName).setValue(null);
                 joinBlue.setEnabled(true);
-                joinRed.setEnabled(true);
-                // ocultar botao para sair da equipa
-                exitTeam.setVisibility(View.GONE);
-
+                joinRed.setEnabled(false);
             }
         });
 
@@ -212,6 +189,10 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
     }
 
     public void addUserToTeam(String team){
+        if(team=="Equipa Azul")
+            redTeam.child(UserDataManager.encodeUserEmail(auth.getCurrentUser().getEmail())).removeValue();
+        else
+            blueTeam.child(UserDataManager.encodeUserEmail(auth.getCurrentUser().getEmail())).removeValue();
         FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(team).child(UserDataManager.encodeUserEmail(auth.getCurrentUser().getEmail())).child("name").setValue(loggedUserName);
     }
     //sempre q a atividade entra no estado OnResume, iniciar um timer ate ao inicio da partida.

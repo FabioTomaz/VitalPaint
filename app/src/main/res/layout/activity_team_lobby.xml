@@ -123,17 +123,4 @@
         </android.support.v7.widget.CardView>
     </LinearLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/exit_team"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:theme="@style/PrimaryFlatButton"
-        android:src="@drawable/exit_icon"
-        android:visibility="gone"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_gravity="bottom|right"
-        android:text="@string/exit_team_btn"/>
-
 </android.support.constraint.ConstraintLayout>
