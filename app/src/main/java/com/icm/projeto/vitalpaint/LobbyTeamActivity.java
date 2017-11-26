@@ -126,11 +126,8 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
         joinBlue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Map<String, Object> player = new HashMap<>();
-                Log.i("ola", loggedUserName+"");
-                player.put(loggedUserName, coordinates);
                 myTeam = "Equipa Azul";
-                blueTeam.updateChildren(player);
+                addUserToTeam(myTeam);
                 joinBlue.setEnabled(false);
                 joinRed.setEnabled(false);
                 // mostrar botao para sair da equipa
@@ -140,11 +137,9 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
         // juntar a equipa vermelha
         joinRed.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Map<String, Object> player = new HashMap<>();
-                player.put(loggedUserName, coordinates);
+            public void onClick(View v) {;
                 myTeam = "Equipa Vermelha";
-                redTeam.updateChildren(player);
+                addUserToTeam(myTeam);
                 joinBlue.setEnabled(false);
                 joinRed.setEnabled(false);
                 // mostrar botao para sair da equipa
@@ -211,6 +206,10 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
 
             }
         });
+    }
+
+    public void addUserToTeam(String team){
+        FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(team).push().setValue(FirebaseAuth.getInstance().getCurrentUser().getEmail());
     }
     //sempre q a atividade entra no estado OnResume, iniciar um timer ate ao inicio da partida.
     //a partida n deve iniciar se a atividade estiver em background, ou for destruida, etc
