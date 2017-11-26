@@ -81,6 +81,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
             enemyTeam = "Equipa Vermelha";
         else
             enemyTeam = "Equipa Azul";
+        Log.i("equipa", myTeam);
         dbRef = FirebaseDatabase.getInstance().getReference("Games").child(gameName);
     }
 

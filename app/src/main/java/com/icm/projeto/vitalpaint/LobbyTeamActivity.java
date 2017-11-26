@@ -168,44 +168,7 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
 
             }
         });
-        //ler inicialmente os jogadores na equipa azul
-        blueTeam.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String textOnLobbyBoard = "blue_team_player";
-                List<String> users = new ArrayList<>();
-                blueAdapter.clear();
-                for (DataSnapshot data : dataSnapshot.getChildren()){
-                    if(!data.getKey().equals("score")) {
-                        Log.i("player", data.getKey()+"");
-                        blueAdapter.add(data.getKey());
-                    }
-                }
-                //adicionar os users na listview
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
 
-        redTeam.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String textOnLobbyBoard = "blue_team_player";
-                List<String> users = new ArrayList<>();
-                redAdapter.clear();
-                for (DataSnapshot data : dataSnapshot.getChildren()){
-                    if(!data.getKey().equals("score")) {
-                        Log.i("player", data.getKey()+"");
-                        redAdapter.add(data.getKey());
-                    }
-                }
-                //adicionar os users na listview
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
         //quando alguem sai/entra na equipa azul
         blueTeam.addValueEventListener(new ValueEventListener() {
             @Override
@@ -219,6 +182,7 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
                         blueAdapter.add(data.getKey());
                     }
                 }
+                blueAdapter.notifyDataSetChanged();
                 //adicionar os users na listview
             }
             @Override
@@ -239,6 +203,7 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
                         redAdapter.add(data.getKey());
                     }
                 }
+                blueAdapter.notifyDataSetChanged();
                 //adicionar os users na listview
             }
             @Override
