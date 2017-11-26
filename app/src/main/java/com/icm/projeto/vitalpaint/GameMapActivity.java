@@ -240,11 +240,8 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.i("location change", "m here");
-        mMap.clear();
         mLastLocation = location;
         //Place current location marker
-        Log.v("TAG_location", "IN ON LOCATION CHANGE, bearing=" + location.getBearing());
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         dbRef.child(myTeam).child(UserDataManager.encodeUserEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail())).child("lat").setValue(location.getLatitude());
         dbRef.child(myTeam).child(UserDataManager.encodeUserEmail(FirebaseAuth.getInstance().getCurrentUser().getEmail())).child("long").setValue(location.getLongitude());
