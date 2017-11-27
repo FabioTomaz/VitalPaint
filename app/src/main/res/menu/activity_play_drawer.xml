@@ -4,14 +4,16 @@
     <group android:checkableBehavior="single">
         <item android:id="@+id/nav_play" android:title="@string/play">
             <menu>
-                <item
-                    android:id="@+id/nav_create_game"
-                    android:title="@string/create_game"
-                    android:icon="@drawable/ic_plus_circle"/>
-                <item
-                    android:id="@+id/nav_join_game"
-                    android:title="@string/join_game"
-                    android:icon="@drawable/ic_account_multiple_plus"/>
+                <group android:checkableBehavior="single">
+                    <item
+                        android:id="@+id/nav_create_game"
+                        android:title="@string/create_game"
+                        android:icon="@drawable/ic_plus_circle"/>
+                    <item
+                        android:id="@+id/nav_join_game"
+                        android:title="@string/join_game"
+                        android:icon="@drawable/ic_account_multiple_plus"/>
+                </group>
             </menu>
         </item>
         <item
@@ -39,6 +41,4 @@
             android:icon="@drawable/ic_leave_game"
             android:title="@string/nav_logout" />
     </group>
-
-
 </menu>

@@ -86,7 +86,7 @@ public class PlayActivity extends AppCompatActivity
             ft.replace(R.id.content_frame, fragment);
             ft.commit();
         }
-
+        navigationView.setCheckedItem(R.id.create_game);
     }
 
     public static Bitmap convertToBitMap(File file){

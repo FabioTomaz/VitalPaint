@@ -1,6 +1,10 @@
 package com.icm.projeto.vitalpaint;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
@@ -16,9 +20,12 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Surface;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -85,7 +92,6 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         gameName = getIntent().getStringExtra("gameName");
         duration = getIntent().getIntExtra("duration", 0);
         myTeam = getIntent().getStringExtra("myTeam");
-        Log.i("gamemap", myTeam + ", " + "duration:" + duration + ", gm " + gameName);
         myName = getIntent().getStringExtra("userName");
         userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
         if (myTeam.equals("Equipa Azul"))
@@ -93,8 +99,32 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         else
             enemyTeam = "Equipa Azul";
         dbRef = FirebaseDatabase.getInstance().getReference("Games").child(gameName);
-    }
+        Button btnGotKilled = (Button) findViewById(R.id.got_killed);
 
+        final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        Intent i = new Intent(GameMapActivity.this, GameEndedActivity.class);
+                        i.putExtra("playerState", "morto");
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        break;
+                }
+            }
+        };
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_Alert);
+        btnGotKilled.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                builder.setMessage("Confirmas a tua morte?").setPositiveButton("Sim", dialogClickListener)
+                        .setNegativeButton("Não", dialogClickListener).show();
+            }
+        });
+
+    }
 
     /**
      * Manipulates the map once available.
@@ -356,7 +386,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         //move map camera
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(latLng)
-                //.zoom(22)
+                .zoom(18)
                 .tilt(50)
                 .bearing(location.getBearing())
                 .build();

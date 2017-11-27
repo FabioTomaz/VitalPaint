@@ -43,8 +43,7 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/Theme.App.Login"
-            android:hint="@string/hint_password">
+            android:theme="@style/Theme.App.Login">
             <EditText
                 android:id="@+id/password"
                 android:layout_width="fill_parent"
@@ -52,7 +51,6 @@
                 android:layout_marginBottom="10dp"
                 android:hint="@string/hint_password"
                 android:inputType="textPassword"
-                style="@style/Theme.App.Login"
                 android:shadowColor="@color/white"
                 android:textColorLink="@color/white"
                 android:textColorHighlight="@color/white"

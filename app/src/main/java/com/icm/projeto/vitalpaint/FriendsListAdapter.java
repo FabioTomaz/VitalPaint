@@ -50,6 +50,7 @@ public class FriendsListAdapter extends FirebaseListAdapter<String> {
     private final String userEmail;
 
     public FriendsListAdapter(Activity activity, Context context, String userEmail) {
+
         super(activity, String.class, R.layout.listview_activity, FirebaseDatabase.getInstance().getReference().child("Users").child(UserDataManager.encodeUserEmail(userEmail)).child("friends"));
         this.context = context;
         this.userEmail = userEmail;
@@ -57,21 +58,25 @@ public class FriendsListAdapter extends FirebaseListAdapter<String> {
     }
 
     @Override
-    protected void populateView(View v, final String model, int position) {
-        final TextView txtTitle = (TextView) v.findViewById(R.id.listview_item_title);
-        final TextView txtUnderTitle = (TextView) v.findViewById(R.id.listview_item_short_description);
-        final ImageView imageView = (ImageView) v.findViewById(R.id.imageRow);
-        DatabaseReference dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(UserDataManager.encodeUserEmail(model));
+    protected void populateView(View v, String model1, int position) {
+        final String friendEmail = model1;
+        final View view = v;
+        DatabaseReference dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(UserDataManager.encodeUserEmail(friendEmail));
         dbData.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
+                TextView txtTitle = (TextView) view.findViewById(R.id.listview_item_title);
+                TextView txtUnderTitle = (TextView) view.findViewById(R.id.listview_item_short_description);
+                ImageView imageView = (ImageView) view.findViewById(R.id.imageRow);
+                Log.i("USERRRR", userEmail);
                 txtTitle.setText(snapshot.child("name").getValue(String.class));
                 txtUnderTitle.setText(snapshot.child("email").getValue(String.class));
                 Drawable drawable = ContextCompat.getDrawable(activity,R.drawable.imagem_perfil);
                 RequestOptions options = new RequestOptions()
                         .error(drawable);
+
                     Glide.with(activity)
-                            .load(FirebaseStorage.getInstance().getReference("User Profile Photos/" + model + "/profilePic"))
+                            .load(FirebaseStorage.getInstance().getReference("User Profile Photos/" + friendEmail + "/profilePic"))
                             .apply(options)
                             .into(imageView);
             }
