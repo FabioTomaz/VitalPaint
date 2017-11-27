@@ -17,49 +17,43 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.icm.projeto.vitalpaint.Data.GamePlayed;
 import com.icm.projeto.vitalpaint.Data.UserDataManager;
 
 /**
  * Created by young on 24/11/2017.
  */
 
-public class GameHistoryListAdapter extends FirebaseListAdapter<String> {
+public class GameHistoryListAdapter extends FirebaseListAdapter<GamePlayed> {
     private final Context context;
     private final Activity activity;
     private final String userEmail;
 
     public GameHistoryListAdapter(Activity activity, Context context, String userEmail) {
-        super(activity, String.class, R.layout.listview_activity, FirebaseDatabase.getInstance().getReference().child("Users").child(UserDataManager.encodeUserEmail(userEmail)).child("friends"));
+        super(activity, GamePlayed.class, R.layout.listview_activity, FirebaseDatabase.getInstance().getReference().child("Users").child(UserDataManager.encodeUserEmail(userEmail)).child("GamesPlayed"));
         this.context = context;
         this.userEmail = userEmail;
         this.activity = activity;
     }
 
     @Override
-    protected void populateView(View v, final String model, int position) {
-        final TextView txtTitle = (TextView) v.findViewById(R.id.listview_item_title);
-        final TextView txtUnderTitle = (TextView) v.findViewById(R.id.listview_item_short_description);
-        final ImageView imageView = (ImageView) v.findViewById(R.id.imageRow);
-        DatabaseReference dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(UserDataManager.encodeUserEmail(model));
-        dbData.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(final DataSnapshot snapshot) {
-                txtTitle.setText(snapshot.child("name").getValue(String.class));
-                txtUnderTitle.setText(snapshot.child("email").getValue(String.class));
-                Drawable drawable = ContextCompat.getDrawable(activity,R.drawable.imagem_perfil);
-                RequestOptions options = new RequestOptions()
-                        .error(drawable);
-                try {
-                    Glide.with(activity)
-                            .load(FirebaseStorage.getInstance().getReference("User Profile Photos/" + model + "/profilePic"))
-                            .apply(options)
-                            .into(imageView);
-                }catch (NullPointerException e){
-                    imageView.setImageDrawable(drawable);
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {}
-        });
+    protected void populateView(View v, final GamePlayed model, int position) {
+        final TextView txtGameResult = (TextView) v.findViewById(R.id.game_result);
+        final TextView txtMode = (TextView) v.findViewById(R.id.game_mode);
+        final TextView txtStartDate = (TextView) v.findViewById(R.id.game_start_date);
+        final ImageView imageView = (ImageView) v.findViewById(R.id.image_game_result);
+
+        if(model.getGameResult()==GamePlayed.RESULT.DRAW) {
+            imageView.setImageResource(R.drawable.ic_minus);
+            txtGameResult.setText("Empate");
+        }else if(model.getGameResult()==GamePlayed.RESULT.WON) {
+            imageView.setImageResource(R.drawable.ic_win);
+            txtGameResult.setText("Vitoria");
+        }else if(model.getGameResult()==GamePlayed.RESULT.LOST) {
+            imageView.setImageResource(R.drawable.ic_loss);
+            txtGameResult.setText("Derrota");
+        }
+        txtStartDate.setText(model.getStartDate().toString());
+        txtMode.setText(model.getGameMode().toString());
     }
 }
