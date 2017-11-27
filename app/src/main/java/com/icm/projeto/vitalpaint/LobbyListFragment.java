@@ -2,6 +2,10 @@ package com.icm.projeto.vitalpaint;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -12,12 +16,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.icm.projeto.vitalpaint.Data.GameData;
 import com.icm.projeto.vitalpaint.Data.Lobby;
 import com.icm.projeto.vitalpaint.Data.LobbyDataListener;
 
@@ -25,9 +31,11 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -55,8 +63,8 @@ public class LobbyListFragment extends Fragment {
     private List<LobbyDataListener> listener;
     private String[] from = {"lobby_name", "gameMode", "gameStart", "gameDuration", "zone"};
     private int[] to = {R.id.lobby_name, R.id.gameMode, R.id.gameStart, R.id.gameDuration, R.id.zone};
-    private double lobbyLat;
-    private double lobbyLongt;
+    private double lat;
+    private double longt;
     private String city;
 
 
@@ -170,14 +178,14 @@ public class LobbyListFragment extends Fragment {
         dbRef.addValueEventListener(new ValueEventListener() { //listener para ler no inicio do fragmento da DB
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                Lobby lobby = new Lobby();
+                GameData lobby = new GameData();
                 hm = new HashMap<>();
                 listViewContents = new ArrayList<>();
                 //obter dados dos lobbys e colocá-los nas estruturas de dados para o listView
                 DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm");
                 DateTime gameStart;
                 for (DataSnapshot data : snapshot.getChildren()) {
-                    lobby = data.getValue(Lobby.class);
+                    lobby = data.getValue(GameData.class);
                     hm = new HashMap<>();
                     gameStart = formatter.parseDateTime(lobby.getStartDate());
                     Log.i("gamestart", gameStart.plusMinutes(lobby.getDuration()+5)+"");
@@ -185,15 +193,20 @@ public class LobbyListFragment extends Fragment {
                         dbRef.child(data.getKey()).setValue(null);//apagar lobby invalido
                     }
                     else{
-                        if(gameStart.isAfter(null)){//o jogo ainda nao começou
-                            hm.put("lobby_name", lobby.getGameName());
-                            hm.put("gameMode", lobby.getGameMode() + "");
-                            hm.put("gameStart", "Início: " + lobby.getStartDate());
-                            hm.put("gameDuration", "Duração: " + lobby.getDuration() + "m");
-                            hm.put("zone", "Zona: " + lobby.getCity());
-                            Log.i("lobby", hm + "");
-                            listViewContents.add(hm);//atualizar a lista de lobbies
-                            hm = new HashMap<>();
+                        float[] dist = new float[1];
+                        // se  o lobby estiver a mais que 10 kilometros do user, nao apresentar
+                        Location.distanceBetween(lobby.getLobbyLat(), lobby.getLobbyLong(), lat, longt, dist);
+                        if ( dist[0]/1000 <= 10){
+                            if(gameStart.isAfter(null)){//o jogo ainda nao começou
+                                hm.put("lobby_name", lobby.getGameName());
+                                hm.put("gameMode", lobby.getGameMode() + "");
+                                hm.put("gameStart", "Início: " + lobby.getStartDate());
+                                hm.put("gameDuration", "Duração: " + lobby.getDuration() + "m");
+                                hm.put("zone", "Zona: " + lobby.getCity());
+                                Log.i("lobby", hm + "");
+                                listViewContents.add(hm);//atualizar a lista de lobbies
+                                hm = new HashMap<>();
+                            }
                         }
                     }
                 }
@@ -216,6 +229,58 @@ public class LobbyListFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    private class MyLocationListener implements LocationListener {
+
+        @Override
+        public void onLocationChanged(Location loc) {
+            //editLocation.setText("");
+            //pb.setVisibility(View.INVISIBLE);
+            Toast.makeText(
+                    getActivity().getBaseContext(),
+                    "Location changed: Lat: " + loc.getLatitude() + " Lng: "
+                            + loc.getLongitude(), Toast.LENGTH_SHORT).show();
+            /*String longitude = "Longitude: " + loc.getLongitude();
+            Log.v("longitude", longitude);
+            String latitude = "Latitude: " + loc.getLatitude();
+            Log.v("latitude", latitude);*/
+            lat = loc.getLatitude();
+            longt = loc.getLongitude();
+
+        /*------- To get city name from coordinates -------- */
+            String cityName = null;
+            Geocoder gcd = new Geocoder(getActivity().getBaseContext(), Locale.getDefault());
+            List<Address> addresses;
+            try {
+                addresses = gcd.getFromLocation(loc.getLatitude(),
+                        loc.getLongitude(), 1);
+                if (addresses.size() > 0) {
+                    System.out.println(addresses.get(0).getLocality());
+                    city = addresses.get(0).getLocality();
+                }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            Log.v("city", city);
+            //editLocation.setText(s);
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
     }
 
     /**
