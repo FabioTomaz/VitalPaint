@@ -2,11 +2,9 @@ package com.icm.projeto.vitalpaint;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -20,9 +18,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -48,11 +44,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.icm.projeto.vitalpaint.Data.GameDataManager;
 import com.icm.projeto.vitalpaint.Data.UserDataManager;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -66,6 +60,9 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     private String gameName;
     private String myTeam = "";
     private String enemyTeam = "";
+    private String startDate;
+    private int radius;
+    private String zone;
     private int duration;
     private DatabaseReference dbRef;
     private String userEmail;
@@ -73,6 +70,8 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     LocationRequest mLocationRequest;
+    private boolean redTeamLost = false; //true se todos os elementos da equipa estiverem mortos
+    private boolean blueTeamLost = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,9 +89,10 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         mapFragment.getMapAsync(this);
 
         gameName = getIntent().getStringExtra("gameName");
-        duration = getIntent().getIntExtra("duration", 0);
         myTeam = getIntent().getStringExtra("myTeam");
         myName = getIntent().getStringExtra("userName");
+        startDate = getIntent().getStringExtra("startDate");
+        zone = getIntent().getStringExtra("zone");
         userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
         if (myTeam.equals("Equipa Azul"))
             enemyTeam = "Equipa Vermelha";
@@ -100,6 +100,15 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
             enemyTeam = "Equipa Azul";
         dbRef = FirebaseDatabase.getInstance().getReference("Games").child(gameName);
         Button btnGotKilled = (Button) findViewById(R.id.got_killed);
+
+        btnGotKilled.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //o jogador foi atingido, registar na firebase database
+                FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(myTeam)
+                        .child(UserDataManager.encodeUserEmail(userEmail)).child("state").setValue(LobbyTeamActivity.PLAYERSTATE.DEAD);
+            }
+        });
 
         final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
@@ -162,12 +171,17 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         dbRef.child(myTeam).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean bool = true;
                 double lat;
                 double longt;
+                String state;
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     if (!data.getKey().equals("score") && !data.getKey().equals(UserDataManager.encodeUserEmail(userEmail)) && data.hasChild("lat") && data.hasChild("long")) {
                         lat = data.child("lat").getValue(Double.class);
                         longt = data.child("long").getValue(Double.class);
+                        state = data.child("state").getValue(String.class);
+                        if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING)
+                            bool = bool && false;
                         LatLng coord = new LatLng(lat, longt);
                         if(!lastestPlayerMarkers.containsKey(data.getKey())){
                             Marker playerMarker;
@@ -186,6 +200,17 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                         }
                     }
                 }
+                //todos os elementos da equipa estao mortos
+                if (bool == true){
+                    if(myTeam=="Equipa Vermelha"){
+                        redTeamLost = true;
+                        finishGame("Equipa Azul", "Equipa Vermelha");
+                    }
+                    else{
+                        blueTeamLost = true;
+                        finishGame("Equipa Vermelha", "Equipa Azul");
+                    }
+                }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
@@ -197,14 +222,19 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
             public void onDataChange(DataSnapshot dataSnapshot) {
                 double lat;
                 double longt;
+                boolean bool = true;
+                String state;
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     if (!data.getKey().equals("score") && !data.getKey().equals(UserDataManager.encodeUserEmail(userEmail)) && data.hasChild("lat") && data.hasChild("long")) {
                         lat = data.child("lat").getValue(Double.class);
                         longt = data.child("long").getValue(Double.class);
+                        state = data.child("state").getValue(String.class);
                         LatLng coord = new LatLng(lat, longt);
                         Location enemyLocation = new Location("");
                         enemyLocation.setLatitude(lat);
                         enemyLocation.setLongitude(longt);
+                        if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING)
+                            bool = bool && false;
                         if(enemyLocation.distanceTo(mLastLocation)<METERSTOSEEENEMIES) {
                             if (!lastestPlayerMarkers.containsKey(data.getKey())) {
                                 Marker playerMarker;
@@ -222,6 +252,18 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                                 lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
                             }
                         }
+                        //todos os elementos da equipa estao mortos
+
+                    }
+                }
+                if (bool == true){
+                    if(myTeam=="Equipa Vermelha"){
+                        redTeamLost = true;
+                        finishGame("Equipa Vermelha", "Equipa Vermelha");
+                    }
+                    else{
+                        blueTeamLost = true;
+                        finishGame("Equipa Azul", "Equipa Azul");
                     }
                 }
             }
@@ -432,6 +474,14 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         } else {
             return true;
         }
+    }
+
+    public void finishGame(String winnerTeam, String myTeam){
+        Intent intent = new Intent(this, GameEndedActivity.class);
+        intent.putExtra("winnerTeam", winnerTeam);
+        intent.putExtra("myTeam", myTeam);
+        intent.putExtra("startDate", startDate);
+        intent.putExtra("zone", zone);
     }
 
     @Override

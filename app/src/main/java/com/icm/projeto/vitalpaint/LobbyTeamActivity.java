@@ -49,7 +49,6 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
     private String myTeam;
     private Map<String, Double> coordinates;
     private String startDate;
-    private int duration;
     private UserDataManager userDataManager;
     private String loggedUserName;
     private FirebaseAuth auth;
@@ -98,7 +97,6 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
         gameMode = GameMode.valueOf(getIntent().getStringExtra("gameMode")); //obter  a string do enum e converter para enum
         startDate = getIntent().getStringExtra("startDate");
         city = getIntent().getStringExtra("city");
-        duration = getIntent().getIntExtra("duration", 0);
         radius = getIntent().getIntExtra("radius", 0);
         lobbyLat = getIntent().getDoubleExtra("lobbyLat", 0.0);
         lobbyLongt = getIntent().getDoubleExtra("lobbyLongt", 0.0);
@@ -113,7 +111,7 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
 
         blueTeamPlayers = new ArrayList<>();
         redTeamPlayers = new ArrayList<>();
-        gameData = new GameData(gameName, gameMode, startDate, duration, lobbyLat, lobbyLongt, city);
+        gameData = new GameData(gameName, gameMode, startDate, lobbyLat, lobbyLongt, city);
 
         blueTeamListView = (ListView) findViewById(R.id.list_blue_team);
         redTeamListView = (ListView) findViewById(R.id.list_red_team);
@@ -201,7 +199,9 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
             redTeam.child(UserDataManager.encodeUserEmail(auth.getCurrentUser().getEmail())).removeValue();
         else
             blueTeam.child(UserDataManager.encodeUserEmail(auth.getCurrentUser().getEmail())).removeValue();
+
         FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(team).child(UserDataManager.encodeUserEmail(auth.getCurrentUser().getEmail())).child("name").setValue(loggedUserName);
+        FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(team).child(UserDataManager.encodeUserEmail(auth.getCurrentUser().getEmail())).child("state").setValue(PLAYERSTATE.PLAYING);
     }
     //sempre q a atividade entra no estado OnResume, iniciar um timer ate ao inicio da partida.
     //a partida n deve iniciar se a atividade estiver em background, ou for destruida, etc
@@ -278,7 +278,9 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
                         intent.putExtra("myTeam", myTeam);
                         intent.putExtra("gameName", gameName);
                         intent.putExtra("userName", loggedUserName);
-                        intent.putExtra("duration", duration);
+                        intent.putExtra("startDate", startDate);
+                        intent.putExtra("zone", city);
+                        intent.putExtra("radius", radius);
                         startActivity(intent);
                     }
                 });
@@ -294,6 +296,10 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
                 game.child(gameName).child(myTeam).child(loggedUserName).setValue(null);
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    public static enum PLAYERSTATE{
+        PLAYING, DEAD
     }
 
 

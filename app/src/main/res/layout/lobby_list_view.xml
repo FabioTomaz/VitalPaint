@@ -42,21 +42,7 @@
                 android:textSize="13sp"
                 android:textStyle="bold" />
         </LinearLayout>
-        <LinearLayout
-            android:id="@+id/middle"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:orientation="vertical"
-            android:padding="7dp">
-            <TextView
-                android:id="@+id/zone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textSize="13sp" />
 
-        </LinearLayout>
         <LinearLayout
             android:id="@+id/subtittle"
             android:layout_width="match_parent"
@@ -71,10 +57,9 @@
                 android:layout_gravity="right"
                 android:textSize="13sp" />
             <TextView
-                android:id="@+id/gameDuration"
+                android:id="@+id/zone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="5dp"
                 android:layout_gravity="right"
                 android:textSize="13sp" />
         </LinearLayout>

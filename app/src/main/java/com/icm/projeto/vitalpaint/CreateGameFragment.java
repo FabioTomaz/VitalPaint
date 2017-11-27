@@ -45,7 +45,7 @@ import java.util.Locale;
  * Use the {//@link CreateGameFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CreateGameFragment extends Fragment {
+public class CreateGameFragment extends Fragment implements LocationListener{
 
     private OnFragmentInteractionListener mListener;
     private Button createBtn;
@@ -54,7 +54,6 @@ public class CreateGameFragment extends Fragment {
     private Spinner gameMode;
     private TimePicker startTime;
     private DateTime gameStart;
-    private com.shawnlin.numberpicker.NumberPicker durationPicker;
     private com.shawnlin.numberpicker.NumberPicker  radiusPicker;
     private double lobbyLongt;
     private double lobbyLat;
@@ -75,14 +74,25 @@ public class CreateGameFragment extends Fragment {
         // Inflate the layout for this fragment
         getActivity().setTitle("Criar Jogo");
         this.inflatedView = inflater.inflate(R.layout.fragment_create_game, container, false);
-               createBtn = (Button) inflatedView.findViewById(R.id.create_game);
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        //ir buscar a ultima localizaçao conhecida
+        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        //se os dados forem antigos solicitar novos dados uma vez
+        if(location != null && location.getTime() > Calendar.getInstance().getTimeInMillis() - 2 * 60 * 1000) {
+            lobbyLat = location.getLatitude();
+            lobbyLongt = location.getLongitude();
+        }
+        else {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        }
+
+        createBtn = (Button) inflatedView.findViewById(R.id.create_game);
         gameName = (EditText) inflatedView.findViewById(R.id.game_name);
         gameMode =(Spinner) inflatedView.findViewById(R.id.game_mode_spinner);
         startTime = (TimePicker) inflatedView.findViewById(R.id.start_time);
         //colocar timepicker com formato 24h e inicializar para a hora atual
         startTime.setIs24HourView(true);
         startTime.setCurrentHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
-        durationPicker = (com.shawnlin.numberpicker.NumberPicker )  inflatedView.findViewById(R.id.duration_picker);
         radiusPicker = (com.shawnlin.numberpicker.NumberPicker )  inflatedView.findViewById(R.id.radio_picker);
 
         gameName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -111,7 +121,6 @@ public class CreateGameFragment extends Fragment {
                         Intent intent = new Intent(getActivity(), LobbyTeamActivity.class);
                         intent.putExtra("gameName", gameName.getText().toString());
                         intent.putExtra("startDate", getSimpleStartTime(gameStart));
-                        intent.putExtra("duration", durationPicker.getValue());
                         intent.putExtra("gameMode", GameMode.TEAMVSTEAM.toString());//passar enum como string
                         intent.putExtra("isHost", true);//este utilizador criou o lobby
                         intent.putExtra("lobbyLat", lobbyLat);
@@ -135,51 +144,20 @@ public class CreateGameFragment extends Fragment {
 
         return inflatedView;
     }
-    public void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager =(InputMethodManager)getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-    public String getSimpleStartTime(DateTime time){
-        return time.getDayOfMonth()+"/"+time.getMonthOfYear()+"/"+time.getYear()+" "+
-                time.getHourOfDay()+":"+time.getMinuteOfHour();
-    }
-    @SuppressLint("MissingPermission")
-    @Override
-    public void onResume(){
-        super.onResume();
-    locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-    locationListener = new MyLocationListener();
-    //receber atualizaçoes a cada 5 segundos,
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, (LocationListener) locationListener);
-
-    }
 
     @Override
-    public void onPause(){
-        super.onPause();
-        locationManager.removeUpdates(locationListener);
-    }
+    public void onLocationChanged(Location location) {
+        if (location != null) {
+            Log.v("Location Changed", location.getLatitude() + " and " + location.getLongitude());
+            lobbyLat = location.getLatitude();
+            lobbyLongt = location.getLongitude();
 
-    private class MyLocationListener implements LocationListener {
-
-        @Override
-        public void onLocationChanged(Location loc) {
-
-
-            /*String longitude = "Longitude: " + loc.getLongitude();
-            Log.v("longitude", longitude);
-            String latitude = "Latitude: " + loc.getLatitude();
-            Log.v("latitude", latitude);*/
-            lobbyLat = loc.getLatitude();
-            lobbyLongt = loc.getLongitude();
-
-        /*------- To get city name from coordinates -------- */
+            /*------- To get city name from coordinates -------- */
             String cityName = null;
             Geocoder gcd = new Geocoder(getActivity().getBaseContext(), Locale.getDefault());
             List<Address> addresses;
             try {
-                addresses = gcd.getFromLocation(loc.getLatitude(),
-                        loc.getLongitude(), 1);
+                addresses = gcd.getFromLocation(lobbyLat, lobbyLongt, 1);
                 if (addresses.size() > 0) {
                     System.out.println(addresses.get(0).getLocality());
                     city = addresses.get(0).getLocality();
@@ -187,23 +165,31 @@ public class CreateGameFragment extends Fragment {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Log.v("city", city);
+            Log.v("city", city+"");
+            locationManager.removeUpdates(this);
         }
+    }
 
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+    }
 
-        }
+    @Override
+    public void onProviderEnabled(String provider) {
+    }
 
-        @Override
-        public void onProviderEnabled(String provider) {
+    @Override
+    public void onProviderDisabled(String provider) {
+    }
 
-        }
+    public void hideKeyboard(View view) {
+        InputMethodManager inputMethodManager =(InputMethodManager)getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
 
-        @Override
-        public void onProviderDisabled(String provider) {
-
-        }
+    public String getSimpleStartTime(DateTime time){
+        return time.getDayOfMonth()+"/"+time.getMonthOfYear()+"/"+time.getYear()+" "+
+                time.getHourOfDay()+":"+time.getMinuteOfHour();
     }
 
 
