@@ -175,7 +175,6 @@ public class CreateGameFragment extends Fragment {
                 e.printStackTrace();
             }
             Log.v("city", city);
-            //editLocation.setText(s);
         }
 
         @Override
