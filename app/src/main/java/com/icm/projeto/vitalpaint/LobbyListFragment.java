@@ -1,11 +1,13 @@
 package com.icm.projeto.vitalpaint;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -16,7 +18,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -66,6 +67,8 @@ public class LobbyListFragment extends Fragment {
     private double lat;
     private double longt;
     private String city;
+    private LocationManager locationManager;
+    private LocationListener locationListener;
 
 
     /**
@@ -102,6 +105,7 @@ public class LobbyListFragment extends Fragment {
 
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -109,6 +113,10 @@ public class LobbyListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_lobby_list, container, false);
         // Return view
         // Set the adapter
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new MyLocationListener();
+        //receber atualizaçoes a cada 5 segundos,
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, (LocationListener) locationListener);
 
         lobbiesListView = (ListView) view.findViewById(R.id.lvLobbies);
         lobbiesListView.setAdapter(adapterItems);
@@ -140,30 +148,34 @@ public class LobbyListFragment extends Fragment {
         dbRef.addListenerForSingleValueEvent(new ValueEventListener() { //listener para ler no inicio do fragmento da DB
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                Lobby lobby = new Lobby();
+                GameData lobby = new GameData();
                 hm = new HashMap<>();
                 listViewContents = new ArrayList<>();
                 //obter dados dos lobbys e colocá-los nas estruturas de dados para o listView
                 DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm");
                 DateTime gameStart;
                 for (DataSnapshot data : snapshot.getChildren()) {
-                    lobby = data.getValue(Lobby.class);
+                    lobby = data.getValue(GameData.class);
                     hm = new HashMap<>();
                     gameStart = formatter.parseDateTime(lobby.getStartDate());
                     Log.i("gamestart", gameStart.plusMinutes(lobby.getDuration()+5)+"");
                     if(!gameStart.plusMinutes(lobby.getDuration()+5).isAfter(null)){//verificar se existem lobbys que ja iniciaram e nao apresentar esses resultados
                         dbRef.child(data.getKey()).setValue(null);//apagar lobby invalido
                     }
-                    else{
-                        if(gameStart.isAfter(null)){//o jogo ainda nao começou
-                            hm.put("lobby_name", lobby.getGameName());
-                            hm.put("gameMode", lobby.getGameMode() + "");
-                            hm.put("gameStart", "Início: " + lobby.getStartDate());
-                            hm.put("gameDuration", "Duração: " + lobby.getDuration() + "m");
-                            Log.i("lobby", hm + "");
-                            hm.put("zone", "Zona: " + lobby.getCity());
-                            listViewContents.add(hm);//atualizar a lista de lobbies
-                            hm = new HashMap<>();
+                    else{ float[] dist = new float[1];
+                        // se  o lobby estiver a mais que 10 kilometros do user, nao apresentar
+                        Location.distanceBetween(lobby.getLobbyLat(), lobby.getLobbyLong(), lat, longt, dist);
+                        if ( dist[0]/1000 <= 10) {
+                            if (gameStart.isAfter(null)) {//o jogo ainda nao começou
+                                hm.put("lobby_name", lobby.getGameName());
+                                hm.put("gameMode", lobby.getGameMode() + "");
+                                hm.put("gameStart", "Início: " + lobby.getStartDate());
+                                hm.put("gameDuration", "Duração: " + lobby.getDuration() + "m");
+                                Log.i("lobby", hm + "");
+                                hm.put("zone", "Zona: " + lobby.getCity());
+                                listViewContents.add(hm);//atualizar a lista de lobbies
+                                hm = new HashMap<>();
+                            }
                         }
                     }
                 }
@@ -221,6 +233,24 @@ public class LobbyListFragment extends Fragment {
         return view;
     }
 
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onResume(){
+        super.onResume();
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new MyLocationListener();
+        //receber atualizaçoes a cada 5 segundos,
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, (LocationListener) locationListener);
+
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        locationManager.removeUpdates(locationListener);
+        //locationManager=null;
+    }
+
     public void onAttach(Context context) {
         super.onAttach(context);
     }
@@ -237,10 +267,6 @@ public class LobbyListFragment extends Fragment {
         public void onLocationChanged(Location loc) {
             //editLocation.setText("");
             //pb.setVisibility(View.INVISIBLE);
-            Toast.makeText(
-                    getActivity().getBaseContext(),
-                    "Location changed: Lat: " + loc.getLatitude() + " Lng: "
-                            + loc.getLongitude(), Toast.LENGTH_SHORT).show();
             /*String longitude = "Longitude: " + loc.getLongitude();
             Log.v("longitude", longitude);
             String latitude = "Latitude: " + loc.getLatitude();

@@ -61,6 +61,7 @@ public class CreateGameFragment extends Fragment {
     private String city;
     private int radius;
     private LocationManager locationManager;
+    private LocationListener locationListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,11 +75,7 @@ public class CreateGameFragment extends Fragment {
         // Inflate the layout for this fragment
         getActivity().setTitle("Criar Jogo");
         this.inflatedView = inflater.inflate(R.layout.fragment_create_game, container, false);
-        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        LocationListener locationListener = new MyLocationListener();
-        //receber atualizaçoes a cada 5 segundos,
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, (LocationListener) locationListener);
-        createBtn = (Button) inflatedView.findViewById(R.id.create_game);
+               createBtn = (Button) inflatedView.findViewById(R.id.create_game);
         gameName = (EditText) inflatedView.findViewById(R.id.game_name);
         gameMode =(Spinner) inflatedView.findViewById(R.id.game_mode_spinner);
         startTime = (TimePicker) inflatedView.findViewById(R.id.start_time);
@@ -145,6 +142,22 @@ public class CreateGameFragment extends Fragment {
     public String getSimpleStartTime(DateTime time){
         return time.getDayOfMonth()+"/"+time.getMonthOfYear()+"/"+time.getYear()+" "+
                 time.getHourOfDay()+":"+time.getMinuteOfHour();
+    }
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onResume(){
+        super.onResume();
+    locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+    locationListener = new MyLocationListener();
+    //receber atualizaçoes a cada 5 segundos,
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, (LocationListener) locationListener);
+
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        locationManager.removeUpdates(locationListener);
     }
 
     private class MyLocationListener implements LocationListener {
