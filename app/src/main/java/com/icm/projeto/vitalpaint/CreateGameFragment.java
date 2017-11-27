@@ -125,7 +125,8 @@ public class CreateGameFragment extends Fragment implements LocationListener{
                         intent.putExtra("isHost", true);//este utilizador criou o lobby
                         intent.putExtra("lobbyLat", lobbyLat);
                         intent.putExtra("lobbyLongt", lobbyLongt);
-                        intent.putExtra("city", city);
+                        intent.putExtra("city", getCityFromLocation(lobbyLat, lobbyLongt));
+                        intent.putExtra("radius", radiusPicker.getValue());
                         startActivity(intent);
                     } else if (gameMode.getSelectedItemPosition() == 1) {
 
@@ -144,6 +145,23 @@ public class CreateGameFragment extends Fragment implements LocationListener{
 
         return inflatedView;
     }
+    /*------- To get city name from coordinates -------- */
+    public String getCityFromLocation(double lobbyLat, double lobbyLongt){
+        Geocoder gcd = new Geocoder(getActivity().getBaseContext(), Locale.getDefault());
+        List<Address> addresses;
+                try {
+            addresses = gcd.getFromLocation(lobbyLat, lobbyLongt, 1);
+            if (addresses.size() > 0) {
+                System.out.println(addresses.get(0).getLocality());
+                city = addresses.get(0).getLocality();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+                Log.v("city", city+"");
+
+        return city;
+    }
 
     @Override
     public void onLocationChanged(Location location) {
@@ -151,21 +169,6 @@ public class CreateGameFragment extends Fragment implements LocationListener{
             Log.v("Location Changed", location.getLatitude() + " and " + location.getLongitude());
             lobbyLat = location.getLatitude();
             lobbyLongt = location.getLongitude();
-
-            /*------- To get city name from coordinates -------- */
-            String cityName = null;
-            Geocoder gcd = new Geocoder(getActivity().getBaseContext(), Locale.getDefault());
-            List<Address> addresses;
-            try {
-                addresses = gcd.getFromLocation(lobbyLat, lobbyLongt, 1);
-                if (addresses.size() > 0) {
-                    System.out.println(addresses.get(0).getLocality());
-                    city = addresses.get(0).getLocality();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Log.v("city", city+"");
             locationManager.removeUpdates(this);
         }
     }
@@ -188,8 +191,14 @@ public class CreateGameFragment extends Fragment implements LocationListener{
     }
 
     public String getSimpleStartTime(DateTime time){
+        String minute = time.getMinuteOfHour()+"";
+        if (minute.length() == 1 )
+            minute = "0"+minute;
+        String hour = time.getHourOfDay()+"";
+        if (hour.length() == 1 )
+            hour = "0"+hour;
         return time.getDayOfMonth()+"/"+time.getMonthOfYear()+"/"+time.getYear()+" "+
-                time.getHourOfDay()+":"+time.getMinuteOfHour();
+                hour+":"+minute;
     }
 
 

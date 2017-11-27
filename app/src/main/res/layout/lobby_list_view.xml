@@ -28,6 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
+                android:textColor="@color/colorPrimaryDark"
                 android:layout_marginLeft="10dp"
                 android:textSize="17sp"
                 android:textStyle="bold" />
@@ -37,6 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
+                android:textColor="@color/colorPrimaryDark"
                 android:layout_marginLeft="10dp"
                 android:paddingTop="5dp"
                 android:textSize="13sp"
@@ -53,6 +55,7 @@
             <TextView
                 android:id="@+id/gameStart"
                 android:layout_width="wrap_content"
+                android:textColor="@color/colorPrimaryDark"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:textSize="13sp" />
@@ -60,6 +63,7 @@
                 android:id="@+id/zone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/colorPrimaryDark"
                 android:layout_gravity="right"
                 android:textSize="13sp" />
         </LinearLayout>

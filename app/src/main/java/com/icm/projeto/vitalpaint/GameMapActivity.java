@@ -72,6 +72,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     LocationRequest mLocationRequest;
     private boolean redTeamLost = false; //true se todos os elementos da equipa estiverem mortos
     private boolean blueTeamLost = false;
+    private Button btnGotKilled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,21 +95,12 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         startDate = getIntent().getStringExtra("startDate");
         zone = getIntent().getStringExtra("zone");
         userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        btnGotKilled = (Button) findViewById(R.id.got_killed);
+        Log.i("myTeam", myTeam+"");
         if (myTeam.equals("Equipa Azul"))
             enemyTeam = "Equipa Vermelha";
         else
             enemyTeam = "Equipa Azul";
-        dbRef = FirebaseDatabase.getInstance().getReference("Games").child(gameName);
-        Button btnGotKilled = (Button) findViewById(R.id.got_killed);
-
-        btnGotKilled.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //o jogador foi atingido, registar na firebase database
-                FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(myTeam)
-                        .child(UserDataManager.encodeUserEmail(userEmail)).child("state").setValue(LobbyTeamActivity.PLAYERSTATE.DEAD);
-            }
-        });
 
         final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
@@ -128,8 +120,14 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         btnGotKilled.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                builder.setMessage("Confirmas a tua morte?").setPositiveButton("Sim", dialogClickListener)
-                        .setNegativeButton("Não", dialogClickListener).show();
+                builder.setMessage("Confirmas a tua morte?").setPositiveButton("Sim", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(myTeam)
+                                .child(UserDataManager.encodeUserEmail(userEmail)).child("state")
+                                .setValue(LobbyTeamActivity.PLAYERSTATE.DEAD);
+                    }
+                }).setNegativeButton("Não", dialogClickListener).show();
             }
         });
 

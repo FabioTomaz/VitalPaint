@@ -3,8 +3,6 @@ package com.icm.projeto.vitalpaint;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -32,12 +30,10 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -142,12 +138,10 @@ public class LobbyListFragment extends Fragment implements LocationListener{
                 intent.putExtra("gameName", lobby.get("lobby_name")+"");
                 intent.putExtra("gameMode", lobby.get("gameMode").toString());
                 intent.putExtra("startDate", lobby.get("gameStart").replaceAll("Início: ", ""));
-                intent.putExtra("duration", lobby.get("gameDuration").replaceAll("[Duração: m]", ""));
                 intent.putExtra("isHost", false);
                 intent.putExtra("lobbyLat", 0.0); //nao precisamos de passar as coordenadas do lobby, estas apenas sao escritas na
                 intent.putExtra("lobbyLongt", 0.0); //firebase na altura da criaçao do lobby, nao as vamos usar mais quando nos juntamos a lobby
                 intent.putExtra("city", lobby.get("zone").replaceAll("Zona: ", ""));
-                startActivity(intent);
                 startActivity(intent);
                 //adapter.dismiss(); // If you want to close the adapter
             }
@@ -251,23 +245,8 @@ public class LobbyListFragment extends Fragment implements LocationListener{
             Log.v("Location Changed", location.getLatitude() + " and " + location.getLongitude());
             lat = location.getLatitude();
             longt = location.getLongitude();
-
-            /*------- To get city name from coordinates -------- */
-            String cityName = null;
-            Geocoder gcd = new Geocoder(getActivity().getBaseContext(), Locale.getDefault());
-            List<Address> addresses;
-            try {
-                addresses = gcd.getFromLocation(lat, longt, 1);
-                if (addresses.size() > 0) {
-                    System.out.println(addresses.get(0).getLocality());
-                    city = addresses.get(0).getLocality();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Log.v("city", city);
-            locationManager.removeUpdates(this);
         }
+        locationManager.removeUpdates(this);
     }
 
     @Override
@@ -282,9 +261,7 @@ public class LobbyListFragment extends Fragment implements LocationListener{
 
     @Override
     public void onProviderDisabled(String provider) {
-
     }
-
 
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -294,54 +271,6 @@ public class LobbyListFragment extends Fragment implements LocationListener{
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-    private class MyLocationListener implements LocationListener {
-
-        @Override
-        public void onLocationChanged(Location loc) {
-            //editLocation.setText("");
-            //pb.setVisibility(View.INVISIBLE);
-            /*String longitude = "Longitude: " + loc.getLongitude();
-            Log.v("longitude", longitude);
-            String latitude = "Latitude: " + loc.getLatitude();
-            Log.v("latitude", latitude);*/
-            lat = loc.getLatitude();
-            longt = loc.getLongitude();
-
-        /*------- To get city name from coordinates -------- */
-            String cityName = null;
-            Geocoder gcd = new Geocoder(getActivity().getBaseContext(), Locale.getDefault());
-            List<Address> addresses;
-            try {
-                addresses = gcd.getFromLocation(loc.getLatitude(),
-                        loc.getLongitude(), 1);
-                if (addresses.size() > 0) {
-                    System.out.println(addresses.get(0).getLocality());
-                    city = addresses.get(0).getLocality();
-                }
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-            Log.v("city", city);
-            //editLocation.setText(s);
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-
-        }
     }
 
     /**
