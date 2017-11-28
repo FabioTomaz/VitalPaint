@@ -172,7 +172,7 @@ public class LobbyListFragment extends Fragment implements LocationListener{
                     lobbyLocation.setLatitude(lobby.getLobbyLat());
                     lobbyLocation.setLongitude(lobby.getLobbyLong());
                     Log.i("dist", myLocation.distanceTo(lobbyLocation)+"");
-                   //if ( myLocation.distanceTo(lobbyLocation)<= 10000) {
+                   if ( myLocation.distanceTo(lobbyLocation)<= 10000) {
                         if (gameStart.isAfter(null)) {//o jogo ainda nao começou
                             hm.put("lobby_name", lobby.getGameName());
                             hm.put("gameMode", lobby.getGameMode() + "");
@@ -182,7 +182,7 @@ public class LobbyListFragment extends Fragment implements LocationListener{
                             listViewContents.add(hm);//atualizar a lista de lobbies
                             hm = new HashMap<>();
                         }
-                   // }
+                    }
                 }
                 SimpleAdapter simpleAdapter = new SimpleAdapter(context, listViewContents, R.layout.lobby_list_view, from, to);
                 lobbiesListView.setAdapter(simpleAdapter);

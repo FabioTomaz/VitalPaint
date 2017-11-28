@@ -1,27 +1,28 @@
 package com.icm.projeto.vitalpaint;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.icm.projeto.vitalpaint.Data.UserData;
+import com.icm.projeto.vitalpaint.Data.UserDataManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameEndedActivity extends AppCompatActivity {
+public class GameEndedActivity extends AppCompatActivity implements UserDataManager.UserDataListener{
     private String startDate;
     private String winningTeam;
     private String myTeam;
@@ -35,9 +36,12 @@ public class GameEndedActivity extends AppCompatActivity {
     private ArrayAdapter redAdapter;
     private ListView blueTeamListView;
     private ListView redTeamListView;
+    private FirebaseAuth auth;
+    private UserDataManager userDataManager;
+    public static final int PROFILE_DATA = 1;
 
 
-    @SuppressLint("ResourceAsColor")
+    //@SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,18 +51,13 @@ public class GameEndedActivity extends AppCompatActivity {
         winningTeam = getIntent().getStringExtra("winnerTeam");
         gameName = getIntent().getStringExtra("gameName");
         Log.i("GAMEEND", myTeam.toString());
-    }
-
-    @Override
-    public View onCreateView(String name, Context context, AttributeSet attrs) {
-        View view = super.onCreateView(name, context, attrs);
         winnerTeamtxt = (TextView) findViewById(R.id.winner_team_txt);
         winnerLayout = (LinearLayout) findViewById(R.id.winnerlayout);
         winnerTeamtxt.setText("A "+winningTeam+" Ganhou!");
-        if (winningTeam.equals("Equipa Azul"))
+        /*if (winningTeam.equals("Equipa Azul"))
             winnerLayout.setBackgroundColor(getResources().getColor(R.color.blueTeamColor));
         else
-            winnerLayout.setBackgroundColor(getResources().getColor(R.color.redTeamColor));
+            winnerLayout.setBackgroundColor(getResources().getColor(R.color.redTeamColor));*/
 
         //listviews
         blueTeamPlayers = new ArrayList<>();
@@ -70,7 +69,14 @@ public class GameEndedActivity extends AppCompatActivity {
         blueTeamListView.setAdapter(blueAdapter);
         redTeamListView.setAdapter(redAdapter);
 
-        dbRef = dbRef = FirebaseDatabase.getInstance().getReference("Games").child(gameName);
+        auth = FirebaseAuth.getInstance();
+        //get current user
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        userDataManager = new UserDataManager(user.getEmail());
+        userDataManager.addListener(this);
+        userDataManager.userDataFromEmailListener(PROFILE_DATA);
+
+        dbRef = FirebaseDatabase.getInstance().getReference("Games").child(gameName);
         dbRef.child("Equipa Azul").addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
@@ -110,6 +116,11 @@ public class GameEndedActivity extends AppCompatActivity {
 
             }
         });
-        return super.onCreateView(name, context, attrs);
+    }
+
+    @Override
+    public void onReceiveUserData(int requestType, UserData user, Bitmap profilePic, Bitmap headerPic) {
+        DatabaseReference db = FirebaseDatabase.getInstance().getReference("Users").child(UserDataManager.encodeUserEmail(user.getEMAIL()));
+        
     }
 }

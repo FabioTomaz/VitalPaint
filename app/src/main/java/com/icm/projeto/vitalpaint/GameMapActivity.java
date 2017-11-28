@@ -2,8 +2,6 @@ package com.icm.projeto.vitalpaint;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
@@ -13,7 +11,6 @@ import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -32,8 +29,6 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -55,7 +50,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.icm.projeto.vitalpaint.Data.UserDataManager;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -219,7 +213,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                             LatLng coord = new LatLng(lat, longt);
                             if(!lastestPlayerMarkers.containsKey(data.getKey())){
                                 Marker playerMarker;
-                                if(myTeam=="Equipa Vermelha"){
+                                if(myTeam.equals("Equipa Vermelha")){
                                     playerMarker = mMap.addMarker(new MarkerOptions()
                                             .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_red_pointer))
                                             .title(data.getKey()));
@@ -259,8 +253,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.i("equipa", "equipa inimiga");
-                List<Boolean> bool = new ArrayList<>(); //ver se todos os elementos da equipa estao mortos
-                //boolean bool = true;
+                Boolean allDead = true; //ver se todos os elementos da equipa estao mortos
                 double lat;
                 double longt;
                 String state;
@@ -274,13 +267,6 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                         enemyLocation.setLatitude(lat);
                         enemyLocation.setLongitude(longt);
                         Log.i("statesssss", state+"");
-                        if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING) {
-                            //bool = bool && false;
-                            bool.add(Boolean.FALSE);
-                            Log.i("statessss", bool+"");
-                        }
-                        else if(LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.DEAD)
-                            bool.add(Boolean.TRUE);
                         if( mLastLocation!= null && enemyLocation.distanceTo(mLastLocation)<METERSTOSEEENEMIES) {
                             if (!lastestPlayerMarkers.containsKey(data.getKey())) {
                                 Marker playerMarker;
@@ -298,23 +284,22 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                                 lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
                             }
                         }
-                        /*else{
-                            if (lastestPlayerMarkers.containsKey(data.getKey())) {
-                                (lastestPlayerMarkers.get(data.getKey())).remove();
-                            }
+                        if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING) {
+                            allDead=false;
+                            break;
+                        }
 
-                        }*/
 
                     }
                 }
                 //Senao houver ninguem vivo na capa chamar a funçao que termina a partida
-                if ( bool.contains(Boolean.FALSE)){
-                    Log.i("bool", "yes");
+                if ( allDead==true ){
                     if(myTeam.equals("Equipa Vermelha")){
-                        finishGame("Equipa Vermelha", "Equipa Vermelha");
-                    }
-                    else{
-                        finishGame("Equipa Azul", "Equipa Azul");
+                        redTeamLost = true;
+                        finishGame("Equipa Azul", "Equipa Vermelha");
+                    } else{
+                        blueTeamLost = true;
+                        finishGame("Equipa Vermelha", "Equipa Azul");
                     }
                 }
             }
