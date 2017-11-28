@@ -81,6 +81,10 @@
     <string name="blueTeam">Equipa Azul</string>
     <string name="redTeam">Equipa Vermelha</string>
     <string name="prefered_game_radius">game_radius</string>
+    <string name="agree">Sim</string>
+    <string name="disagree">Não</string>
+    <string name="confirm_death">Confirmas a tua morte?</string>
+    <string name="confirm_leave_game">Tens a certeza que queres sair?</string>
 
 
 </resources>

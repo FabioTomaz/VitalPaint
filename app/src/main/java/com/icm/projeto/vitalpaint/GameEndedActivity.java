@@ -1,8 +1,12 @@
 package com.icm.projeto.vitalpaint;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -37,18 +41,24 @@ public class GameEndedActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        winnerTeamtxt = (TextView) findViewById(R.id.winner_team_txt);
-        winnerLayout = (LinearLayout) findViewById(R.id.winnerlayout);
         setContentView(R.layout.activity_game_ended);
         startDate = getIntent().getStringExtra("startDate");
         myTeam = getIntent().getStringExtra("myTeam");
         winningTeam = getIntent().getStringExtra("winnerTeam");
         gameName = getIntent().getStringExtra("gameName");
+        Log.i("GAMEEND", myTeam.toString());
+    }
+
+    @Override
+    public View onCreateView(String name, Context context, AttributeSet attrs) {
+        View view = super.onCreateView(name, context, attrs);
+        winnerTeamtxt = (TextView) findViewById(R.id.winner_team_txt);
+        winnerLayout = (LinearLayout) findViewById(R.id.winnerlayout);
         winnerTeamtxt.setText("A "+winningTeam+" Ganhou!");
         if (winningTeam.equals("Equipa Azul"))
-            winnerLayout.setBackgroundColor(R.color.blueTeamColor);
+            winnerLayout.setBackgroundColor(getResources().getColor(R.color.blueTeamColor));
         else
-            winnerLayout.setBackgroundColor(R.color.redTeamColor);
+            winnerLayout.setBackgroundColor(getResources().getColor(R.color.redTeamColor));
 
         //listviews
         blueTeamPlayers = new ArrayList<>();
@@ -100,6 +110,6 @@ public class GameEndedActivity extends AppCompatActivity {
 
             }
         });
-
+        return super.onCreateView(name, context, attrs);
     }
 }

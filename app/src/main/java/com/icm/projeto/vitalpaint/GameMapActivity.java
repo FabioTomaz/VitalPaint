@@ -1,6 +1,7 @@
 package com.icm.projeto.vitalpaint;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -26,8 +28,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -98,6 +104,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
         gameName = getIntent().getStringExtra("gameName");
         myTeam = getIntent().getStringExtra("myTeam");
         myName = getIntent().getStringExtra("userName");
@@ -129,30 +136,25 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 });
             }
         }, 1000, 1000);*/
-
-        final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE:
-                        FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(myTeam)
-                                .child(UserDataManager.encodeUserEmail(userEmail)).child("state")
-                                .setValue(LobbyTeamActivity.PLAYERSTATE.DEAD);
-                        /*FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(enemyTeam)
-                                .child("score").setValue(score++);*/
-                        break;
-
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        break;
-                }
-            }
-        };
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Light_Dialog_Alert);
+        final Activity activity = this;
         btnGotKilled.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                builder.setMessage("Confirmas a tua morte?").setPositiveButton("Sim", dialogClickListener)
-                        .setNegativeButton("Não", dialogClickListener).show();
+                MaterialDialog dialog = new MaterialDialog.Builder(activity)
+                        .title(R.string.confirm_death)
+                        .positiveText(R.string.agree)
+                        .negativeText(R.string.disagree)
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(myTeam)
+                                        .child(UserDataManager.encodeUserEmail(userEmail)).child("state")
+                                        .setValue(LobbyTeamActivity.PLAYERSTATE.DEAD);
+                                        /*FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(enemyTeam)
+                                                .child("score").setValue(score++);*/
+                            }
+                        })
+                        .show();
             }
         });
 
@@ -204,48 +206,45 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         dbRef.child(myTeam).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                List<Boolean> bool = new ArrayList<>(); //ver se todos os elementos da equipa estao mortos
+                Boolean allDead = true; //ver se todos os elementos da equipa estao mortos
                 double lat;
                 double longt;
                 String state;
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    if (!data.getKey().equals("score") && !data.getKey().equals(UserDataManager.encodeUserEmail(userEmail)) && data.hasChild("lat") && data.hasChild("long")) {
-                        lat = data.child("lat").getValue(Double.class);
-                        longt = data.child("long").getValue(Double.class);
+                    if (!data.getKey().equals("score")){
                         state = data.child("state").getValue(String.class);
-                        Log.i("arr", bool+"");
-                        if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING) {
-                            bool.add(Boolean.FALSE);
-                            Log.i("statessss", bool+"");
-                        }
-                        else if(LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.DEAD)
-                            bool.add(Boolean.TRUE);
-                        LatLng coord = new LatLng(lat, longt);
-                        if(!lastestPlayerMarkers.containsKey(data.getKey())){
-                            Marker playerMarker;
-                            if(myTeam=="Equipa Vermelha"){
-                                playerMarker = mMap.addMarker(new MarkerOptions()
-                                        .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_red_pointer))
-                                        .title(data.getKey()));
+                        if(!data.getKey().equals(UserDataManager.encodeUserEmail(userEmail)) && data.hasChild("lat") && data.hasChild("long")) {
+                            lat = data.child("lat").getValue(Double.class);
+                            longt = data.child("long").getValue(Double.class);
+                            LatLng coord = new LatLng(lat, longt);
+                            if(!lastestPlayerMarkers.containsKey(data.getKey())){
+                                Marker playerMarker;
+                                if(myTeam=="Equipa Vermelha"){
+                                    playerMarker = mMap.addMarker(new MarkerOptions()
+                                            .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_red_pointer))
+                                            .title(data.getKey()));
+                                }else{
+                                    playerMarker = mMap.addMarker(new MarkerOptions()
+                                            .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_blue_pointer))
+                                            .title(data.getKey()));
+                                }
+                                lastestPlayerMarkers.put(data.getKey(), playerMarker);
                             }else{
-                                playerMarker = mMap.addMarker(new MarkerOptions()
-                                        .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_blue_pointer))
-                                        .title(data.getKey()));
+                                lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
                             }
-                            lastestPlayerMarkers.put(data.getKey(), playerMarker);
-                        }else{
-                            lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
+                        }
+                        if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING) {
+                            allDead=false;
+                            break;
                         }
                     }
                 }
                 //Senao houver ninguem vivo na capa chamar a funçao que termina a partida
-                if ( bool.contains(Boolean.FALSE)){
-                    Log.i("bool", bool+"");
+                if ( allDead==true ){
                     if(myTeam.equals("Equipa Vermelha")){
                         redTeamLost = true;
                         finishGame("Equipa Azul", "Equipa Vermelha");
-                    }
-                    else{
+                    } else{
                         blueTeamLost = true;
                         finishGame("Equipa Vermelha", "Equipa Azul");
                     }
@@ -259,6 +258,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         dbRef.child(enemyTeam).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.i("equipa", "equipa inimiga");
                 List<Boolean> bool = new ArrayList<>(); //ver se todos os elementos da equipa estao mortos
                 //boolean bool = true;
                 double lat;
@@ -377,7 +377,6 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
      */
     private void initSensors() {
         String TAG= "SENSORS";
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         Sensor mSensorGravity = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         Sensor mSensorMagneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
@@ -494,6 +493,27 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.d("CDA", "onBackPressed Called");
+        MaterialDialog dialog = new MaterialDialog.Builder(this)
+                .title(R.string.confirm_leave_game)
+                .positiveText(R.string.agree)
+                .negativeText(R.string.disagree)
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        finish();
+                    }
+                })
+                .show();
+    }
+
+    @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {}
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
@@ -532,13 +552,13 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     public void finishGame(String winnerTeam, String myTeam){
         endGame.setVisibility(View.VISIBLE); //mostrar mensagem de fim de partida
         Intent intent = new Intent(this, GameEndedActivity.class);
+        Log.i("winning team", winnerTeam);
         intent.putExtra("winnerTeam", winnerTeam);
         intent.putExtra("myTeam", myTeam);
         intent.putExtra("startDate", startDate);
         intent.putExtra("zone", zone);
         intent.putExtra("gameName", gameName);
         startActivity(intent);
-        finish();
     }
 
     @Override
