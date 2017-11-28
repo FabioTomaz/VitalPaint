@@ -2,11 +2,9 @@ package com.icm.projeto.vitalpaint;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.provider.SyncStateContract;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -18,7 +16,6 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.android.gms.common.api.Response;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,7 +31,6 @@ import com.icm.projeto.vitalpaint.Data.UserDataManager;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,11 +39,6 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
-
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 
 public class LobbyTeamActivity extends AppCompatActivity implements UserDataManager.UserDataListener {
     private String gameName;
@@ -106,7 +97,7 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
         isHost = getIntent().getBooleanExtra ("isHost", false);
         gameMode = GameMode.valueOf(getIntent().getStringExtra("gameMode")); //obter  a string do enum e converter para enum
         startDate = getIntent().getStringExtra("startDate");
-        city = getIntent().getStringExtra("city");
+        city = getIntent().getStringExtra("zone");
         radius = getIntent().getIntExtra("radius", 0);
         lobbyLat = getIntent().getDoubleExtra("lobbyLat", 0.0);
         lobbyLongt = getIntent().getDoubleExtra("lobbyLongt", 0.0);

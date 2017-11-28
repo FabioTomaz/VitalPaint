@@ -14,6 +14,7 @@
         android:layout_height="150dp"
         card_view:cardElevation="7dp">
         <LinearLayout
+            android:id="@+id/winnerlayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
@@ -32,10 +33,10 @@
                 android:orientation="horizontal"
                 android:paddingTop="10dp">
                 <TextView
+                    android:id="@+id/winner_team_txt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="A EQUIPA AZUL GANHOU"
                     android:textSize="25dp"
                     android:textColor="@color/white"/>
             </LinearLayout>

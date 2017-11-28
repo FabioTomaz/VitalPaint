@@ -22,6 +22,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -47,10 +49,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.icm.projeto.vitalpaint.Data.UserDataManager;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class GameMapActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     public static final double SMOOTHING_FACTOR_COMPASS = 0.9;
@@ -66,13 +70,18 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     private int duration;
     private DatabaseReference dbRef;
     private String userEmail;
-    public static final float METERSTOSEEENEMIES = 500;
+    public static final float METERSTOSEEENEMIES = 100;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     LocationRequest mLocationRequest;
     private boolean redTeamLost = false; //true se todos os elementos da equipa estiverem mortos
     private boolean blueTeamLost = false;
     private Button btnGotKilled;
+    private LinearLayout endGame;
+    private int scoreBlue;
+    private int scoreRed;
+    private int count;
+    private TextView textGameTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,19 +105,41 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         zone = getIntent().getStringExtra("zone");
         userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
         btnGotKilled = (Button) findViewById(R.id.got_killed);
+        endGame = (LinearLayout) findViewById(R.id.endGame);
+        dbRef = FirebaseDatabase.getInstance().getReference("Games").child(gameName);
+        textGameTime = (TextView) findViewById(R.id.textGameTime);
         Log.i("myTeam", myTeam+"");
         if (myTeam.equals("Equipa Azul"))
             enemyTeam = "Equipa Vermelha";
         else
             enemyTeam = "Equipa Azul";
+        count = 0;
+        /*Timer T=new Timer();
+        T.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        textGameTime.setText(hmsTimeFormatter(count/1000));
+                        count++;
+                    }
+                });
+            }
+        }, 1000, 1000);*/
 
         final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
-                        Intent i = new Intent(GameMapActivity.this, GameEndedActivity.class);
-                        i.putExtra("playerState", "morto");
+                        FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(myTeam)
+                                .child(UserDataManager.encodeUserEmail(userEmail)).child("state")
+                                .setValue(LobbyTeamActivity.PLAYERSTATE.DEAD);
+                        /*FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(enemyTeam)
+                                .child("score").setValue(score++);*/
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
@@ -120,17 +151,21 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         btnGotKilled.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                builder.setMessage("Confirmas a tua morte?").setPositiveButton("Sim", new DialogInterface.OnClickListener(){
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(myTeam)
-                                .child(UserDataManager.encodeUserEmail(userEmail)).child("state")
-                                .setValue(LobbyTeamActivity.PLAYERSTATE.DEAD);
-                    }
-                }).setNegativeButton("Não", dialogClickListener).show();
+                builder.setMessage("Confirmas a tua morte?").setPositiveButton("Sim", dialogClickListener)
+                        .setNegativeButton("Não", dialogClickListener).show();
             }
         });
 
+    }
+
+    private String hmsTimeFormatter(long milliSeconds) {
+
+        String hms = String.format("%02d:%02d:%02d",
+                TimeUnit.MILLISECONDS.toHours(milliSeconds),
+                TimeUnit.MILLISECONDS.toMinutes(milliSeconds) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(milliSeconds)),
+                TimeUnit.MILLISECONDS.toSeconds(milliSeconds) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliSeconds)));
+
+        return hms;
     }
 
     /**
@@ -169,7 +204,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         dbRef.child(myTeam).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                boolean bool = true;
+                List<Boolean> bool = new ArrayList<>(); //ver se todos os elementos da equipa estao mortos
                 double lat;
                 double longt;
                 String state;
@@ -178,8 +213,13 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                         lat = data.child("lat").getValue(Double.class);
                         longt = data.child("long").getValue(Double.class);
                         state = data.child("state").getValue(String.class);
-                        if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING)
-                            bool = bool && false;
+                        Log.i("arr", bool+"");
+                        if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING) {
+                            bool.add(Boolean.FALSE);
+                            Log.i("statessss", bool+"");
+                        }
+                        else if(LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.DEAD)
+                            bool.add(Boolean.TRUE);
                         LatLng coord = new LatLng(lat, longt);
                         if(!lastestPlayerMarkers.containsKey(data.getKey())){
                             Marker playerMarker;
@@ -198,9 +238,10 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                         }
                     }
                 }
-                //todos os elementos da equipa estao mortos
-                if (bool == true){
-                    if(myTeam=="Equipa Vermelha"){
+                //Senao houver ninguem vivo na capa chamar a funçao que termina a partida
+                if ( bool.contains(Boolean.FALSE)){
+                    Log.i("bool", bool+"");
+                    if(myTeam.equals("Equipa Vermelha")){
                         redTeamLost = true;
                         finishGame("Equipa Azul", "Equipa Vermelha");
                     }
@@ -218,9 +259,10 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         dbRef.child(enemyTeam).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Boolean> bool = new ArrayList<>(); //ver se todos os elementos da equipa estao mortos
+                //boolean bool = true;
                 double lat;
                 double longt;
-                boolean bool = true;
                 String state;
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     if (!data.getKey().equals("score") && !data.getKey().equals(UserDataManager.encodeUserEmail(userEmail)) && data.hasChild("lat") && data.hasChild("long")) {
@@ -231,9 +273,15 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                         Location enemyLocation = new Location("");
                         enemyLocation.setLatitude(lat);
                         enemyLocation.setLongitude(longt);
-                        if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING)
-                            bool = bool && false;
-                        if(enemyLocation.distanceTo(mLastLocation)<METERSTOSEEENEMIES) {
+                        Log.i("statesssss", state+"");
+                        if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING) {
+                            //bool = bool && false;
+                            bool.add(Boolean.FALSE);
+                            Log.i("statessss", bool+"");
+                        }
+                        else if(LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.DEAD)
+                            bool.add(Boolean.TRUE);
+                        if( mLastLocation!= null && enemyLocation.distanceTo(mLastLocation)<METERSTOSEEENEMIES) {
                             if (!lastestPlayerMarkers.containsKey(data.getKey())) {
                                 Marker playerMarker;
                                 if (enemyTeam == "Equipa Vermelha") {
@@ -250,17 +298,22 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                                 lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
                             }
                         }
-                        //todos os elementos da equipa estao mortos
+                        /*else{
+                            if (lastestPlayerMarkers.containsKey(data.getKey())) {
+                                (lastestPlayerMarkers.get(data.getKey())).remove();
+                            }
+
+                        }*/
 
                     }
                 }
-                if (bool == true){
-                    if(myTeam=="Equipa Vermelha"){
-                        redTeamLost = true;
+                //Senao houver ninguem vivo na capa chamar a funçao que termina a partida
+                if ( bool.contains(Boolean.FALSE)){
+                    Log.i("bool", "yes");
+                    if(myTeam.equals("Equipa Vermelha")){
                         finishGame("Equipa Vermelha", "Equipa Vermelha");
                     }
                     else{
-                        blueTeamLost = true;
                         finishGame("Equipa Azul", "Equipa Azul");
                     }
                 }
@@ -269,6 +322,8 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
             public void onCancelled(DatabaseError databaseError) {}
         });
     }
+
+
 
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -426,7 +481,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         //move map camera
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(latLng)
-                .zoom(18)
+                .zoom(23)
                 .tilt(50)
                 .bearing(location.getBearing())
                 .build();
@@ -475,11 +530,15 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     }
 
     public void finishGame(String winnerTeam, String myTeam){
+        endGame.setVisibility(View.VISIBLE); //mostrar mensagem de fim de partida
         Intent intent = new Intent(this, GameEndedActivity.class);
         intent.putExtra("winnerTeam", winnerTeam);
         intent.putExtra("myTeam", myTeam);
         intent.putExtra("startDate", startDate);
         intent.putExtra("zone", zone);
+        intent.putExtra("gameName", gameName);
+        startActivity(intent);
+        finish();
     }
 
     @Override
