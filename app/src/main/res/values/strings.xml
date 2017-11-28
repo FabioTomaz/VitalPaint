@@ -77,6 +77,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="game_starts_in">O jogo começa em:</string>
     <string name="game_radio_txt">Raio do jogo:</string>
+    <string name="prefered_game_radius">game_radius</string>
 
 
 </resources>

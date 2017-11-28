@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -26,6 +27,7 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 
 import com.icm.projeto.vitalpaint.Data.GameMode;
+import com.shawnlin.numberpicker.NumberPicker;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -61,10 +63,12 @@ public class CreateGameFragment extends Fragment implements LocationListener{
     private int radius;
     private LocationManager locationManager;
     private LocationListener locationListener;
+    private SharedPreferences sharedPref;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
     }
 
     @SuppressLint("MissingPermission")
@@ -94,6 +98,14 @@ public class CreateGameFragment extends Fragment implements LocationListener{
         startTime.setIs24HourView(true);
         startTime.setCurrentHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
         radiusPicker = (com.shawnlin.numberpicker.NumberPicker )  inflatedView.findViewById(R.id.radio_picker);
+        radiusPicker.setValue(sharedPref.getInt(getResources().getString(R.string.prefered_game_radius), 5));
+        radiusPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putInt(getResources().getString(R.string.prefered_game_radius), newVal);
+            }
+        });
 
         gameName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override

@@ -16,6 +16,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -188,8 +189,10 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
 
     @Override
     public void onReceiveUserData(int requestType, UserData user, Bitmap profilePic, Bitmap headerPic) {
+        Log.i("update", "update");
         if (getView()!=null) {
             name.setText(user.getNAME());
+            Log.i("BIO", user.getSHORTBIO());
             shortBio.setText(user.getSHORTBIO());
 
             PieChart pieChart = (PieChart) getView().findViewById(R.id.pieChart);
@@ -221,16 +224,43 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
         }
         if(FirebaseAuth.getInstance().getCurrentUser().getEmail()==userEmail){
             shortBio.setOnClickListener(new View.OnClickListener() {
-                String in = null;
+
                 @Override
                 public void onClick(View v) {
                     MaterialDialog builder = new MaterialDialog.Builder(getContext())
-                            .title("Escreve a tua biografia")
+                            .title("Descrição")
                             .positiveText("Confirmar")
                             .negativeText("Cancelar")
-                            .inputRangeRes(2, 20, R.color.navigationBarColor)
+                            .inputRangeRes(10, 100, R.color.navigationBarColor)
                             .inputType(InputType.TYPE_CLASS_TEXT )
-                            .input("Biografia Nova", "", new MaterialDialog.InputCallback() {
+                            .input("Descrição de jogador nova", "", new MaterialDialog.InputCallback() {
+                                @Override
+                                public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+
+                                }
+                            })
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    userDataManager.updateShortBio(dialog.getInputEditText().getText().toString());
+                                }
+                            })
+                            .negativeColor(getResources().getColor(R.color.navigationBarColor))
+                            .positiveColor(getResources().getColor(R.color.navigationBarColor))
+                            .show();
+                }
+            });
+            name.setOnClickListener(new View.OnClickListener() {
+                String in = "";
+                @Override
+                public void onClick(View v) {
+                    MaterialDialog builder = new MaterialDialog.Builder(getContext())
+                            .title("Nome")
+                            .positiveText("Confirmar")
+                            .negativeText("Cancelar")
+                            .inputRangeRes(5, 25, R.color.navigationBarColor)
+                            .inputType(InputType.TYPE_CLASS_TEXT )
+                            .input("Novo nome", "", new MaterialDialog.InputCallback() {
                                 @Override
                                 public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                                     in = input.toString();
@@ -239,25 +269,11 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
                             .onPositive(new MaterialDialog.SingleButtonCallback() {
                                 @Override
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    userDataManager.updateShortBio(in);
+                                    userDataManager.updateName(in);
                                 }
                             })
-                            .show();
-                }
-            });
-            name.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    MaterialDialog builder = new MaterialDialog.Builder(getContext())
-                            .title("Novo Nome")
-                            .positiveText("Confirmar")
-                            .negativeText("Cancelar")
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    userDataManager.updateShortBio("new short bio");
-                                }
-                            })
+                            .negativeColor(getResources().getColor(R.color.navigationBarColor))
+                            .positiveColor(getResources().getColor(R.color.navigationBarColor))
                             .show();
                 }
             });

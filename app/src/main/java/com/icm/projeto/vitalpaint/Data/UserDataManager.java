@@ -56,7 +56,7 @@ public class UserDataManager  implements Serializable, Parcelable{
         FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child("friends").push().setValue(friendEmail);
     }
     public void updateShortBio(String shortBio){
-        FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child("shortBio").setValue(shortBio);
+        FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child("shortbio").setValue(shortBio);
     }
     public void updateName(String newName){
         FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child("name").setValue(newName);
@@ -67,21 +67,14 @@ public class UserDataManager  implements Serializable, Parcelable{
         dbData.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
+                Log.i("update", "update");
                 if(snapshot.getValue()==null) {
                     notifyObservers(requestType, null, null, null);
                 }else {
                     UserData userData = new UserData();
-                    List<UserData> listOfFriends = new ArrayList<>();
-                    for (DataSnapshot emp : snapshot.child("friends").getChildren()) {
-                        UserData friendData = new UserData();
-                        friendData.setEMAIL(emp.child("email").getValue(String.class));
-                        friendData.setNAME(emp.child("name").getValue(String.class));
-                        listOfFriends.add(friendData);
-                    }
-                    userData.setFriends(listOfFriends);
                     userData.setEMAIL(snapshot.child("email").getValue(String.class));
                     userData.setNAME(snapshot.child("name").getValue(String.class));
-                    userData.setSHORTBIO(snapshot.child("shortBio").getValue(String.class));
+                    userData.setSHORTBIO(snapshot.child("shortbio").getValue(String.class));
                     userData.setnMatchPlayed(snapshot.child("nMatchPlayed").getValue(Integer.class));
                     userData.setnVictories(snapshot.child("nVictories").getValue(Integer.class));
                     final UserData finalUserData = userData;

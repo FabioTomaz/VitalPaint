@@ -59,6 +59,7 @@ public class FriendsListAdapter extends FirebaseListAdapter<String> {
 
     @Override
     protected void populateView(View v, String model1, int position) {
+        Log.i("MODEL", model1);
         final String friendEmail = model1;
         final View view = v;
         DatabaseReference dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(UserDataManager.encodeUserEmail(friendEmail));
