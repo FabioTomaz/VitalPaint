@@ -55,9 +55,11 @@ public class UserDataManager  implements Serializable, Parcelable{
     public void addFriend(String friendEmail){
         FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child("friends").push().setValue(friendEmail);
     }
-    public void addLocation(Location locationsPlayed){
-        dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child("locationsPlayed").push();
-        dbData.setValue(locationsPlayed);
+    public void updateShortBio(String shortBio){
+        FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child("shortBio").setValue(shortBio);
+    }
+    public void updateName(String newName){
+        FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email)).child("name").setValue(newName);
     }
 
     public void userDataFromEmailListener(final int requestType) {
@@ -79,7 +81,7 @@ public class UserDataManager  implements Serializable, Parcelable{
                     userData.setFriends(listOfFriends);
                     userData.setEMAIL(snapshot.child("email").getValue(String.class));
                     userData.setNAME(snapshot.child("name").getValue(String.class));
-                    userData.setSHORTBIO(snapshot.child("shotbio").getValue(String.class));
+                    userData.setSHORTBIO(snapshot.child("shortBio").getValue(String.class));
                     userData.setnMatchPlayed(snapshot.child("nMatchPlayed").getValue(Integer.class));
                     userData.setnVictories(snapshot.child("nVictories").getValue(Integer.class));
                     final UserData finalUserData = userData;
@@ -167,32 +169,3 @@ public class UserDataManager  implements Serializable, Parcelable{
     @Override
     public void writeToParcel(Parcel dest, int flags) {}
 }
-
-
-//atualizar na database o nome de um user. Se for o user logado, a classe UserData tmb será atualizada
-    /*public void updateName(final String username, final String name){
-        final DatabaseReference dbData = FirebaseDatabase.getInstance().getReference().child("Users");
-        dbData.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                UserData userData = new UserData();
-                for (DataSnapshot data : snapshot.getChildren()) {//percore os users ate encontrar o user com username correto
-                    if (data.getKey().equals(username)) {
-                        userData = data.getValue(com.icm.projeto.vitalpaint.Data.UserData.class);//obter dados do user
-                        userData.setNAME(name);//atualizar o nome
-                        if(UserData.loggedUser.getUSERNAME().equals(username))
-                            UserData.loggedUser.setNAME(name); //atualizar os dados do user logado na classe UserData
-                        Map<String, Object> map = new HashMap<String, Object>();
-                        map.put(username, userData);
-                        dbData.updateChildren(map); //do nos Users, ele atualiza o no do username ja existente com os novos dados
-                    }
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }*/
-
-

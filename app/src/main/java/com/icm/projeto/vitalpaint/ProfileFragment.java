@@ -2,8 +2,10 @@ package com.icm.projeto.vitalpaint;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,14 +15,18 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
@@ -212,6 +218,49 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
                         .make(getView(), "Podes alterar a tua biografia, foto de perfil e foto de capa clicando neles.", Snackbar.LENGTH_LONG);
                 snackbar.show();
             }
+        }
+        if(FirebaseAuth.getInstance().getCurrentUser().getEmail()==userEmail){
+            shortBio.setOnClickListener(new View.OnClickListener() {
+                String in = null;
+                @Override
+                public void onClick(View v) {
+                    MaterialDialog builder = new MaterialDialog.Builder(getContext())
+                            .title("Escreve a tua biografia")
+                            .positiveText("Confirmar")
+                            .negativeText("Cancelar")
+                            .inputRangeRes(2, 20, R.color.navigationBarColor)
+                            .inputType(InputType.TYPE_CLASS_TEXT )
+                            .input("Biografia Nova", "", new MaterialDialog.InputCallback() {
+                                @Override
+                                public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                                    in = input.toString();
+                                }
+                            })
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    userDataManager.updateShortBio(in);
+                                }
+                            })
+                            .show();
+                }
+            });
+            name.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MaterialDialog builder = new MaterialDialog.Builder(getContext())
+                            .title("Novo Nome")
+                            .positiveText("Confirmar")
+                            .negativeText("Cancelar")
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    userDataManager.updateShortBio("new short bio");
+                                }
+                            })
+                            .show();
+                }
+            });
         }
     }
 }
