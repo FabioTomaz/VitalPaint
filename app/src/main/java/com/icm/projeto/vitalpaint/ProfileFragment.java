@@ -189,9 +189,9 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
             PieChart pieChart = (PieChart) getView().findViewById(R.id.pieChart);
             List<PieEntry> entries = new ArrayList<>();
 
-            entries.add(new PieEntry(5, "Vitorias"));
-            entries.add(new PieEntry(5, "Empates"));
-            entries.add(new PieEntry(5, "Derrotas"));
+            entries.add(new PieEntry(user.getnVictories(), "Vitorias"));
+            entries.add(new PieEntry(user.getnDraws(), "Empates"));
+            entries.add(new PieEntry(user.getnLosses(), "Derrotas"));
 
             PieDataSet set = new PieDataSet(entries, "Resultados dos Jogos");
             set.setValueTextSize(20);
@@ -209,7 +209,7 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
                 profileImageView.setImageBitmap(profilePic);
             if(FirebaseAuth.getInstance().getCurrentUser().getEmail()==userEmail) {
                 Snackbar snackbar = Snackbar
-                        .make(getView(), "Podes alterar o teu nome, biografia, foto de perfil e de capa clicando neles.", Snackbar.LENGTH_LONG);
+                        .make(getView(), "Podes alterar a tua biografia, foto de perfil e foto de capa clicando neles.", Snackbar.LENGTH_LONG);
                 snackbar.show();
             }
         }

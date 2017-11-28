@@ -60,7 +60,6 @@ public class UserDataManager  implements Serializable, Parcelable{
         dbData.setValue(locationsPlayed);
     }
 
-
     public void userDataFromEmailListener(final int requestType) {
         DatabaseReference dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(encodeUserEmail(email));
         dbData.addListenerForSingleValueEvent(new ValueEventListener() {

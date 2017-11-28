@@ -2,9 +2,11 @@ package com.icm.projeto.vitalpaint;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.provider.SyncStateContract;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -16,6 +18,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.common.api.Response;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,6 +34,7 @@ import com.icm.projeto.vitalpaint.Data.UserDataManager;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,6 +43,11 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 public class LobbyTeamActivity extends AppCompatActivity implements UserDataManager.UserDataListener {
     private String gameName;
@@ -64,6 +73,8 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
     private ArrayAdapter redAdapter;
     private Button joinRed;
     private Button joinBlue;
+    private Button inviteRed;
+    private Button inviteBlue;
     private DatabaseReference blueTeam;
     private DatabaseReference redTeam;
     private DatabaseReference game;
@@ -83,7 +94,6 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
         setContentView(R.layout.activity_team_lobby);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);//nao bloquear o ecra
-        loggedUserName = "";
         auth = FirebaseAuth.getInstance();
         userDataManager = new UserDataManager(auth.getCurrentUser().getEmail());
         userDataManager.addListener(this);
@@ -108,6 +118,24 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
 
         joinBlue = (Button) findViewById(R.id.enter_blue_team);
         joinRed = (Button) findViewById(R.id.enter_red_team);
+        inviteBlue = (Button) findViewById(R.id.invite_friend_blue);
+        inviteRed = (Button) findViewById(R.id.invite_friend_red);
+        joinBlue.setEnabled(false);
+        joinRed.setEnabled(false);
+        inviteBlue.setEnabled(false);
+        inviteRed.setEnabled(false);
+        inviteBlue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                inviteFriend("youngf3@live.com.pt");
+            }
+        });
+        inviteRed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                inviteFriend("youngf3@live.com.pt");
+            }
+        });
 
         blueTeamPlayers = new ArrayList<>();
         redTeamPlayers = new ArrayList<>();
@@ -194,6 +222,10 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
         });
     }
 
+    private void inviteFriend(String friendEmail) {
+        new SendInviteTask().execute(auth.getCurrentUser().getEmail(), friendEmail);
+    }
+
     public void addUserToTeam(String team){
         if(team=="Equipa Azul")
             redTeam.child(UserDataManager.encodeUserEmail(auth.getCurrentUser().getEmail())).removeValue();
@@ -259,6 +291,10 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
     @Override
     public void onReceiveUserData(int requestType , UserData user, Bitmap profilePic, Bitmap headerPic) {
         loggedUserName = user.getNAME();
+        joinBlue.setEnabled(true);
+        joinRed.setEnabled(true);
+        inviteBlue.setEnabled(true);
+        inviteRed.setEnabled(true);
     }
 
     private void scheduleGame(){
