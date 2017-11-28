@@ -141,7 +141,7 @@ public class LobbyListFragment extends Fragment implements LocationListener{
                 intent.putExtra("isHost", false);
                 intent.putExtra("lobbyLat", 0.0); //nao precisamos de passar as coordenadas do lobby, estas apenas sao escritas na
                 intent.putExtra("lobbyLongt", 0.0); //firebase na altura da criaçao do lobby, nao as vamos usar mais quando nos juntamos a lobby
-                intent.putExtra("city", lobby.get("zone").replaceAll("Zona: ", ""));
+                intent.putExtra("zone", lobby.get("zone").replaceAll("Zona: ", ""));
                 startActivity(intent);
                 //adapter.dismiss(); // If you want to close the adapter
             }

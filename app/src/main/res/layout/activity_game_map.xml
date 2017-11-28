@@ -10,44 +10,55 @@
         android:layout_height="0dp">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="140dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@color/orange">
+            android:background="@color/redTeamColor">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Equipa Laranja"
+                android:text="@string/redTeam"
                 android:gravity="center"/>
         </LinearLayout>
-            <ProgressBar
-                android:id="@+id/gameTimeLeft"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_weight="0.5"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_margin="5dp"
-                android:padding="10dp"
-                android:background="@drawable/drawable_circle_dark_blue"
-                android:layout_gravity="center"
-                android:indeterminate="false"
-                android:max="100"
-                android:progress="100"
-                android:progressDrawable="@drawable/drawable_circle_yellow"
-                android:rotation="-90" />
+
+        <TextView
+            android:id="@+id/textGameTime"
+            android:layout_width="105dp"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textAlignment="center"
+            android:text="00:00:00"
+            android:layout_gravity="center"
+            android:textColor="@color/orange"
+            android:textSize="15sp" />
+
         <LinearLayout
-            android:layout_weight="1"
-            android:layout_width="0dp"
+            android:layout_gravity="left"
+            android:layout_width="140dp"
             android:layout_height="match_parent">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Equipa Azul"
+                android:text="@string/blueTeam"
                 android:background="@color/blue"
                 android:gravity="center"/>
         </LinearLayout>
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/endGame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:background="@color/Transwhite">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="25sp"
+            android:text="@string/end_match"/>
+        </LinearLayout>
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
@@ -68,8 +79,9 @@
                 android:id="@+id/got_killed"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/navigationBarColor"
+                android:background="@color/orange"
                 android:textColor="@color/white"
+                android:textSize="20sp"
                 android:theme="@style/Widget.AppCompat.Button.Borderless.Colored"
                 android:text="@string/text_im_hit"/>
     </LinearLayout>

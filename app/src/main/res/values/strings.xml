@@ -5,7 +5,7 @@
     <item name="masked" type="id" />
 
 
-    <string name="text_im_hit">Mataram-me!</string>
+    <string name="text_im_hit">Fui Atingido!</string>
     <string name="text_log">Show Log</string>
     <string name="text_leave_game">Leave Game</string>
 
@@ -77,6 +77,9 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="game_starts_in">O jogo começa em:</string>
     <string name="game_radio_txt">Raio do jogo:</string>
+    <string name="end_match">Fim da partida!</string>
+    <string name="blueTeam">Equipa Azul</string>
+    <string name="redTeam">Equipa Vermelha</string>
     <string name="prefered_game_radius">game_radius</string>
 
 

@@ -137,7 +137,7 @@ public class CreateGameFragment extends Fragment implements LocationListener{
                         intent.putExtra("isHost", true);//este utilizador criou o lobby
                         intent.putExtra("lobbyLat", lobbyLat);
                         intent.putExtra("lobbyLongt", lobbyLongt);
-                        //intent.putExtra("city", getCityFromLocation(lobbyLat, lobbyLongt));
+                        intent.putExtra("zone", getCityFromLocation(lobbyLat, lobbyLongt));
                         intent.putExtra("radius", radiusPicker.getValue());
                         startActivity(intent);
                     } else if (gameMode.getSelectedItemPosition() == 1) {
