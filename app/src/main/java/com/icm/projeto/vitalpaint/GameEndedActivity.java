@@ -167,7 +167,7 @@ public class GameEndedActivity extends AppCompatActivity{
                 blueAdapter.clear();
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     if (!data.getKey().equals("score")) {
-                        blueAdapter.add(data.child("name").getValue());
+                        blueAdapter.add(data.child("name").getValue(String.class));
                     }
                 }
                 blueAdapter.notifyDataSetChanged();
@@ -184,7 +184,6 @@ public class GameEndedActivity extends AppCompatActivity{
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<String> users = new ArrayList<>();
-                blueAdapter.clear();
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     if (winningTeam.equals(myTeam)) {
                         int score = 0;
