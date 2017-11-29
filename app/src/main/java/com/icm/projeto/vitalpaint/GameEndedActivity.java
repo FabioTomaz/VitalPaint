@@ -223,7 +223,7 @@ public class GameEndedActivity extends AppCompatActivity{
         else {
             result = GamePlayed.RESULT.LOST;
         }
-        userDbRef.child(userEncEmail).push().setValue(new GamePlayed(result, startDate, gameMode, time ,zone));
+        userDbRef.child(userEncEmail).child("gamesPlayed").push().setValue(new GamePlayed(result, startDate, gameMode, time ,zone));
 
         //apagar o no do jogo
         //dbRef.setValue(null);
