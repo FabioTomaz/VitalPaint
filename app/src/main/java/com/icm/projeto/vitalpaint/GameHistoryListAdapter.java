@@ -2,21 +2,12 @@ package com.icm.projeto.vitalpaint;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.database.FirebaseListAdapter;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
 import com.icm.projeto.vitalpaint.Data.GamePlayed;
 import com.icm.projeto.vitalpaint.Data.UserDataManager;
 
@@ -43,10 +34,8 @@ public class GameHistoryListAdapter extends FirebaseListAdapter<GamePlayed> {
         final TextView txtStartDate = (TextView) v.findViewById(R.id.game_start_date);
         final ImageView imageView = (ImageView) v.findViewById(R.id.image_game_result);
 
-        if(model.getGameResult()==GamePlayed.RESULT.DRAW) {
-            imageView.setImageResource(R.drawable.ic_minus);
-            txtGameResult.setText("Empate");
-        }else if(model.getGameResult()==GamePlayed.RESULT.WON) {
+
+        if(model.getGameResult()==GamePlayed.RESULT.WON) {
             imageView.setImageResource(R.drawable.ic_win);
             txtGameResult.setText("Vitoria");
         }else if(model.getGameResult()==GamePlayed.RESULT.LOST) {

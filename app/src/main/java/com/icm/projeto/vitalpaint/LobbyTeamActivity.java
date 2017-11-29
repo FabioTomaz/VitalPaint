@@ -308,6 +308,8 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
                         intent.putExtra("startDate", startDate);
                         intent.putExtra("zone", city);
                         intent.putExtra("radius", radius);
+                        if (gameMode == GameMode.TEAMVSTEAM)
+                            intent.putExtra("gameMode", GameMode.TEAMVSTEAM.toString() );
                         startActivity(intent);
                     }
                 });

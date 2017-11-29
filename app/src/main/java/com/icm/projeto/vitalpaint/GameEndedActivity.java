@@ -16,8 +16,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.icm.projeto.vitalpaint.Data.GameMode;
+import com.icm.projeto.vitalpaint.Data.GamePlayed;
 import com.icm.projeto.vitalpaint.Data.UserData;
 import com.icm.projeto.vitalpaint.Data.UserDataManager;
+
+import org.joda.time.DateTime;
+import org.joda.time.Period;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +45,8 @@ public class GameEndedActivity extends AppCompatActivity implements UserDataMana
     private ListView redTeamListView;
     private FirebaseAuth auth;
     private UserDataManager userDataManager;
+    //private GameMode gameMode;
+    private String zone;
     public static final int PROFILE_DATA = 1;
 
 
@@ -50,6 +59,8 @@ public class GameEndedActivity extends AppCompatActivity implements UserDataMana
         myTeam = getIntent().getStringExtra("myTeam");
         winningTeam = getIntent().getStringExtra("winnerTeam");
         gameName = getIntent().getStringExtra("gameName");
+        zone = getIntent().getStringExtra("zone");
+        //gameMode = GameMode.valueOf(getIntent().getStringExtra("gameMode")); //obter  a string do enum e converter para enum
         Log.i("GAMEEND", myTeam.toString());
         winnerTeamtxt = (TextView) findViewById(R.id.winner_team_txt);
         winnerLayout = (LinearLayout) findViewById(R.id.winnerlayout);
@@ -121,6 +132,20 @@ public class GameEndedActivity extends AppCompatActivity implements UserDataMana
     @Override
     public void onReceiveUserData(int requestType, UserData user, Bitmap profilePic, Bitmap headerPic) {
         DatabaseReference db = FirebaseDatabase.getInstance().getReference("Users").child(UserDataManager.encodeUserEmail(user.getEMAIL()));
-        
+        GamePlayed.RESULT result;
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm");
+        DateTime gameBegin = formatter.parseDateTime(startDate);
+        Period p =  new Period(new DateTime(), gameBegin);
+        int time = p.getMinutes();
+        Log.i("time", time+"");
+        if (winningTeam.equals(myTeam)) {
+            db.child("nVictories").setValue(user.getnVictories()+1);
+            result = GamePlayed.RESULT.WON;
+        }
+        else {
+            db.child("nLosses").setValue(user.getnVictories() + 1);
+            result = GamePlayed.RESULT.LOST;
+        }
+        db.child("gamesPlayed").push().setValue(new GamePlayed(result, startDate, time ,zone));
     }
 }

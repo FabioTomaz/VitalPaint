@@ -47,6 +47,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.icm.projeto.vitalpaint.Data.GameMode;
 import com.icm.projeto.vitalpaint.Data.UserDataManager;
 
 import java.io.IOException;
@@ -82,6 +83,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     private int scoreRed;
     private int count;
     private TextView textGameTime;
+    private GameMode gameMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +106,8 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         myName = getIntent().getStringExtra("userName");
         startDate = getIntent().getStringExtra("startDate");
         zone = getIntent().getStringExtra("zone");
+        //Log.i("gamemode", getIntent().getStringExtra("gameMode")+"");
+        //gameMode = GameMode.valueOf(getIntent().getStringExtra("gameMode")); //obter  a string do enum e converter para enum
         userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
         btnGotKilled = (Button) findViewById(R.id.got_killed);
         endGame = (LinearLayout) findViewById(R.id.endGame);
@@ -288,8 +292,6 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                             allDead=false;
                             break;
                         }
-
-
                     }
                 }
                 //Senao houver ninguem vivo na capa chamar a funçao que termina a partida
@@ -543,7 +545,9 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         intent.putExtra("startDate", startDate);
         intent.putExtra("zone", zone);
         intent.putExtra("gameName", gameName);
+        //intent.putExtra("gameMode", gameMode);
         startActivity(intent);
+        finish();
     }
 
     @Override
