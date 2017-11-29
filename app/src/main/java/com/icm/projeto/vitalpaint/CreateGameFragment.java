@@ -23,11 +23,9 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TimePicker;
 
 import com.icm.projeto.vitalpaint.Data.GameMode;
-import com.shawnlin.numberpicker.NumberPicker;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -53,14 +51,11 @@ public class CreateGameFragment extends Fragment implements LocationListener{
     private Button createBtn;
     private View inflatedView;
     private EditText gameName;
-    private Spinner gameMode;
     private TimePicker startTime;
     private DateTime gameStart;
-    private com.shawnlin.numberpicker.NumberPicker  radiusPicker;
     private double lobbyLongt;
     private double lobbyLat;
     private String city;
-    private int radius;
     private LocationManager locationManager;
     private LocationListener locationListener;
     private SharedPreferences sharedPref;
@@ -92,20 +87,10 @@ public class CreateGameFragment extends Fragment implements LocationListener{
 
         createBtn = (Button) inflatedView.findViewById(R.id.create_game);
         gameName = (EditText) inflatedView.findViewById(R.id.game_name);
-        gameMode =(Spinner) inflatedView.findViewById(R.id.game_mode_spinner);
         startTime = (TimePicker) inflatedView.findViewById(R.id.start_time);
         //colocar timepicker com formato 24h e inicializar para a hora atual
         startTime.setIs24HourView(true);
         startTime.setCurrentHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
-        radiusPicker = (com.shawnlin.numberpicker.NumberPicker )  inflatedView.findViewById(R.id.radio_picker);
-        radiusPicker.setValue(sharedPref.getInt(getResources().getString(R.string.prefered_game_radius), 5));
-        radiusPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putInt(getResources().getString(R.string.prefered_game_radius), newVal);
-            }
-        });
 
         gameName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -129,20 +114,16 @@ public class CreateGameFragment extends Fragment implements LocationListener{
                 DateTime dt = formatter.parseDateTime(getSimpleStartTime(gameStart));
 
                 if(gameStart.isAfter(null)) { //verificar se a data de inicio do jogo nÃ£o Ã© uma data passada
-                    if (gameMode.getSelectedItemPosition() == 1) {//selecionado modo Team vs Team
-                        Intent intent = new Intent(getActivity(), LobbyTeamActivity.class);
-                        intent.putExtra("gameName", gameName.getText().toString());
-                        intent.putExtra("startDate", getSimpleStartTime(gameStart));
-                        intent.putExtra("gameMode", GameMode.TEAMVSTEAM.toString());//passar enum como string
-                        intent.putExtra("isHost", true);//este utilizador criou o lobby
-                        intent.putExtra("lobbyLat", lobbyLat);
-                        intent.putExtra("lobbyLongt", lobbyLongt);
-                        intent.putExtra("zone", getCityFromLocation(lobbyLat, lobbyLongt));
-                        intent.putExtra("radius", radiusPicker.getValue());
-                        startActivity(intent);
-                    } else if (gameMode.getSelectedItemPosition() == 1) {
 
-                    }
+                    Intent intent = new Intent(getActivity(), LobbyTeamActivity.class);
+                    intent.putExtra("gameName", gameName.getText().toString());
+                    intent.putExtra("startDate", getSimpleStartTime(gameStart));
+                    intent.putExtra("gameMode", GameMode.TEAMVSTEAM.toString());//passar enum como string
+                    intent.putExtra("isHost", true);//este utilizador criou o lobby
+                    intent.putExtra("lobbyLat", lobbyLat);
+                    intent.putExtra("lobbyLongt", lobbyLongt);
+                    intent.putExtra("zone", getCityFromLocation(lobbyLat, lobbyLongt));
+                    startActivity(intent);
                 }
                 else {
                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());

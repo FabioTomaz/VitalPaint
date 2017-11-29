@@ -80,7 +80,6 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
     private String city;
     private double lobbyLongt;
     private double lobbyLat;
-    private int radius;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +100,6 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
         gameMode = GameMode.valueOf(getIntent().getStringExtra("gameMode")); //obter  a string do enum e converter para enum
         startDate = getIntent().getStringExtra("startDate");
         city = getIntent().getStringExtra("zone");
-        radius = getIntent().getIntExtra("radius", 0);
         lobbyLat = getIntent().getDoubleExtra("lobbyLat", 0.0);
         lobbyLongt = getIntent().getDoubleExtra("lobbyLongt", 0.0);
         //duration = new Period(startDate, endDate);
@@ -312,7 +310,6 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
                             intent.putExtra("userName", loggedUserName);
                             intent.putExtra("startDate", startDate);
                             intent.putExtra("zone", city);
-                            intent.putExtra("radius", radius);
                             if (gameMode == GameMode.TEAMVSTEAM)
                                 intent.putExtra("gameMode", GameMode.TEAMVSTEAM.toString());
                             startActivity(intent);

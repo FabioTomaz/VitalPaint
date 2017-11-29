@@ -19,4 +19,15 @@
     <string name="btn_change">Change</string>
     <string name="hint_new_email">New email</string>
     <string name="text_im_hit">Im Hit!</string>
+    <string name="blue_team_join">Join Blue Team</string>
+    <string name="blue_team_name">Blue Team</string>
+    <string name="red_team_name">Red Team</string>
+    <string name="red_team_join">Join Red Team</string>
+    <string name="nome">Name</string>
+    <string name="username">Choose an username</string>
+    <string name="startDateText">Game start Date</string>
+    <string name="agree">yes</string>
+    <string name="disagree">No</string>
+    <string name="confirm_death">Confirm your death?</string>
+    <string name="confirm_leave_game">Are you sure you want to leave?</string>
 </resources>

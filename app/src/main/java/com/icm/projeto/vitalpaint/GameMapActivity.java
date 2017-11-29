@@ -4,10 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -41,6 +37,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -65,27 +62,24 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     private String myTeam = "";
     private String enemyTeam = "";
     private String startDate;
-    private int radius;
     private String zone;
-    private int duration;
     private DatabaseReference dbRef;
     private String userEmail;
     public static final float METERSTOSEEENEMIES = 100;
-    GoogleApiClient mGoogleApiClient;
+    private GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     LocationRequest mLocationRequest;
-    private boolean redTeamLost = false; //true se todos os elementos da equipa estiverem mortos
-    private boolean blueTeamLost = false;
     private Button btnGotKilled;
     private LinearLayout endGame;
-    private int scoreBlue;
-    private int scoreRed;
     private GameMode gameMode;
+    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_map);
+
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);//nao bloquear o ecra
 
@@ -143,11 +137,13 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                                 FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(myTeam)
                                         .child(UserDataManager.encodeUserEmail(userEmail)).child("state")
                                         .setValue(LobbyTeamActivity.PLAYERSTATE.DEAD);
-                                        /*FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(enemyTeam)
-                                                .child("score").setValue(score++);*/
                             }
-                        })
-                        .show();
+                        }).show();
+
+                Marker marker = lastestPlayerMarkers.get(user.getEmail());
+                marker.remove();
+                lastestPlayerMarkers.remove(UserDataManager.encodeUserEmail(user.getEmail()));
+                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, (com.google.android.gms.location.LocationListener) GameMapActivity.this);
             }
         });
 
@@ -226,10 +222,10 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                         if(!data.getKey().equals(UserDataManager.encodeUserEmail(userEmail)) && data.hasChild("lat") && data.hasChild("long")) {
                             lat = data.child("lat").getValue(Double.class);
                             longt = data.child("long").getValue(Double.class);
+                            state = data.child("state").getValue(String.class);
                             LatLng coord = new LatLng(lat, longt);
                             if(!lastestPlayerMarkers.containsKey(data.getKey())){
                                 Marker playerMarker;
-                                Log.i("teatest", myTeam.equals("Equipa Vermelha")+"");
                                 if(myTeam.equals("Equipa Vermelha")){
                                     playerMarker = mMap.addMarker(new MarkerOptions()
                                             .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_red_pointer))
@@ -241,7 +237,15 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                                 }
                                 lastestPlayerMarkers.put(data.getKey(), playerMarker);
                             }else{
-                                lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
+                                if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING)
+                                    lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
+                                else{
+                                    Marker marker = lastestPlayerMarkers.get(user.getEmail());
+                                    if(marker != null){
+                                        marker.remove();
+                                        lastestPlayerMarkers.remove(data.getKey());
+                                    }
+                                }
                             }
                         }
                     }
@@ -289,11 +293,9 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                         Location enemyLocation = new Location("");
                         enemyLocation.setLatitude(lat);
                         enemyLocation.setLongitude(longt);
-                        Log.i("statesssss", state+"");
                         if( mLastLocation!= null && enemyLocation.distanceTo(mLastLocation)<METERSTOSEEENEMIES) {
                             if (!lastestPlayerMarkers.containsKey(data.getKey())) {
                                 Marker playerMarker;
-                                Log.i("teatest", myTeam.equals("Equipa Vermelha")+"");
                                 if (enemyTeam.equals("Equipa Vermelha")) {
                                     playerMarker = mMap.addMarker(new MarkerOptions()
                                             .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_red_pointer))
@@ -305,7 +307,15 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                                 }
                                 lastestPlayerMarkers.put(data.getKey(), playerMarker);
                             } else {
-                                lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
+                                if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING)
+                                    lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
+                                else{
+                                    Marker marker = lastestPlayerMarkers.get(user.getEmail());
+                                    if(marker != null){
+                                        marker.remove();
+                                        lastestPlayerMarkers.remove(data.getKey());
+                                    }
+                                }
                             }
                         }
                         if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING) {
