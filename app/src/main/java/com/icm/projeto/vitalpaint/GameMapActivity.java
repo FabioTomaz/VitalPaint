@@ -559,6 +559,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         intent.putExtra("zone", zone);
         intent.putExtra("gameName", gameName);
         intent.putExtra("gameMode", gameMode.toString());
+        intent.putExtra("myName", myName);
         startActivity(intent);
         finish();
     }

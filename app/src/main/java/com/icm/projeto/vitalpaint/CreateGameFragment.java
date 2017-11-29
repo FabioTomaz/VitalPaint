@@ -164,6 +164,7 @@ public class CreateGameFragment extends Fragment implements LocationListener{
                 try {
             addresses = gcd.getFromLocation(lobbyLat, lobbyLongt, 1);
             if (addresses.size() > 0) {
+                System.out.println(addresses.get(0).getLocality());
                 city = addresses.get(0).getLocality();
             }
         } catch (IOException e) {

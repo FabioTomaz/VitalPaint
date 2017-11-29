@@ -1,10 +1,13 @@
 package com.icm.projeto.vitalpaint;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -47,8 +50,11 @@ public class GameEndedActivity extends AppCompatActivity{
     private UserDataManager userDataManager;
     private GameMode gameMode;
     private String zone;
+    private Button exitButton;
+    private Button replayButton;
     public static final int PROFILE_DATA = 1;
     private String userEncEmail;
+    private String myName;
 
 
     @SuppressLint("ResourceAsColor")
@@ -61,6 +67,7 @@ public class GameEndedActivity extends AppCompatActivity{
         winningTeam = getIntent().getStringExtra("winnerTeam");
         gameName = getIntent().getStringExtra("gameName");
         zone = getIntent().getStringExtra("zone");
+        myName = getIntent().getStringExtra("myName");
         gameMode = GameMode.valueOf(getIntent().getStringExtra("gameMode")); //obter  a string do enum e converter para enum
         Log.i("GAMEEND", myTeam.toString());
         winnerTeamtxt = (TextView) findViewById(R.id.winner_team_txt);
@@ -76,6 +83,30 @@ public class GameEndedActivity extends AppCompatActivity{
         redTeamPlayers = new ArrayList<>();
         blueTeamListView = (ListView) findViewById(R.id.list_blue_team);
         redTeamListView = (ListView) findViewById(R.id.list_red_team);
+        exitButton = (Button) findViewById(R.id.exitButton);
+        exitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(GameEndedActivity.this, PlayActivity.class);
+                startActivity(intent);
+            }
+        });
+        replayButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(GameEndedActivity.this, GameMapActivity.class);
+                Log.i("myteam", myTeam+"");
+                intent.putExtra("myTeam", myTeam);
+                intent.putExtra("gameName", gameName);
+                intent.putExtra("userName", myName);
+                intent.putExtra("startDate", startDate);
+                intent.putExtra("zone", zone);
+                if (gameMode == GameMode.TEAMVSTEAM)
+                    intent.putExtra("gameMode", GameMode.TEAMVSTEAM.toString() );
+                startActivity(intent);
+            }
+        });
+        replayButton = (Button) findViewById(R.id.replayButton);
         blueAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, new ArrayList<String>());
         redAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, new ArrayList<String>());
         blueTeamListView.setAdapter(blueAdapter);
