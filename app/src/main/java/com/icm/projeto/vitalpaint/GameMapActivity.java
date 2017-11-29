@@ -156,8 +156,6 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
             }
         });
 
-        this.mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-        this.mAccelerometer = this.mSensorManager.getDefaultSensor( Sensor.TYPE_ORIENTATION );
     }
 
     private String hmsTimeFormatter(long milliSeconds) {
@@ -213,6 +211,23 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     if (!data.getKey().equals("score")){
                         state = data.child("state").getValue(String.class);
+                        if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING){
+                            allDead = false;
+                        }
+                    }
+                }
+                //Senao houver ninguem vivo na capa chamar a funçao que termina a partida
+                if ( allDead==true ){
+                    if(myTeam.equals("Equipa Vermelha")){
+                        redTeamLost = true;
+                        finishGame("Equipa Azul", "Equipa Vermelha");
+                    } else{
+                        blueTeamLost = true;
+                        finishGame("Equipa Vermelha", "Equipa Azul");
+                    }
+                }
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    if (!data.getKey().equals("score")){
                         if(!data.getKey().equals(UserDataManager.encodeUserEmail(userEmail)) && data.hasChild("lat") && data.hasChild("long")) {
                             lat = data.child("lat").getValue(Double.class);
                             longt = data.child("long").getValue(Double.class);
@@ -233,22 +248,13 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                                 lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
                             }
                         }
-                        if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING) {
+                        /*if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING) {
                             allDead=false;
                             break;
-                        }
+                        }*/
                     }
                 }
-                //Senao houver ninguem vivo na capa chamar a funçao que termina a partida
-                if ( allDead==true ){
-                    if(myTeam.equals("Equipa Vermelha")){
-                        redTeamLost = true;
-                        finishGame("Equipa Azul", "Equipa Vermelha");
-                    } else{
-                        blueTeamLost = true;
-                        finishGame("Equipa Vermelha", "Equipa Azul");
-                    }
-                }
+
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
@@ -263,6 +269,24 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 double lat;
                 double longt;
                 String state;
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    if (!data.getKey().equals("score")){
+                        state = data.child("state").getValue(String.class);
+                        if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING){
+                            allDead = false;
+                        }
+                    }
+                }
+                //Senao houver ninguem vivo na capa chamar a funçao que termina a partida
+                if ( allDead==true ){
+                    if(myTeam.equals("Equipa Vermelha")){
+                        redTeamLost = true;
+                        finishGame("Equipa Azul", "Equipa Vermelha");
+                    } else{
+                        blueTeamLost = true;
+                        finishGame("Equipa Vermelha", "Equipa Azul");
+                    }
+                }
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     if (!data.getKey().equals("score") && !data.getKey().equals(UserDataManager.encodeUserEmail(userEmail)) && data.hasChild("lat") && data.hasChild("long")) {
                         lat = data.child("lat").getValue(Double.class);
@@ -296,16 +320,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                         }
                     }
                 }
-                //Senao houver ninguem vivo na capa chamar a funçao que termina a partida
-                if ( allDead==true ){
-                    if(myTeam.equals("Equipa Vermelha")){
-                        redTeamLost = true;
-                        finishGame("Equipa Azul", "Equipa Vermelha");
-                    } else{
-                        blueTeamLost = true;
-                        finishGame("Equipa Vermelha", "Equipa Azul");
-                    }
-                }
+
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
@@ -326,15 +341,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     @Override
     protected void onResume() {
         super.onResume();
-        this.haveAccelerometer = this.mSensorManager.registerListener( mSensorEventListener, this.mAccelerometer, 2000 );
-
-        if ( haveAccelerometer ) {
-            Log.i("ready", "ready to go");
-        } else {
-            // unregister and stop
-        }
     }
-
 
     @Override
     public void onConnected(Bundle bundle) {
@@ -430,7 +437,6 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     @Override
     protected void onPause() {
         super.onPause();
-        mSensorManager.unregisterListener(mSensorEventListener);
     }
 
     @Override
@@ -533,21 +539,4 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
 
         }
     }
-
-    private SensorManager mSensorManager = null;
-
-    private Sensor mAccelerometer;
-
-    boolean haveAccelerometer = false;
-
-    private SensorEventListener mSensorEventListener = new SensorEventListener() {
-        public void onAccuracyChanged( Sensor sensor, int accuracy ) {}
-
-        @Override
-        public void onSensorChanged( SensorEvent event ) {
-            float degree = Math.round(event.values[0]);
-            Log.i("sensorresult", String.valueOf(degree));
-            updateCameraBearing(mMap, degree);
-        }
-    };
 }

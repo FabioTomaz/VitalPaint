@@ -5,7 +5,7 @@
     tools:context="com.icm.projeto.vitalpaint.GameHistoryFragment">
 
     <ListView
-        android:id="@+id/list_friends"
+        android:id="@+id/list_games_history"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

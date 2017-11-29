@@ -27,6 +27,7 @@ import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -62,24 +63,38 @@ public class FriendsListAdapter extends FirebaseListAdapter<String> {
         Log.i("MODEL", model1);
         final String friendEmail = model1;
         final View view = v;
+        final TextView txtTitle = (TextView) view.findViewById(R.id.listview_item_title);
+        final TextView txtUnderTitle = (TextView) view.findViewById(R.id.listview_item_short_description);
+        final ImageView imageView = (ImageView) view.findViewById(R.id.imageRow);
         DatabaseReference dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(UserDataManager.encodeUserEmail(friendEmail));
         dbData.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot snapshot) {
-                TextView txtTitle = (TextView) view.findViewById(R.id.listview_item_title);
-                TextView txtUnderTitle = (TextView) view.findViewById(R.id.listview_item_short_description);
-                ImageView imageView = (ImageView) view.findViewById(R.id.imageRow);
-                Log.i("USERRRR", userEmail);
-                txtTitle.setText(snapshot.child("name").getValue(String.class));
-                txtUnderTitle.setText(snapshot.child("email").getValue(String.class));
-                Drawable drawable = ContextCompat.getDrawable(activity,R.drawable.imagem_perfil);
-                RequestOptions options = new RequestOptions()
-                        .error(drawable);
+                FirebaseStorage.getInstance().getReference("User Profile Photos/" + friendEmail + "/profilePic").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        txtTitle.setText(snapshot.child("name").getValue(String.class));
+                        txtUnderTitle.setText(snapshot.child("email").getValue(String.class));
+                        Drawable drawable = ContextCompat.getDrawable(activity,R.drawable.imagem_perfil);
+                        RequestOptions options = new RequestOptions()
+                                .error(drawable);
+                        Glide.with(context)
+                                .load(uri)
+                                .apply(options)
+                                .into(imageView);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        txtTitle.setText(snapshot.child("name").getValue(String.class));
+                        txtUnderTitle.setText(snapshot.child("email").getValue(String.class));
+                        Drawable drawable = ContextCompat.getDrawable(activity,R.drawable.imagem_perfil);
+                        Glide.with(context)
+                                .load(drawable)
+                                .into(imageView);
+                    }
+                });;
 
-                    Glide.with(activity)
-                            .load(FirebaseStorage.getInstance().getReference("User Profile Photos/" + friendEmail + "/profilePic"))
-                            .apply(options)
-                            .into(imageView);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}

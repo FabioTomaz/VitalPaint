@@ -2,6 +2,7 @@ package com.icm.projeto.vitalpaint;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,7 +22,7 @@ public class GameHistoryListAdapter extends FirebaseListAdapter<GamePlayed> {
     private final String userEmail;
 
     public GameHistoryListAdapter(Activity activity, Context context, String userEmail) {
-        super(activity, GamePlayed.class, R.layout.listview_activity, FirebaseDatabase.getInstance().getReference().child("Users").child(UserDataManager.encodeUserEmail(userEmail)).child("GamesPlayed"));
+        super(activity, GamePlayed.class, R.layout.game_history_listview, FirebaseDatabase.getInstance().getReference().child("Users").child(UserDataManager.encodeUserEmail(userEmail)).child("gamesPlayed"));
         this.context = context;
         this.userEmail = userEmail;
         this.activity = activity;
@@ -29,6 +30,7 @@ public class GameHistoryListAdapter extends FirebaseListAdapter<GamePlayed> {
 
     @Override
     protected void populateView(View v, final GamePlayed model, int position) {
+        Log.i("gamehistory", model.toString());
         final TextView txtGameResult = (TextView) v.findViewById(R.id.game_result);
         final TextView txtMode = (TextView) v.findViewById(R.id.game_mode);
         final TextView txtStartDate = (TextView) v.findViewById(R.id.game_start_date);

@@ -26,10 +26,10 @@ public class GameHistoryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        getActivity().setTitle("Historico de Jogos");
         View view = inflater.inflate(R.layout.fragment_game_history, container, false);
+        getActivity().setTitle("Historico de Jogos");
         FirebaseListAdapter<GamePlayed> adapter = new GameHistoryListAdapter(getActivity(), getContext(),FirebaseAuth.getInstance().getCurrentUser().getEmail());
-        ListView friendsListView = (ListView)view.findViewById(R.id.list_friends);
+        ListView friendsListView = (ListView)view.findViewById(R.id.list_games_history);
         friendsListView.setAdapter(adapter);
         return view;
     }

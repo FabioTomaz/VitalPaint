@@ -6,8 +6,23 @@ package com.icm.projeto.vitalpaint.Data;
 
 public class GamePlayed {
     public static enum RESULT{
-        WON, LOST
+        WON, LOST, DRAW
     }
+
+    public GamePlayed(){
+    }
+
+    @Override
+    public String toString() {
+        return "GamePlayed{" +
+                "gameResult=" + gameResult +
+                ", startDate='" + startDate + '\'' +
+                ", gameMode=" + gameMode +
+                ", time=" + time +
+                ", city='" + city + '\'' +
+                '}';
+    }
+
     private RESULT gameResult;
     private String startDate;
     private GameMode gameMode;
