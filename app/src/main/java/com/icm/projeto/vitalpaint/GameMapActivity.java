@@ -152,6 +152,8 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
             }
         });
 
+        this.mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+        this.mAccelerometer = this.mSensorManager.getDefaultSensor( Sensor.TYPE_ORIENTATION );
     }
 
     private String hmsTimeFormatter(long milliSeconds) {
@@ -322,69 +324,15 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     @Override
     protected void onResume() {
         super.onResume();
-        initSensors();
+        this.haveAccelerometer = this.mSensorManager.registerListener( mSensorEventListener, this.mAccelerometer, 2000 );
+
+        if ( haveAccelerometer ) {
+            Log.i("ready", "ready to go");
+        } else {
+            // unregister and stop
+        }
     }
 
-    private SensorEventListener mSensorEventListener = new SensorEventListener() {
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        }
-
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            float[] mGravity = null;
-            float[] mGeomagnetic=null;
-            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
-                mGravity = event.values;
-            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
-                mGeomagnetic = event.values;
-            if (mGravity != null && mGeomagnetic != null) {
-                float R[] = new float[9];
-                float I[] = new float[9];
-                boolean success = SensorManager.getRotationMatrix(R, I, mGravity,
-                        mGeomagnetic);
-                if (success) {
-                    float orientation[] = new float[3];
-                    SensorManager.getOrientation(R, orientation);
-                    int azimut = (int) Math.round(Math.toDegrees(orientation[0]));
-                    float azimuthInRadians = orientation[0];
-                    float azimuthInDegress = (float)((Math.toDegrees(azimuthInRadians)+360)%360);
-                    Log.i("AZIMUTHH", String.valueOf(azimuthInDegress));
-                    updateCameraBearing(mMap, azimuthInDegress);
-                }
-            }
-        }
-    };
-
-    /**
-     * Initialize the Sensors (Gravity and magnetic field, required as a compass
-     * sensor)
-     */
-    private void initSensors() {
-        String TAG= "SENSORS";
-        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        Sensor mSensorGravity = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        Sensor mSensorMagneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-
-    /* Initialize the gravity sensor */
-        if (mSensorGravity != null) {
-            Log.i(TAG, "Gravity sensor available. (TYPE_GRAVITY)");
-            sensorManager.registerListener(mSensorEventListener,
-                    mSensorGravity, SensorManager.SENSOR_DELAY_GAME);
-        } else {
-            Log.i(TAG, "Gravity sensor unavailable. (TYPE_GRAVITY)");
-        }
-
-    /* Initialize the magnetic field sensor */
-        if (mSensorMagneticField != null) {
-            Log.i(TAG, "Magnetic field sensor available. (TYPE_MAGNETIC_FIELD)");
-            sensorManager.registerListener(mSensorEventListener,
-                    mSensorMagneticField, SensorManager.SENSOR_DELAY_GAME);
-        } else {
-            Log.i(TAG,
-                    "Magnetic field sensor unavailable. (TYPE_MAGNETIC_FIELD)");
-        }
-    }
 
     @Override
     public void onConnected(Bundle bundle) {
@@ -480,6 +428,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     @Override
     protected void onPause() {
         super.onPause();
+        mSensorManager.unregisterListener(mSensorEventListener);
     }
 
     @Override
@@ -580,4 +529,21 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
 
         }
     }
+
+    private SensorManager mSensorManager = null;
+
+    private Sensor mAccelerometer;
+
+    boolean haveAccelerometer = false;
+
+    private SensorEventListener mSensorEventListener = new SensorEventListener() {
+        public void onAccuracyChanged( Sensor sensor, int accuracy ) {}
+
+        @Override
+        public void onSensorChanged( SensorEvent event ) {
+            float degree = Math.round(event.values[0]);
+            Log.i("sensorresult", String.valueOf(degree));
+            updateCameraBearing(mMap, degree);
+        }
+    };
 }

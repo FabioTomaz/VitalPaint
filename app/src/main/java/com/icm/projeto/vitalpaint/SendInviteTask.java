@@ -30,7 +30,7 @@ public class SendInviteTask extends AsyncTask<String ,Void,Void>{
     protected Void doInBackground(String... params) {
             final String senderEmail = params[0];
             final String friendEmail = params[1];
-            DatabaseReference dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(UserDataManager.encodeUserEmail(friendEmail)).child("tokenID");
+            DatabaseReference dbData = FirebaseDatabase.getInstance().getReference().child("Users").child(UserDataManager.encodeUserEmail(friendEmail)).child("name");
             dbData.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
