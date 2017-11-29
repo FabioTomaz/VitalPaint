@@ -1,5 +1,7 @@
 package com.icm.projeto.vitalpaint;
 
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -57,6 +59,7 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
     private Handler handler;
     private Runnable myRunnable;
     private Timer timer;
+    private Context context;
 
     List<String> blueTeamPlayers;
     List<String> redTeamPlayers;
@@ -103,6 +106,7 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
         lobbyLongt = getIntent().getDoubleExtra("lobbyLongt", 0.0);
         //duration = new Period(startDate, endDate);
         this.setTitle(gameName);
+        context = this.getBaseContext();
         coordinates = new HashMap<>();
         coordinates.put("lat", 0.0);
         coordinates.put("longt", 0.0);
@@ -300,17 +304,26 @@ public class LobbyTeamActivity extends AppCompatActivity implements UserDataMana
                 finish();
                 LobbyTeamActivity.this.runOnUiThread(new Runnable() {
                     public void run() {
-                        Intent intent = new Intent(LobbyTeamActivity.this, GameMapActivity.class);
-                        Log.i("myteam", myTeam+"");
-                        intent.putExtra("myTeam", myTeam);
-                        intent.putExtra("gameName", gameName);
-                        intent.putExtra("userName", loggedUserName);
-                        intent.putExtra("startDate", startDate);
-                        intent.putExtra("zone", city);
-                        intent.putExtra("radius", radius);
-                        if (gameMode == GameMode.TEAMVSTEAM)
-                            intent.putExtra("gameMode", GameMode.TEAMVSTEAM.toString() );
-                        startActivity(intent);
+                        if (blueAdapter.getCount() > 0 && redAdapter.getCount() > 0) {
+                            Intent intent = new Intent(LobbyTeamActivity.this, GameMapActivity.class);
+                            Log.i("myteam", myTeam + "");
+                            intent.putExtra("myTeam", myTeam);
+                            intent.putExtra("gameName", gameName);
+                            intent.putExtra("userName", loggedUserName);
+                            intent.putExtra("startDate", startDate);
+                            intent.putExtra("zone", city);
+                            intent.putExtra("radius", radius);
+                            if (gameMode == GameMode.TEAMVSTEAM)
+                                intent.putExtra("gameMode", GameMode.TEAMVSTEAM.toString());
+                            startActivity(intent);
+                        }
+                        else {
+                            AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                            alert.setTitle(getResources().getString(R.string.invalidDateWarning));
+                            alert.setMessage(getResources().getString(R.string.invalidDateWarningDetail));
+                            alert.setPositiveButton("OK", null);
+                            alert.show();
+                        }
                     }
                 });
             }

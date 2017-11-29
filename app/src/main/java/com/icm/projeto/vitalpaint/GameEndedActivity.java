@@ -218,6 +218,8 @@ public class GameEndedActivity extends AppCompatActivity{
         if (winningTeam.equals(myTeam)) {
             result = GamePlayed.RESULT.WON;
         }
+
+
         else {
             result = GamePlayed.RESULT.LOST;
         }

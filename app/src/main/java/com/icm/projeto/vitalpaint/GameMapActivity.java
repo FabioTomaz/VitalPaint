@@ -214,10 +214,10 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 if ( allDead==true ){
                     dbRef.child(myTeam).removeEventListener(this);
                     if(myTeam.equals("Equipa Vermelha")){
-                        finishGame("Equipa Vermelha", "Equipa Vermelha");
+                        finishGame("Equipa Azul", "Equipa Vermelha");
                         return;
                     } else{
-                        finishGame("Equipa Azul", "Equipa Azul");
+                        finishGame("Equipa Vermelha", "Equipa Azul");
                         return;
                     }
                 }
@@ -229,6 +229,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                             LatLng coord = new LatLng(lat, longt);
                             if(!lastestPlayerMarkers.containsKey(data.getKey())){
                                 Marker playerMarker;
+                                Log.i("teatest", myTeam.equals("Equipa Vermelha")+"");
                                 if(myTeam.equals("Equipa Vermelha")){
                                     playerMarker = mMap.addMarker(new MarkerOptions()
                                             .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_red_pointer))
@@ -276,10 +277,10 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 if ( allDead==true ){
                     dbRef.child(enemyTeam).removeEventListener(this);
                     if(myTeam.equals("Equipa Vermelha")){
-                        finishGame("Equipa Azul", "Equipa Vermelha");
+                        finishGame("Equipa Vermelha", "Equipa Vermelha");
                         return;
                     } else{
-                        finishGame("Equipa Vermelha", "Equipa Azul");
+                        finishGame("Equipa Azul", "Equipa Azul");
                         return;
                     }
                 }
@@ -296,6 +297,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                         if( mLastLocation!= null && enemyLocation.distanceTo(mLastLocation)<METERSTOSEEENEMIES) {
                             if (!lastestPlayerMarkers.containsKey(data.getKey())) {
                                 Marker playerMarker;
+                                Log.i("teatest", myTeam.equals("Equipa Vermelha")+"");
                                 if (enemyTeam.equals("Equipa Vermelha")) {
                                     playerMarker = mMap.addMarker(new MarkerOptions()
                                             .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_red_pointer))
