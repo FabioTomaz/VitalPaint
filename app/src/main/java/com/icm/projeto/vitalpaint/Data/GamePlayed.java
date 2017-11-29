@@ -1,22 +1,26 @@
 package com.icm.projeto.vitalpaint.Data;
 
-import org.joda.time.DateTime;
-import org.joda.time.LocalTime;
-
-import java.util.Date;
-
 /**
  * Created by young on 27/11/2017.
  */
 
 public class GamePlayed {
     public static enum RESULT{
-        WON, LOST, DRAW
+        WON, LOST
     }
     private RESULT gameResult;
-    private DateTime startDate;
+    private String startDate;
     private GameMode gameMode;
-    private LocalTime time;
+    private int time;
+    private String city;
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
 
     public RESULT getGameResult() {
         return gameResult;
@@ -26,11 +30,11 @@ public class GamePlayed {
         this.gameResult = gameResult;
     }
 
-    public DateTime getStartDate() {
+    public String getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(DateTime startDate) {
+    public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
 
@@ -42,18 +46,18 @@ public class GamePlayed {
         this.gameMode = gameMode;
     }
 
-    public LocalTime getTime() {
+    public int getTime() {
         return time;
     }
 
-    public void setTime(LocalTime time) {
+    public void setTime(int time) {
         this.time = time;
     }
 
-    public GamePlayed(RESULT gameResult, DateTime startDate, GameMode gameMode, LocalTime time) {
+    public GamePlayed(RESULT gameResult, String startDate, int time, String city) {
         this.gameResult = gameResult;
         this.startDate = startDate;
-        this.gameMode = gameMode;
         this.time = time;
+        this.city = city;
     }
 }
