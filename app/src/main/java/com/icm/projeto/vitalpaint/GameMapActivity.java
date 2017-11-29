@@ -430,8 +430,8 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
 
     @Override
     protected void onPause() {
-
         super.onPause();
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
     }
 
     @Override

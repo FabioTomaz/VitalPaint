@@ -203,7 +203,6 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
             List<PieEntry> entries = new ArrayList<>();
 
             entries.add(new PieEntry(user.getnVictories(), "Vitorias"));
-            entries.add(new PieEntry(user.getnDraws(), "Empates"));
             entries.add(new PieEntry(user.getnLosses(), "Derrotas"));
 
             PieDataSet set = new PieDataSet(entries, "Resultados dos Jogos");
