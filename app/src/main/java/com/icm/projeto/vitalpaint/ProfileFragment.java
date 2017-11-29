@@ -9,11 +9,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.text.InputType;
 import android.util.Log;
@@ -28,6 +30,8 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
@@ -211,11 +215,46 @@ public class ProfileFragment extends Fragment implements UserDataManager.UserDat
             pieChart.setData(data);
             pieChart.invalidate(); // refresh
             pieChart.animateY(600, Easing.EasingOption.EaseInOutQuad);
-
-            if (headerPic != null)
-                headerImageView.setImageBitmap(headerPic);
-            if (profilePic != null)
-                profileImageView.setImageBitmap(profilePic);
+            FirebaseStorage.getInstance().getReference("User Profile Photos/" + userEmail + "/headerPic").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    Drawable drawable = ContextCompat.getDrawable(getActivity(), R.drawable.imagem_capa);
+                    RequestOptions options = new RequestOptions()
+                            .error(drawable);
+                    Glide.with(getContext())
+                            .load(uri)
+                            .apply(options)
+                            .into(headerImageView);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    Drawable drawable = ContextCompat.getDrawable(getActivity(),R.drawable.imagem_capa);
+                    Glide.with(getContext())
+                            .load(drawable)
+                            .into(headerImageView);
+                }
+            });;
+            FirebaseStorage.getInstance().getReference("User Profile Photos/" + userEmail + "/profilePic").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    Drawable drawable = ContextCompat.getDrawable(getActivity(), R.drawable.imagem_perfil);
+                    RequestOptions options = new RequestOptions()
+                            .error(drawable);
+                    Glide.with(getContext())
+                            .load(uri)
+                            .apply(options)
+                            .into(profileImageView);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    Drawable drawable = ContextCompat.getDrawable(getActivity(),R.drawable.imagem_perfil);
+                    Glide.with(getContext())
+                            .load(drawable)
+                            .into(profileImageView);
+                }
+            });;
             if(FirebaseAuth.getInstance().getCurrentUser().getEmail()==userEmail) {
                 Snackbar snackbar = Snackbar
                         .make(getView(), "Podes alterar a tua biografia, foto de perfil e foto de capa clicando neles.", Snackbar.LENGTH_LONG);
