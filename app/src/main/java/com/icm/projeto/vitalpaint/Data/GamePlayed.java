@@ -69,9 +69,10 @@ public class GamePlayed {
         this.time = time;
     }
 
-    public GamePlayed(RESULT gameResult, String startDate, int time, String city) {
+    public GamePlayed(RESULT gameResult, String startDate, GameMode gameMode, int time, String city) {
         this.gameResult = gameResult;
         this.startDate = startDate;
+        this.gameMode = gameMode;
         this.time = time;
         this.city = city;
     }

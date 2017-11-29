@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -81,8 +80,6 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     private LinearLayout endGame;
     private int scoreBlue;
     private int scoreRed;
-    private int count;
-    private TextView textGameTime;
     private GameMode gameMode;
 
     @Override
@@ -107,18 +104,16 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         startDate = getIntent().getStringExtra("startDate");
         zone = getIntent().getStringExtra("zone");
         //Log.i("gamemode", getIntent().getStringExtra("gameMode")+"");
-        //gameMode = GameMode.valueOf(getIntent().getStringExtra("gameMode")); //obter  a string do enum e converter para enum
+        gameMode = GameMode.valueOf(getIntent().getStringExtra("gameMode")); //obter  a string do enum e converter para enum
         userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
         btnGotKilled = (Button) findViewById(R.id.got_killed);
         endGame = (LinearLayout) findViewById(R.id.endGame);
         dbRef = FirebaseDatabase.getInstance().getReference("Games").child(gameName);
-        textGameTime = (TextView) findViewById(R.id.textGameTime);
         Log.i("myTeam", myTeam+"");
         if (myTeam.equals("Equipa Azul"))
             enemyTeam = "Equipa Vermelha";
         else
             enemyTeam = "Equipa Azul";
-        count = 0;
         /*Timer T=new Timer();
         T.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -164,7 +159,6 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 TimeUnit.MILLISECONDS.toHours(milliSeconds),
                 TimeUnit.MILLISECONDS.toMinutes(milliSeconds) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(milliSeconds)),
                 TimeUnit.MILLISECONDS.toSeconds(milliSeconds) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliSeconds)));
-
         return hms;
     }
 
@@ -218,12 +212,13 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 }
                 //Senao houver ninguem vivo na capa chamar a funçao que termina a partida
                 if ( allDead==true ){
+                    dbRef.child(myTeam).removeEventListener(this);
                     if(myTeam.equals("Equipa Vermelha")){
-                        redTeamLost = true;
-                        finishGame("Equipa Azul", "Equipa Vermelha");
+                        finishGame("Equipa Vermelha", "Equipa Vermelha");
+                        return;
                     } else{
-                        blueTeamLost = true;
-                        finishGame("Equipa Vermelha", "Equipa Azul");
+                        finishGame("Equipa Azul", "Equipa Azul");
+                        return;
                     }
                 }
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
@@ -279,12 +274,13 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 }
                 //Senao houver ninguem vivo na capa chamar a funçao que termina a partida
                 if ( allDead==true ){
+                    dbRef.child(enemyTeam).removeEventListener(this);
                     if(myTeam.equals("Equipa Vermelha")){
-                        redTeamLost = true;
                         finishGame("Equipa Azul", "Equipa Vermelha");
+                        return;
                     } else{
-                        blueTeamLost = true;
                         finishGame("Equipa Vermelha", "Equipa Azul");
+                        return;
                     }
                 }
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
@@ -300,7 +296,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                         if( mLastLocation!= null && enemyLocation.distanceTo(mLastLocation)<METERSTOSEEENEMIES) {
                             if (!lastestPlayerMarkers.containsKey(data.getKey())) {
                                 Marker playerMarker;
-                                if (enemyTeam == "Equipa Vermelha") {
+                                if (enemyTeam.equals("Equipa Vermelha")) {
                                     playerMarker = mMap.addMarker(new MarkerOptions()
                                             .position(coord).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_red_pointer))
                                             .title(data.getKey()));
@@ -341,6 +337,68 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     @Override
     protected void onResume() {
         super.onResume();
+        initSensors();
+    }
+
+    private SensorEventListener mSensorEventListener = new SensorEventListener() {
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            float[] mGravity = null;
+            float[] mGeomagnetic=null;
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+                mGravity = event.values;
+            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+                mGeomagnetic = event.values;
+            if (mGravity != null && mGeomagnetic != null) {
+                float R[] = new float[9];
+                float I[] = new float[9];
+                boolean success = SensorManager.getRotationMatrix(R, I, mGravity,
+                        mGeomagnetic);
+                if (success) {
+                    float orientation[] = new float[3];
+                    SensorManager.getOrientation(R, orientation);
+                    int azimut = (int) Math.round(Math.toDegrees(orientation[0]));
+                    float azimuthInRadians = orientation[0];
+                    float azimuthInDegress = (float)((Math.toDegrees(azimuthInRadians)+360)%360);
+                    Log.i("AZIMUTHH", String.valueOf(azimuthInDegress));
+                    updateCameraBearing(mMap, azimuthInDegress);
+                }
+            }
+        }
+    };
+
+    /**
+     * Initialize the Sensors (Gravity and magnetic field, required as a compass
+     * sensor)
+     */
+    private void initSensors() {
+        String TAG= "SENSORS";
+        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        Sensor mSensorGravity = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        Sensor mSensorMagneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+    /* Initialize the gravity sensor */
+        if (mSensorGravity != null) {
+            Log.i(TAG, "Gravity sensor available. (TYPE_GRAVITY)");
+            sensorManager.registerListener(mSensorEventListener,
+                    mSensorGravity, SensorManager.SENSOR_DELAY_GAME);
+        } else {
+            Log.i(TAG, "Gravity sensor unavailable. (TYPE_GRAVITY)");
+        }
+
+    /* Initialize the magnetic field sensor */
+        if (mSensorMagneticField != null) {
+            Log.i(TAG, "Magnetic field sensor available. (TYPE_MAGNETIC_FIELD)");
+            sensorManager.registerListener(mSensorEventListener,
+                    mSensorMagneticField, SensorManager.SENSOR_DELAY_GAME);
+        } else {
+            Log.i(TAG,
+                    "Magnetic field sensor unavailable. (TYPE_MAGNETIC_FIELD)");
+        }
     }
 
     @Override
@@ -500,7 +558,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         intent.putExtra("startDate", startDate);
         intent.putExtra("zone", zone);
         intent.putExtra("gameName", gameName);
-        //intent.putExtra("gameMode", gameMode);
+        intent.putExtra("gameMode", gameMode.toString());
         startActivity(intent);
         finish();
     }
