@@ -73,6 +73,7 @@ public class GameEndedActivity extends AppCompatActivity{
         winnerTeamtxt = (TextView) findViewById(R.id.winner_team_txt);
         winnerLayout = (LinearLayout) findViewById(R.id.winnerlayout);
         winnerTeamtxt.setText("A " + winningTeam + " Ganhou!");
+        replayButton = (Button) findViewById(R.id.replayButton);
         if (winningTeam.equals("Equipa Azul"))
             winnerLayout.setBackgroundColor(getResources().getColor(R.color.blueTeamColor));
         else
@@ -158,7 +159,7 @@ public class GameEndedActivity extends AppCompatActivity{
             }
         });
 
-        dbRef.child("Equipa Vermelha").addListenerForSingleValueEvent(new ValueEventListener() {
+        dbRef.child("Equipa Azul").addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -166,10 +167,10 @@ public class GameEndedActivity extends AppCompatActivity{
                 blueAdapter.clear();
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     if (!data.getKey().equals("score")) {
-                        redAdapter.add(data.child("name").getValue());
+                        blueAdapter.add(data.child("name").getValue());
                     }
                 }
-                redAdapter.notifyDataSetChanged();
+                blueAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -188,7 +189,7 @@ public class GameEndedActivity extends AppCompatActivity{
                     if (winningTeam.equals(myTeam)) {
                         int score = 0;
                         if (data.child("nVictories").getValue(Integer.class) != null)
-                              score = data.child("nVictories").getValue(Integer.class);
+                            score = data.child("nVictories").getValue(Integer.class);
                         score++;
                         userDbRef.child(userEncEmail).child("nVictories").setValue(score);
                     }
@@ -223,7 +224,7 @@ public class GameEndedActivity extends AppCompatActivity{
         userDbRef.child(userEncEmail).push().setValue(new GamePlayed(result, startDate, gameMode, time ,zone));
 
         //apagar o no do jogo
-        dbRef.setValue(null);
+        //dbRef.setValue(null);
     }
 
 }
