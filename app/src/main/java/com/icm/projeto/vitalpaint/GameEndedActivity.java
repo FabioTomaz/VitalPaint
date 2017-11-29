@@ -91,6 +91,7 @@ public class GameEndedActivity extends AppCompatActivity{
                 startActivity(intent);
             }
         });
+        replayButton = (Button) findViewById(R.id.replayButton);
         replayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -106,7 +107,7 @@ public class GameEndedActivity extends AppCompatActivity{
                 startActivity(intent);
             }
         });
-        replayButton = (Button) findViewById(R.id.replayButton);
+
         blueAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, new ArrayList<String>());
         redAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, new ArrayList<String>());
         blueTeamListView.setAdapter(blueAdapter);
@@ -117,7 +118,6 @@ public class GameEndedActivity extends AppCompatActivity{
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         userEncEmail = UserDataManager.encodeUserEmail(user.getEmail());
         dbRef = FirebaseDatabase.getInstance().getReference("Games").child(gameName);
-        userDbRef = FirebaseDatabase.getInstance().getReference("Users");
         dbRef.child("Equipa Azul").addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
@@ -158,26 +158,7 @@ public class GameEndedActivity extends AppCompatActivity{
             }
         });
 
-        dbRef.child("Equipa Vermelha").addListenerForSingleValueEvent(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List<String> users = new ArrayList<>();
-                blueAdapter.clear();
-                for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    if (!data.getKey().equals("score")) {
-                        redAdapter.add(data.child("name").getValue());
-                    }
-                }
-                redAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
+        userDbRef = FirebaseDatabase.getInstance().getReference("Users");
         userDbRef.child(userEncEmail).addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
@@ -220,10 +201,7 @@ public class GameEndedActivity extends AppCompatActivity{
         else {
             result = GamePlayed.RESULT.LOST;
         }
-        userDbRef.child(userEncEmail).push().setValue(new GamePlayed(result, startDate, gameMode, time ,zone));
-
-        //apagar o no do jogo
-        dbRef.setValue(null);
+        userDbRef.child(userEncEmail).child("gamesPlayed").push().setValue(new GamePlayed(result, startDate, gameMode, time ,zone));
     }
 
 }

@@ -214,10 +214,10 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 if ( allDead==true ){
                     dbRef.child(myTeam).removeEventListener(this);
                     if(myTeam.equals("Equipa Vermelha")){
-                        finishGame("Equipa Vermelha", "Equipa Vermelha");
+                        finishGame("Equipa Azul", "Equipa Vermelha");
                         return;
                     } else{
-                        finishGame("Equipa Azul", "Equipa Azul");
+                        finishGame("Equipa Vermelha", "Equipa Azul");
                         return;
                     }
                 }
@@ -243,10 +243,6 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                                 lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
                             }
                         }
-                        /*if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING) {
-                            allDead=false;
-                            break;
-                        }*/
                     }
                 }
 
@@ -337,68 +333,6 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
     @Override
     protected void onResume() {
         super.onResume();
-        initSensors();
-    }
-
-    private SensorEventListener mSensorEventListener = new SensorEventListener() {
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        }
-
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            float[] mGravity = null;
-            float[] mGeomagnetic=null;
-            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
-                mGravity = event.values;
-            if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
-                mGeomagnetic = event.values;
-            if (mGravity != null && mGeomagnetic != null) {
-                float R[] = new float[9];
-                float I[] = new float[9];
-                boolean success = SensorManager.getRotationMatrix(R, I, mGravity,
-                        mGeomagnetic);
-                if (success) {
-                    float orientation[] = new float[3];
-                    SensorManager.getOrientation(R, orientation);
-                    int azimut = (int) Math.round(Math.toDegrees(orientation[0]));
-                    float azimuthInRadians = orientation[0];
-                    float azimuthInDegress = (float)((Math.toDegrees(azimuthInRadians)+360)%360);
-                    Log.i("AZIMUTHH", String.valueOf(azimuthInDegress));
-                    updateCameraBearing(mMap, azimuthInDegress);
-                }
-            }
-        }
-    };
-
-    /**
-     * Initialize the Sensors (Gravity and magnetic field, required as a compass
-     * sensor)
-     */
-    private void initSensors() {
-        String TAG= "SENSORS";
-        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        Sensor mSensorGravity = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        Sensor mSensorMagneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-
-    /* Initialize the gravity sensor */
-        if (mSensorGravity != null) {
-            Log.i(TAG, "Gravity sensor available. (TYPE_GRAVITY)");
-            sensorManager.registerListener(mSensorEventListener,
-                    mSensorGravity, SensorManager.SENSOR_DELAY_GAME);
-        } else {
-            Log.i(TAG, "Gravity sensor unavailable. (TYPE_GRAVITY)");
-        }
-
-    /* Initialize the magnetic field sensor */
-        if (mSensorMagneticField != null) {
-            Log.i(TAG, "Magnetic field sensor available. (TYPE_MAGNETIC_FIELD)");
-            sensorManager.registerListener(mSensorEventListener,
-                    mSensorMagneticField, SensorManager.SENSOR_DELAY_GAME);
-        } else {
-            Log.i(TAG,
-                    "Magnetic field sensor unavailable. (TYPE_MAGNETIC_FIELD)");
-        }
     }
 
     @Override
@@ -463,7 +397,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
         dbRef.child(myTeam).child(UserDataManager.encodeUserEmail(userEmail)).child("long").setValue(location.getLongitude());
         if(!lastestPlayerMarkers.containsKey(userEmail)){
             Marker playerMarker;
-            if(myTeam=="Equipa Vermelha"){
+            if(myTeam.equals("Equipa Vermelha")){
                 playerMarker = mMap.addMarker(new MarkerOptions()
                         .position(latLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_red_pointer))
                         .title(userEmail));
@@ -494,6 +428,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
 
     @Override
     protected void onPause() {
+
         super.onPause();
     }
 
