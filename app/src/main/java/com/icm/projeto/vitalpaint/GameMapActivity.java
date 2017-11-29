@@ -211,6 +211,23 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     if (!data.getKey().equals("score")){
                         state = data.child("state").getValue(String.class);
+                        if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING){
+                            allDead = false;
+                        }
+                    }
+                }
+                //Senao houver ninguem vivo na capa chamar a funçao que termina a partida
+                if ( allDead==true ){
+                    if(myTeam.equals("Equipa Vermelha")){
+                        redTeamLost = true;
+                        finishGame("Equipa Azul", "Equipa Vermelha");
+                    } else{
+                        blueTeamLost = true;
+                        finishGame("Equipa Vermelha", "Equipa Azul");
+                    }
+                }
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    if (!data.getKey().equals("score")){
                         if(!data.getKey().equals(UserDataManager.encodeUserEmail(userEmail)) && data.hasChild("lat") && data.hasChild("long")) {
                             lat = data.child("lat").getValue(Double.class);
                             longt = data.child("long").getValue(Double.class);
@@ -231,22 +248,13 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                                 lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
                             }
                         }
-                        if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING) {
+                        /*if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING) {
                             allDead=false;
                             break;
-                        }
+                        }*/
                     }
                 }
-                //Senao houver ninguem vivo na capa chamar a funçao que termina a partida
-                if ( allDead==true ){
-                    if(myTeam.equals("Equipa Vermelha")){
-                        redTeamLost = true;
-                        finishGame("Equipa Azul", "Equipa Vermelha");
-                    } else{
-                        blueTeamLost = true;
-                        finishGame("Equipa Vermelha", "Equipa Azul");
-                    }
-                }
+
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
@@ -261,6 +269,24 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                 double lat;
                 double longt;
                 String state;
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    if (!data.getKey().equals("score")){
+                        state = data.child("state").getValue(String.class);
+                        if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING){
+                            allDead = false;
+                        }
+                    }
+                }
+                //Senao houver ninguem vivo na capa chamar a funçao que termina a partida
+                if ( allDead==true ){
+                    if(myTeam.equals("Equipa Vermelha")){
+                        redTeamLost = true;
+                        finishGame("Equipa Azul", "Equipa Vermelha");
+                    } else{
+                        blueTeamLost = true;
+                        finishGame("Equipa Vermelha", "Equipa Azul");
+                    }
+                }
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     if (!data.getKey().equals("score") && !data.getKey().equals(UserDataManager.encodeUserEmail(userEmail)) && data.hasChild("lat") && data.hasChild("long")) {
                         lat = data.child("lat").getValue(Double.class);
@@ -294,16 +320,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                         }
                     }
                 }
-                //Senao houver ninguem vivo na capa chamar a funçao que termina a partida
-                if ( allDead==true ){
-                    if(myTeam.equals("Equipa Vermelha")){
-                        redTeamLost = true;
-                        finishGame("Equipa Azul", "Equipa Vermelha");
-                    } else{
-                        blueTeamLost = true;
-                        finishGame("Equipa Vermelha", "Equipa Azul");
-                    }
-                }
+
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
