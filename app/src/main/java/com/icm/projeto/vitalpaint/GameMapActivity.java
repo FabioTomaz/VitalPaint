@@ -137,13 +137,13 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                                 FirebaseDatabase.getInstance().getReference().child("Games").child(gameName).child(myTeam)
                                         .child(UserDataManager.encodeUserEmail(userEmail)).child("state")
                                         .setValue(LobbyTeamActivity.PLAYERSTATE.DEAD);
+                                Marker marker = lastestPlayerMarkers.get(user.getEmail());
+                                marker.remove();
+                                lastestPlayerMarkers.remove(UserDataManager.encodeUserEmail(user.getEmail()));
+                                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, (com.google.android.gms.location.LocationListener) GameMapActivity.this);
+
                             }
                         }).show();
-
-                Marker marker = lastestPlayerMarkers.get(user.getEmail());
-                marker.remove();
-                lastestPlayerMarkers.remove(UserDataManager.encodeUserEmail(user.getEmail()));
-                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, (com.google.android.gms.location.LocationListener) GameMapActivity.this);
             }
         });
 
