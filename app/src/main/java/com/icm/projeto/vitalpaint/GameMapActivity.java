@@ -240,6 +240,7 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
                                 if (LobbyTeamActivity.PLAYERSTATE.valueOf(state) == LobbyTeamActivity.PLAYERSTATE.PLAYING)
                                     lastestPlayerMarkers.get(data.getKey()).setPosition(coord);
                                 else{
+                                    //se o jogador estiver morto, nao incluir o seu marcador no mapa
                                     Marker marker = lastestPlayerMarkers.get(user.getEmail());
                                     if(marker != null){
                                         marker.remove();
@@ -440,8 +441,8 @@ public class GameMapActivity extends FragmentActivity implements OnMapReadyCallb
 
     @Override
     protected void onPause() {
-
         super.onPause();
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
     }
 
     @Override

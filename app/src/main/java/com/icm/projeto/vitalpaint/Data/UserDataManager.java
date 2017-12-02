@@ -4,7 +4,6 @@ package com.icm.projeto.vitalpaint.Data;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -77,6 +76,7 @@ public class UserDataManager  implements Serializable, Parcelable{
                     userData.setSHORTBIO(snapshot.child("shortbio").getValue(String.class));
                     userData.setnMatchPlayed(snapshot.child("nMatchPlayed").getValue(Integer.class));
                     userData.setnVictories(snapshot.child("nVictories").getValue(Integer.class));
+                    userData.setnLosses(snapshot.child("nLosses").getValue(Integer.class));
                     final UserData finalUserData = userData;
 
                     StorageReference storageRef = FirebaseStorage.getInstance().getReference("User Profile Photos/" + email + "/profilePic");
